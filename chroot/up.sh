@@ -11,6 +11,19 @@ BASE_ARCH_IMAGE="${SCRIPT_DIR}/../images/archlinux-pinephone-barebone-20230203.i
 CHROOT_ARCH_IMAGE="${SCRIPT_DIR}/../images/archlinux-pinephone-chroot.img"
 CHROOT_DIR="${SCRIPT_DIR}/.chroot"
 
+if [ ! -f "${BASE_ARCH_IMAGE}" ]
+then
+  log_red "No Arch image found!"
+  read -p "Do you want to download images now? [Y/n]: " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Nn]$ ]]
+  then
+    exit 1
+  fi
+
+  "${SCRIPT_DIR}"/../images/download.sh
+fi
+
 if "${SCRIPT_DIR}"/is-up.sh
 then
   log_red "Chroot is already up!"
@@ -23,7 +36,7 @@ if [ -f "${CHROOT_ARCH_IMAGE}" ]
 then
   log_blue "Skipping copy"
 else
-  log_blue "Making copy of arch image"
+  log_blue "Making copy of Arch image"
   FIRST_SETUP="true"
   cp "${BASE_ARCH_IMAGE}" "${CHROOT_ARCH_IMAGE}"
 fi
@@ -40,13 +53,9 @@ sudo mount "${LOOP_DEV}p2" "${CHROOT_DIR}"
 if [[ "${FIRST_SETUP}" == "true" ]]
 then
   log_blue "Running first time setup"
-  sudo arch-chroot "${CHROOT_DIR}" /bin/bash << EOF
-pacman-key --init
-pacman-key --populate archlinuxarm
-
-pacman -Syu --noconfirm
-pacman -S --needed --noconfirm base-devel
-EOF
+  sudo cp "${SCRIPT_DIR}/setup.sh" "${CHROOT_DIR}/root/setup.sh"
+  sudo arch-chroot "${CHROOT_DIR}" /root/setup.sh
+  sudo mount --bind "${SCRIPT_DIR}/../" "${CHROOT_DIR}/opt/build/"
 else
   log_blue "Skipping first time setup"
 fi

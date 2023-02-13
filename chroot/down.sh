@@ -17,5 +17,6 @@ fi
 LOOP_DEV=$(sudo losetup --associated "${CHROOT_ARCH_IMAGE}" | cut -d':' -f1)
 
 log_blue "Destroying loop device"
+sudo umount -d "${CHROOT_DIR}/opt/build/"
 sudo umount -d "${CHROOT_DIR}"
 sudo losetup -d "${LOOP_DEV}"

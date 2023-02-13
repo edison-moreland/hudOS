@@ -1,0 +1,35 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@rules_foreign_cc//toolchains/native_tools:native_tools_toolchain.bzl", "native_tool_toolchain")
+load("//third_party/tools:wayland_scanner_build.bzl", "current_wayland_scanner_toolchain", "wayland_scanner_tool")
+
+package(default_visibility = ["//visibility:public"])
+
+toolchain_type(
+    name = "wayland_scanner_toolchain",
+)
+
+current_wayland_scanner_toolchain(
+    name = "current_wayland_scanner_toolchain",
+)
+
+wayland_scanner_tool(
+    name = "wayland_scanner_tool",
+    srcs = "@wayland_tool//:all_srcs",
+    tags = ["manual"],
+)
+
+native_tool_toolchain(
+    name = "built_wayland_scanner",
+    env = {
+        "PKG_CONFIG_PATH": "$(execpath :wayland_scanner_tool)/lib/pkgconfig/",
+        "BUILD.PKG_CONFIG_PATH": "$(execpath :wayland_scanner_tool)/lib/pkgconfig/",
+    },
+    path = "$(location :wayland_scanner_tool)/bin/wayland-scanner",
+    target = ":wayland_scanner_tool",
+)
+
+toolchain(
+    name = "built_wayland_scanner_toolchain",
+    toolchain = ":built_wayland_scanner",
+    toolchain_type = ":wayland_scanner_toolchain",
+)
