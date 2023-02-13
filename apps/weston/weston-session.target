@@ -1,0 +1,8 @@
+[Unit]
+Description=Weston, HUD Compositor
+Documentation=man:weston(1) man:weston.ini(5)
+Documentation=https://wayland.freedesktop.org/
+
+[Install]
+WantedBy=default.target
+Also=weston.service weston.socket

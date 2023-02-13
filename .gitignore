@@ -1,0 +1,7 @@
+bazel-bin
+bazel-hudos
+bazel-out
+bazel-testlogs
+.deploy/
+.ijwb/
+.idea/

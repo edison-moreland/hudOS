@@ -1,0 +1,14 @@
+[Unit]
+Description={app}, a HUD Application
+
+# Start after weston
+After=weston.service
+Wants=weston.service
+
+[Service]
+Type=simple
+ExecStart={prefix}/bin/{app}_arm
+Restart=always
+
+[Install]
+WantedBy=weston-session.target

@@ -1,0 +1,31 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "meson")
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+meson(
+    name = "wayland",
+    lib_source = ":all_srcs",
+    build_data = [
+        "@com_github_edison_moreland_nreal_hud//third_party:meson_cross.txt"
+    ],
+    env = {
+        "CROSSFILE": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @com_github_edison_moreland_nreal_hud//third_party:meson_cross.txt))/meson_cross.txt"
+    },
+    setup_args = [
+        "--cross-file=$CROSSFILE"
+    ],
+    options = {
+        "libraries": "false",
+        "scanner": "true",
+        "tests": "false",
+        "documentation": "false",
+        "dtd_validation": "false",
+    },
+    visibility = ["//visibility:public"],
+    deps = [
+        "@libffi",
+    ]
+)

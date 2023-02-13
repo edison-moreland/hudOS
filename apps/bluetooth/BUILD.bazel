@@ -1,0 +1,26 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("//app_rules/go:go.bzl", "hudapp_go")
+
+go_library(
+    name = "bluetooth_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/edison-moreland/nreal_hud/apps/bluetooth",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@com_github_go_ble_ble//:ble",
+        "@com_github_go_ble_ble//examples/lib/dev",
+        "@com_github_pkg_errors//:errors",
+    ],
+)
+
+hudapp_go(
+    app = "bluetooth",
+    embed = [":bluetooth_lib"],
+    setcap = "cap_net_raw,cap_net_admin+eip",
+)
+
+go_binary(
+    name = "bluetooth",
+    embed = [":bluetooth_lib"],
+    visibility = ["//visibility:public"],
+)

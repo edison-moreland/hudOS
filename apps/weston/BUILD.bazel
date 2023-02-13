@@ -1,0 +1,25 @@
+load("//app_rules:app.bzl", "hudapp")
+
+exports_files([
+    "weston.service",
+    "weston.socket",
+    "weston-session.target",
+    "001-weston.sh",
+    "weston.ini",
+])
+
+hudapp(
+    app = "weston",
+    binaries = [],
+    configs = [
+        ":weston.ini",
+    ],
+    post_deploy = [
+        ":001-weston.sh",
+    ],
+    systemd_units = [
+        ":weston-session.target",
+        ":weston.service",
+        ":weston.socket",
+    ],
+)

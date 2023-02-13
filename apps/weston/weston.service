@@ -1,0 +1,20 @@
+[Unit]
+Description=Weston, a Wayland compositor, as a user service
+Documentation=man:weston(1) man:weston.ini(5)
+Documentation=https://wayland.freedesktop.org/
+
+# Activate using a systemd socket
+Requires=weston.socket
+After=weston.socket
+
+PartOf=weston-session.target
+
+[Service]
+Type=notify
+TimeoutStartSec=60
+WatchdogSec=20
+ExecStart=/usr/bin/weston --config="/opt/hud/.config/weston.ini" --modules=systemd-notify.so
+Restart=always
+
+[Install]
+WantedBy=weston-session.target

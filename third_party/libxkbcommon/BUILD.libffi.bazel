@@ -1,0 +1,33 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+# TODO: Support compiling from
+configure_make(
+    name = "libffi",
+    lib_source = ":all_srcs",
+    configure_in_place = True,
+    configure_options = [
+        "--disable-docs",
+        "--build=x86_64-linux-gnu",
+        "--target=aarch64-linux-gnu",
+        "--host=aarch64-linux-gnu",
+        "--disable-multi-os-directory",
+    ],
+    out_shared_libs = [
+        "libffi.so",
+        "libffi.so.8",
+        "libffi.so.8.1.2",
+    ],
+    out_static_libs = [
+        "libffi.a",
+    ],
+    visibility = ["//visibility:public"],
+    target_compatible_with = [
+        "@platforms//cpu:aarch64",
+        "@platforms//os:linux"
+    ],
+)

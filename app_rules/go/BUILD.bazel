@@ -1,0 +1,4 @@
+exports_files([
+    "template.service",
+    "post_deploy.sh",
+])
