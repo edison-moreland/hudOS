@@ -3,39 +3,7 @@ Experimental PinePhone distro to provide a heads-up display using the Nreal Air.
 
 This is very much a work in progress and not ready to be used.
 
-# Syncing go deps with bazel 
-```
-go mod tidy
-bazel run //:gazelle
-bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%go_dependencies
-bazel run //:gazelle
-```
-
-# Debugging notes
-Restart HUD
-```bash
-sudo loginctl terminate-user hud
-```
-
-Service logs
-```bash
-sudo journalctl _SYSTEMD_USER_UNIT=hud_bluetooth.service
-```
-
-# Documentation
-- Tow-boot
-    - https://tow-boot.org/devices/pine64-pinephoneA64.html
-- Arm Arch
-    - https://github.com/dreemurrs-embedded/Pine64-Arch
-    - NetworkManager
-        - https://wiki.archlinux.org/title/NetworkManager
-- Weston 
-    - https://wayland.pages.freedesktop.org/weston/toc/running-weston.html
-    - https://wiki.archlinux.org/title/Weston
-
-
 # Phone setup
-TODO: Add bits about updating ANX/Modem firmware?
 NOTE: Setup was built on x86_64 Manjaro, running anywhere else might cause problems. 
 
 1. Download images
@@ -64,6 +32,37 @@ NOTE: Setup was built on x86_64 Manjaro, running anywhere else might cause probl
         - You'll be asked to input a password several times, use `123456`.
         - Encrypting the SSH key is optional.
         - `./provision.sh <pinephone_ip>`
-5. Deploying the HUD
+6. Deploying the HUD
     1. Run the deploy script.
         - `./deploy.sh <pinephone_ip>`
+
+# Notes
+## Documentation
+- Tow-boot
+    - https://tow-boot.org/devices/pine64-pinephoneA64.html
+- Arm Arch
+    - https://github.com/dreemurrs-embedded/Pine64-Arch
+    - NetworkManager
+        - https://wiki.archlinux.org/title/NetworkManager
+- Weston
+    - https://wayland.pages.freedesktop.org/weston/toc/running-weston.html
+    - https://wiki.archlinux.org/title/Weston
+
+
+## Syncing go deps with bazel
+```
+go mod tidy
+bazel run //:gazelle
+bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%go_dependencies
+bazel run //:gazelle
+```
+
+## Restart HUD
+```bash
+sudo loginctl terminate-user hud
+```
+
+## App logs
+```bash
+sudo journalctl _SYSTEMD_USER_UNIT=hud_<appname>.service
+```
