@@ -29,7 +29,7 @@ fi
 
 log_blue "Installing SSH key"
 # shellcheck disable=SC2029
-ssh "${PINEPHONE_ALARM_SSH}" "${PROVISION_SCRIPTS}/install_ssh_key.sh $(base64 < "${DEPLOY_SSH_KEY_PUB}")"
+ssh "${PINEPHONE_ALARM_SSH}" "${PROVISION_SCRIPTS}/install_ssh_key.sh $(base64 -w0 < "${DEPLOY_SSH_KEY_PUB}")"
 
 log_blue "Installing Weston"
 ssh -i "${DEPLOY_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "${PROVISION_SCRIPTS}/install_weston.sh"
