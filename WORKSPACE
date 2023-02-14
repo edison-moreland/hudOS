@@ -66,12 +66,7 @@ load("@bazel-zig-cc//toolchain:defs.bzl", zig_toolchains = "toolchains")
 zig_toolchains()
 
 register_toolchains(
-    "@zig_sdk//toolchain:linux_amd64_gnu.2.19",
-    "@zig_sdk//toolchain:linux_arm64_gnu.2.28",
-    "@zig_sdk//toolchain:darwin_amd64",
-    "@zig_sdk//toolchain:darwin_arm64",
-    "@zig_sdk//toolchain:windows_amd64",
-    "@zig_sdk//toolchain:windows_arm64",
+    "@zig_sdk//toolchain:linux_arm64_gnu.2.34",  # Which version of gnu?
 )
 
 # ForeignCC
@@ -91,7 +86,3 @@ rules_foreign_cc_dependencies(
 load("//third_party:repositories.bzl", "repositories")
 
 repositories()
-
-register_toolchains(
-    "//third_party/tools:built_wayland_scanner_toolchain",
-)

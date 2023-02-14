@@ -2,6 +2,7 @@ bazel-bin
 bazel-hudos
 bazel-out
 bazel-testlogs
+buildroot
 .deploy/
 .ijwb/
 .idea/

@@ -24,12 +24,12 @@ function checksha {
     return 1
   fi
 
-  if [[ $(shasum -a 256 "${TARGET_FILE}" | cut -d' ' -f1) != "${EXPECTED_SHA}" ]]
+  if [[ $(shasum -a 256 "${TARGET_FILE}") != "${EXPECTED_SHA}" ]]
   then
+    return 0
+  else
     return 1
   fi
-
-  return 0
 }
 
 

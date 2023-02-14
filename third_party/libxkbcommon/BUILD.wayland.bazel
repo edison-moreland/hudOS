@@ -9,21 +9,17 @@ meson(
     name = "wayland",
     lib_source = ":all_srcs",
     build_data = [
-        "@com_github_edison_moreland_nreal_hud//third_party:meson_cross.txt",
-        "@com_github_edison_moreland_nreal_hud//third_party/tools:wayland_scanner_tool",
-        "@com_github_edison_moreland_nreal_hud//third_party/tools:wayland_scanner_tool.build",
+        "@com_github_edison_moreland_nreal_hud//third_party:meson_cross.txt"
     ],
     env = {
-        "CROSSFILE": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @com_github_edison_moreland_nreal_hud//third_party:meson_cross.txt))/meson_cross.txt",
-        "WAYLAND_PKG_CONFIG_PATH": "$$(dirname $$EXT_BUILD_ROOT$$/$(execpath @com_github_edison_moreland_nreal_hud//third_party/tools:wayland_scanner_tool))/../wayland_scanner_tool.build/lib/pkgconfig",
+        "CROSSFILE": "$$(dirname $$EXT_BUILD_ROOT$$/$(location @com_github_edison_moreland_nreal_hud//third_party:meson_cross.txt))/meson_cross.txt"
     },
     setup_args = [
-        "--cross-file=$CROSSFILE",
-        "--build.pkg-config-path=$WAYLAND_PKG_CONFIG_PATH"
+        "--cross-file=$CROSSFILE"
     ],
     options = {
-        "libraries": "true",
-        "scanner": "false",
+        "libraries": "false",
+        "scanner": "true",
         "tests": "false",
         "documentation": "false",
         "dtd_validation": "false",
@@ -31,9 +27,5 @@ meson(
     visibility = ["//visibility:public"],
     deps = [
         "@libffi",
-    ],
-    target_compatible_with = [
-        "@platforms//cpu:aarch64",
-        "@platforms//os:linux"
-    ],
+    ]
 )

@@ -1,8 +1,7 @@
 [binaries]
-c = 'zig_cc'
-cpp = 'zig_c++'
-c_ld = 'ld.lld'
-cpp_ld = 'ld.lld'
+c = 'cc'
+cpp = 'c++'
+ar = 'llvm-ar'
 
 [host_machine]
 system = 'linux'
