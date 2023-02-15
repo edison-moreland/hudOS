@@ -65,30 +65,30 @@ pv < "${BUILDROOT_OUTPUT_DIR}/images/rootfs.ext4" > "${LODEV}p2"
 sync
 
 log_blue "Mounting boot partition"
-MNT_ROOT="$(mktemp -d)"
-mount "${LODEV}p1" "${MNT_ROOT}"
-function clean_mnt {
-  log_yellow "Cleaning mount"
-  umount "${MNT_ROOT}"
-  rm -r "${MNT_ROOT}"
+MNT_BOOT="$(mktemp -d)"
+mount "${LODEV}p1" "${MNT_BOOT}"
+function clean_boot {
+  log_yellow "Unmounting boot partition"
+  umount "${MNT_BOOT}"
+  rm -r "${MNT_BOOT}"
   clean_lodev
 }
-trap clean_mnt EXIT
+trap clean_boot EXIT
 
 log_blue "Copying images"
 KERNEL_IMAGE="${BUILDROOT_OUTPUT_DIR}/images/Image.gz"
 INITRAMFS="${BUILDROOT_OUTPUT_DIR}/images/rootfs.cpio"
 DEVICE_TREE="${BUILDROOT_OUTPUT_DIR}/images/sun50i-a64-pinephone-1.2.dtb"
 
-cp "${KERNEL_IMAGE}" "${MNT_ROOT}/"
-cp "${INITRAMFS}" "${MNT_ROOT}/initramfs-linux.img"
-mkdir -p "${MNT_ROOT}/dtbs/allwinner/"
-cp "${DEVICE_TREE}" "${MNT_ROOT}/dtbs/allwinner/"
-
+cp "${KERNEL_IMAGE}" "${MNT_BOOT}/"
+cp "${INITRAMFS}" "${MNT_BOOT}/initramfs-linux.img"
+mkdir -p "${MNT_BOOT}/dtbs/allwinner/"
+cp "${DEVICE_TREE}" "${MNT_BOOT}/dtbs/allwinner/"
 
 log_blue "Generating boot script"
-"${BUILDROOT_OUTPUT_DIR}"/host/bin/mkimage -A arm -O linux -T script -C none -n "U-Boot boot script" -d "${SCRIPT_DIR}/boot.txt" "${MNT_ROOT}/boot.scr"
+"${BUILDROOT_OUTPUT_DIR}"/host/bin/mkimage -A arm -O linux -T script -C none -n "U-Boot boot script" -d "${SCRIPT_DIR}/boot.txt" "${MNT_BOOT}/boot.scr"
 
+log_blue "Finalizing!"
 chown "${REALUSER}":"${REALUSER}" "${OUTPUT_IMAGE}"
 
 # Fix fstab
