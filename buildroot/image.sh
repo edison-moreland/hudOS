@@ -17,7 +17,7 @@ else
 fi
 
 BUILDROOT_DIR="${SCRIPT_DIR}/.buildroot"
-BUILDROOT_OUTPUT_DIR="${BUILDROOT_DIR}/output/images"
+BUILDROOT_OUTPUT_DIR="${BUILDROOT_DIR}/output"
 
 if [ ! -d "${BUILDROOT_DIR}" ]
 then
@@ -32,7 +32,7 @@ then
 fi
 
 OUTPUT_IMAGE="${SCRIPT_DIR}/hudOS.img"
-OUTPUT_IMAGE_MB="500"
+OUTPUT_IMAGE_MB="300"
 
 if [ -f "${OUTPUT_IMAGE}" ]
 then
@@ -53,17 +53,20 @@ trap clean_lodev EXIT
 
 log_blue "Partitioning..."
 parted -s "${LODEV}" mklabel gpt
-parted -s "${LODEV}" unit s mkpart primary 8192 491519
-parted -s "${LODEV}" unit s mkpart primary 524288 100%
+parted -s "${LODEV}" unit s mkpart primary 8192 25%
+parted -s "${LODEV}" unit s mkpart primary 25% 100%
+sync
 
 log_blue "Formatting boot partition"
-mkfs.vfat -n BOOT "${LODEV}p1"-
+mkfs.vfat -n BOOT "${LODEV}p1"
 
 log_blue "Copying rootfs partition to image"
-pv < "${BUILDROOT_OUTPUT_DIR}/rootfs.ext4" > "${LODEV}p2"
+pv < "${BUILDROOT_OUTPUT_DIR}/images/rootfs.ext4" > "${LODEV}p2"
+sync
 
+log_blue "Mounting boot partition"
 MNT_ROOT="$(mktemp -d)"
-mount "${LODEV}p2" "${MNT_ROOT}"
+mount "${LODEV}p1" "${MNT_ROOT}"
 function clean_mnt {
   log_yellow "Cleaning mount"
   umount "${MNT_ROOT}"
@@ -72,9 +75,21 @@ function clean_mnt {
 }
 trap clean_mnt EXIT
 
-KERNEL_IMAGE="${BUILDROOT_OUTPUT_DIR}/Image.gz"
-INITRAMFS="${BUILDROOT_OUTPUT_DIR}/rootfs.cpio"
+log_blue "Copying images"
+KERNEL_IMAGE="${BUILDROOT_OUTPUT_DIR}/images/Image.gz"
+INITRAMFS="${BUILDROOT_OUTPUT_DIR}/images/rootfs.cpio"
+DEVICE_TREE="${BUILDROOT_OUTPUT_DIR}/images/sun50i-a64-pinephone-1.2.dtb"
 
+cp "${KERNEL_IMAGE}" "${MNT_ROOT}/"
+cp "${INITRAMFS}" "${MNT_ROOT}/initramfs-linux.img"
+mkdir -p "${MNT_ROOT}/dtbs/allwinner/"
+cp "${DEVICE_TREE}" "${MNT_ROOT}/dtbs/allwinner/"
+
+
+log_blue "Generating boot script"
+"${BUILDROOT_OUTPUT_DIR}"/host/bin/mkimage -A arm -O linux -T script -C none -n "U-Boot boot script" -d "${SCRIPT_DIR}/boot.txt" "${MNT_ROOT}/boot.scr"
+
+chown "${REALUSER}":"${REALUSER}" "${OUTPUT_IMAGE}"
 
 # Fix fstab
 # Copy boot files
