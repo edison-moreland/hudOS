@@ -28,5 +28,5 @@ mkdir "${BUILDROOT_DIR}"
 curl "${BUILDROOT_URL}" | tar -xJf - -C "${BUILDROOT_DIR}" --strip-components=1
 
 pushd "${BUILDROOT_DIR}"
-ln -s ../.config .
+make BR2_EXTERNAL="${SCRIPT_DIR}/br2_hudos" hudos_defconfig
 popd

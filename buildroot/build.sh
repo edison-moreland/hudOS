@@ -18,6 +18,15 @@ then
   exit 1
 fi
 
+# make BR2_EXTERNAL=/path/to/foo menuconfig
+
+log_blue "Running buildroot"
+log_yellow "THIS MAY TAKE A LONG TIME!"
 pushd "${BUILDROOT_DIR}"
-make
+make "$@"
 popd
+
+if [ ! -f "${SCRIPT_DIR}/hudOS.img" ]
+then
+  ln -s -t "${SCRIPT_DIR}/" "${BUILDROOT_DIR}/output/images/hudOS.img"
+fi
