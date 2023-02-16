@@ -1,0 +1,23 @@
+config BR2_PACKAGE_PINE_FIRMWARE
+	bool "pine-firmware"
+	help
+	    Provides firmware from megi's linux-firmware tree
+
+if BR2_PACKAGE_PINE_FIRMWARE
+
+config BR2_PACKAGE_PINE_FIRMWARE_ANX7688
+    bool "ANX7688 HDMI to USB Type-C Bridge"
+    help
+        Firmware files for Analogix ANX7688
+
+config BR2_PACKAGE_PINE_FIRMWARE_OV5640
+    bool "OV5640 Camera"
+    help
+        Firmware file for OmniVision OV5460 Camera (rear camera)
+
+config BR2_PACKAGE_PINE_FIRMWARE_RTL8723CS
+    bool "RTL8723CS WiFi/Bluetooth"
+    help
+        Firmware for Realtek RTL8723CS
+
+endif

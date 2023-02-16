@@ -1,1 +1,2 @@
 source "$BR2_EXTERNAL_HUDOS_PATH/package/hud-landing-pad/Config.in"
+source "$BR2_EXTERNAL_HUDOS_PATH/package/pine-firmware/Config.in"
