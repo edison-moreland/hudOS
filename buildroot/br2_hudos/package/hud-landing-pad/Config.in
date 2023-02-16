@@ -1,0 +1,5 @@
+config BR2_PACKAGE_HUD_LANDING_PAD
+    bool "hud landing pad"
+    help
+        Setup everything needed to deploy hud after the system boots.
+        Eventually the deploy will also be included in buildroot.

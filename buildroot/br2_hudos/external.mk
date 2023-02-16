@@ -1,0 +1,1 @@
+include $(sort $(wildcard $(BR2_EXTERNAL_HUDOS_PATH)/package/*/*.mk))
