@@ -1,0 +1,3 @@
+enable wpa_supplicant@.service wlan0
+disable wpa_supplicant-nl80211@.service
+disable wpa_supplicant-wired@.service

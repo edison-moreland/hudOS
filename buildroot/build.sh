@@ -23,7 +23,7 @@ fi
 log_blue "Running buildroot"
 log_yellow "THIS MAY TAKE A LONG TIME!"
 pushd "${BUILDROOT_DIR}"
-make "$@"
+make BR2_EXTERNAL="${SCRIPT_DIR}/br2_hudos" "$@"
 popd
 
 BUILDROOT_IMAGE_OUT="${BUILDROOT_DIR}/output/images/hudOS.img"

@@ -17,8 +17,8 @@ define HUD_NETWORK_INSTALL_TARGET_CMDS
 	sed s/WPA_SUPPLICANT_PSK/$(BR2_PACKAGE_HUD_NETWORK_WIFI_PSK)/ > \
 		$(TARGET_DIR)/etc/wpa_supplicant/wpa_supplicant-wlan0.conf; \
 
-	$(INSTALL) -D -m 644 $(HUD_NETWORK_PKGDIR)/20-wlan0.preset \
-		$(TARGET_DIR)/usr/lib/systemd/system-preset/20-wlan0.preset; \
+	$(INSTALL) -D -m 644 $(HUD_NETWORK_PKGDIR)/50-wpa_supplicant.preset \
+		$(TARGET_DIR)/etc/systemd/system-preset/50-wpa_supplicant.preset; \
 	$(INSTALL) -D -m 644 $(HUD_NETWORK_PKGDIR)/wlan0.network \
 		$(TARGET_DIR)/etc/systemd/network/wlan0.network;
 endef
