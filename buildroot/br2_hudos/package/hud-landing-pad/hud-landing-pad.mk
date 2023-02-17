@@ -23,7 +23,11 @@ define HUD_LANDING_PAD_SETUP_WIFI
 		$(TARGET_DIR)/etc/wpa_supplicant/wpa_supplicant-wlan0.conf; \
 
 	$(INSTALL) -D -m 644 $(HUD_LANDING_PAD_PKGDIR)/20-wifi.preset \
-		$(TARGET_DIR)/usr/lib/systemd/system-preset/20-wifi.preset;
+		$(TARGET_DIR)/usr/lib/systemd/system-preset/20-wifi.preset; \
+
+	mkdir -p $(TARGET_DIR)/etc/systemd/network/
+	$(INSTALL) -D -m 644 $(HUD_LANDING_PAD_PKGDIR)/wlan0.network \
+		$(TARGET_DIR)/etc/systemd/network/wlan0.network;
 endef
 
 define HUD_LANDING_PAD_SETUP_AUTOLOGIN
