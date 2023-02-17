@@ -16,3 +16,4 @@ popd
 # These settings should not be saved to git
 log_blue "Filtering sensitive keys"
 sed -i '/^BR2_PACKAGE_HUD_LANDING_PAD_WIFI_/d' "${DEFCONFIG_PATH}"
+sed -i '/^BR2_PACKAGE_HUD_LANDING_PAD_DEPLOY_USER/d' "${DEFCONFIG_PATH}"

@@ -17,4 +17,10 @@ config BR2_PACKAGE_HUD_LANDING_PAD_WIFI_PASSWORD
     prompt "Password"
     help
         Password for network
+
+config BR2_PACKAGE_HUD_LANDING_PAD_DEPLOY_USER
+    bool "Create deploy user + ssh key"
+    help
+        Creates deploy user and ssh key for development.
+        Deploy user is used to live update the user interface.
 endif
