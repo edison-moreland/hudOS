@@ -1,0 +1,2 @@
+enable wpa_supplicant@.service
+enable wpa_supplicant@wlan0.service

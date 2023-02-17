@@ -26,7 +26,23 @@ pushd "${BUILDROOT_DIR}"
 make "$@"
 popd
 
-if [ ! -f "${SCRIPT_DIR}/hudOS.img" ]
+BUILDROOT_IMAGE_OUT="${BUILDROOT_DIR}/output/images/hudOS.img"
+if [ -f "${BUILDROOT_IMAGE_OUT}"  ]
 then
-  ln -s -t "${SCRIPT_DIR}/" "${BUILDROOT_DIR}/output/images/hudOS.img"
+  log_blue "Buildroot produced a new image!"
+  if [ -f "${SCRIPT_DIR}/hudOS.img" ]
+  then
+    rm "${SCRIPT_DIR}/hudOS.img"
+  fi
+  mv "${BUILDROOT_IMAGE_OUT}" "${SCRIPT_DIR}/hudOS.img"
+fi
+
+if [ "${BUILDROOT_DIR}/.config" -nt "${SCRIPT_DIR}/br2_hudos/configs/hudos_defconfig" ]
+then
+  read -p "Save config changes to hudos_defconfig? [Y/n]: " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Nn]$ ]]
+  then
+    "${SCRIPT_DIR}"/save_config.sh
+  fi
 fi

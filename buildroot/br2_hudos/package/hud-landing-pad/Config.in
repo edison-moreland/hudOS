@@ -1,5 +1,20 @@
 config BR2_PACKAGE_HUD_LANDING_PAD
     bool "hud landing pad"
+    depends on BR2_PACKAGE_SYSTEMD
     help
         Setup everything needed to deploy hud after the system boots.
         Eventually the deploy will also be included in buildroot.
+
+if BR2_PACKAGE_HUD_LANDING_PAD
+config BR2_PACKAGE_HUD_LANDING_PAD_WIFI_SSID
+    string
+    prompt "SSID"
+    help
+        SSID for network
+
+config BR2_PACKAGE_HUD_LANDING_PAD_WIFI_PASSWORD
+    string
+    prompt "Password"
+    help
+        Password for network
+endif
