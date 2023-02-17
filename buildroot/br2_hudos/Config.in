@@ -1,2 +1,4 @@
-source "$BR2_EXTERNAL_HUDOS_PATH/package/hud-landing-pad/Config.in"
+source "$BR2_EXTERNAL_HUDOS_PATH/package/hud-deploy-user/Config.in"
+source "$BR2_EXTERNAL_HUDOS_PATH/package/hud-network/Config.in"
+source "$BR2_EXTERNAL_HUDOS_PATH/package/hud-ui/Config.in"
 source "$BR2_EXTERNAL_HUDOS_PATH/package/pine-firmware/Config.in"

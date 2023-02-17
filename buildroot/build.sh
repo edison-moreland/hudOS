@@ -48,7 +48,7 @@ then
 fi
 
 # TODO: Pull this from images dir
-BUILDROOT_DEPLOY_KEY_OUT="${BUILDROOT_DIR}/output/build/hud-landing-pad-0.0.1/deploy_ed25519"
+BUILDROOT_DEPLOY_KEY_OUT="${BUILDROOT_DIR}/output/build/hud-deploy-user-0.0.1/deploy_ed25519"
 if [ "${BUILDROOT_DEPLOY_KEY_OUT}" -nt "${SCRIPT_DIR}/deploy_ed25519" ]
 then
   log_blue "Deploy key updated"

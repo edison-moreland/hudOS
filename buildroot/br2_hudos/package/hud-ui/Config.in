@@ -1,0 +1,5 @@
+config BR2_PACKAGE_HUD_UI
+    bool "hud ui"
+    depends on BR2_PACKAGE_SYSTEMD
+    help
+        Create hud user, sets up user session

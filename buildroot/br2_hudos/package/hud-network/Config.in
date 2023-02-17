@@ -1,0 +1,20 @@
+config BR2_PACKAGE_HUD_NETWORK
+    bool "hud network"
+    depends on BR2_PACKAGE_SYSTEMD
+    help
+        Auto join WiFi
+
+if BR2_PACKAGE_HUD_NETWORK
+config BR2_PACKAGE_HUD_NETWORK_WIFI_SSID
+    string
+    prompt "SSID"
+    help
+        SSID for network
+
+config BR2_PACKAGE_HUD_NETWORK_WIFI_PSK
+    string
+    prompt "Password"
+    help
+        Password for network
+
+endif
