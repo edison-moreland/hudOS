@@ -4,7 +4,7 @@ HUD_UI_SITE_METHOD = local
 HUD_UI_INSTALL_TARGET = YES
 
 define HUD_UI_USERS
-	hud -1 hud -1 * /opt/hud /bin/bash - hudOS
+	hud -1 hud -1 * /opt/hud /bin/bash seat hudOS
 endef
 
 define HUD_UI_INSTALL_TARGET_CMDS
