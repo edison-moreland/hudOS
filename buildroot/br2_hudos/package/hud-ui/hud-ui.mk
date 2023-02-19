@@ -4,13 +4,12 @@ HUD_UI_SITE_METHOD = local
 HUD_UI_INSTALL_TARGET = YES
 
 define HUD_UI_USERS
-	hud -1 hud -1 * /opt/hud /bin/bash seat hudOS
+	hud -1 hud -1 * /opt/hud /bin/false - hudOS
 endef
 
 define HUD_UI_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/etc/systemd/system/getty@tty1.service.d/; \
-	$(INSTALL) -D -m 644 $(HUD_UI_PKGDIR)/autologin.conf \
-		$(TARGET_DIR)/etc/systemd/system/getty@tty1.service.d/autologin.conf;
+	$(INSTALL) -D -m 644 $(HUD_UI_PKGDIR)/50-disable_getty.preset \
+		$(TARGET_DIR)/etc/systemd/system-preset/50-disable_getty.preset;
 endef
 
 $(eval $(generic-package))
