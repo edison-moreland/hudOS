@@ -84,4 +84,4 @@ else
 fi
 
 echo "Restarting UI"
-#loginctl terminate-user ${HUD_USER}
+systemctl restart hud.target

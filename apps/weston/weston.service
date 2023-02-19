@@ -16,7 +16,7 @@ TTYReset=yes
 TTYVHangup=yes
 TTYVTDisallocate=yes
 
-StandardOutput=tty
+StandardOutput=journal
 StandardInput=tty-fail
 StandardError=journal
 

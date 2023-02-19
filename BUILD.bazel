@@ -9,6 +9,6 @@ pkg_tar(
     srcs = [
         #        "//apps/uitest:hudapp",
         "//apps/weston:hudapp",
-        #        "//apps/bluetooth:hudapp",
+        "//apps/bluetooth:hudapp",
     ],
 )

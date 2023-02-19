@@ -12,4 +12,11 @@ define HUD_UI_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/etc/systemd/system-preset/50-disable_getty.preset;
 endef
 
+# These could probably find a better place to live
+# This is so setcap work for the bluetooth daemon
+define HUD_UI_LINUX_CONFIG_FIXUPS
+	$(call KCONFIG_ENABLE_OPT,CONFIG_EXT4_FS_SECURITY)
+	$(call KCONFIG_ENABLE_OPT,CONFIG_EXT4_FS_XATTR)
+endef
+
 $(eval $(generic-package))

@@ -1,14 +1,16 @@
 [Unit]
 Description={app}, a HUD Application
-
-# Start after weston
-After=weston.service
-Wants=weston.service
+PartOf=hud-apps.target
 
 [Service]
+User=hud
+Group=hud
+WorkingDirectory=/opt/hud
+
 Type=simple
+Environment=XDG_RUNTIME_DIR=/opt/hud/run
 ExecStart={prefix}/bin/{app}_arm
 Restart=always
 
 [Install]
-WantedBy=weston-session.target
+WantedBy=hud-apps.target

@@ -21,8 +21,8 @@ log_blue "Building App Bundle"
 bazel build '//:app_bundle'
 
 log_blue "Deploying App Bundle"
-scp -i "${PINEPHONE_SSH_KEY}" "${BUNDLE_DEPLOYER}" "${PINEPHONE_ROOT_SSH}":/home/deploy/bundle_deployer.sh
-pv < "${APP_BUNDLE}" | ssh -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "/bin/sudo /bin/bash /home/deploy/bundle_deployer.sh"
+scp -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null -i "${PINEPHONE_SSH_KEY}" "${BUNDLE_DEPLOYER}" "${PINEPHONE_ROOT_SSH}":/home/deploy/bundle_deployer.sh
+pv < "${APP_BUNDLE}" | ssh -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "/bin/sudo /bin/bash /home/deploy/bundle_deployer.sh"
 
 log_blue "Deployment Status"
 #ssh -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "systemctl -M hud@.host --user status"
