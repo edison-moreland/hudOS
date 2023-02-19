@@ -1,0 +1,15 @@
+config BR2_PACKAGE_BCC
+    bool "bcc"
+    depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_4_13
+    depends on BR2_PACKAGE_LLVM
+    depends on BR2_PACKAGE_LLVM_BPF
+    depends on BR2_PACKAGE_CLANG
+    select BR2_PACKAGE_XZ
+    select BR2_PACKAGE_LIBBPF
+    help
+        BPF Compiler Collection
+
+comment "bcc needs clang & llvm(w/bpf)"
+    depends on !BR2_PACKAGE_LLVM
+    depends on !BR2_PACKAGE_LLVM_BPF
+    depends on !BR2_PACKAGE_CLANG

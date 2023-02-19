@@ -1,0 +1,14 @@
+config BR2_PACKAGE_BPFTRACE
+    bool "bpftrace"
+    depends on BR2_PACKAGE_BCC
+    depends on BR2_PACKAGE_BINUTILS
+    select BR2_PACKAGE_LIBBPF
+    select BR2_PACKAGE_CEREAL
+    select BR2_PACKAGE_LIBPCAP
+    help
+        BPF Trace
+
+
+comment "bpf trace needs bcc + binutils"
+    depends on !BR2_PACKAGE_BCC
+    depends on !BR2_PACKAGE_BINUTILS
