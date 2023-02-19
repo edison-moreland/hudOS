@@ -23,7 +23,7 @@ trap clean_workspace EXIT
 HUD_USER="hud"
 HUD_PREFIX="/opt/hud"
 HUD_BIN_DIR="${HUD_PREFIX}/bin"
-HUD_UNIT_DIR="${HUD_PREFIX}/.local/share/systemd/user"
+HUD_UNIT_DIR="/etc/systemd/system"
 HUD_CONFIG_DIR="${HUD_PREFIX}/.config"
 
 function sync_folder {
@@ -50,7 +50,7 @@ if [ -d "${WORKSPACE}/services" ]
 then
   echo "Syncing systemd units"
   sync_folder "${WORKSPACE}/services/" "${HUD_UNIT_DIR}"
-  systemctl --machine=${HUD_USER}@.host --user daemon-reload
+  systemctl daemon-reload
 else
   echo "No systemd units to sync..."
 fi
@@ -84,4 +84,4 @@ else
 fi
 
 echo "Restarting UI"
-loginctl terminate-user ${HUD_USER}
+#loginctl terminate-user ${HUD_USER}

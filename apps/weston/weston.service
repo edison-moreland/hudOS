@@ -1,20 +1,30 @@
 [Unit]
-Description=Weston, a Wayland compositor, as a user service
-Documentation=man:weston(1) man:weston.ini(5)
-Documentation=https://wayland.freedesktop.org/
-
-# Activate using a systemd socket
-Requires=weston.socket
-After=weston.socket
-
-PartOf=weston-session.target
+Description=Weston, hudOS Compositor
+PartOf=hud.target
+Before=hud-apps.target
 
 [Service]
-Type=notify
-TimeoutStartSec=60
-WatchdogSec=20
-ExecStart=/usr/bin/weston --config="/opt/hud/.config/weston.ini" --modules=systemd-notify.so
+User=hud
+Group=hud
+WorkingDirectory=/opt/hud
+#PAMName=login
+
+UtmpIdentifier=tty7
+UtmpMode=user
+TTYPath=/dev/tty7
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+StandardOutput=tty
+StandardInput=tty-fail
+StandardError=journal
+
 Restart=always
+Environment=XDG_RUNTIME_DIR=/opt/hud/run
+ExecStartPre=/bin/chvt 7
+ExecStart=/usr/bin/weston --config=/opt/hud/.config/weston.ini --log=/var/log/hud/weston.log
+IgnoreSIGPIPE=no
 
 [Install]
-WantedBy=weston-session.target
+WantedBy=hud.target

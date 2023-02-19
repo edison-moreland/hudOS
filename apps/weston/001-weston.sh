@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# Post install for weston
+mkdir -p /var/log/hud/
+chown hud:hud /var/log/hud/
 
-systemctl -M hud@.host --user enable weston-session.target weston.service weston.socket
-systemctl -M hud@.host --user start weston-session.target weston.service weston.socket
+mkdir -m 700 -p /opt/hud/run/
+chown hud:hud /opt/hud/run/
+
+systemctl enable hud.target hud-apps.target weston.service
+systemctl start hud.target hud-apps.target weston.service

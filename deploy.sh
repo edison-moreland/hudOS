@@ -22,7 +22,7 @@ bazel build '//:app_bundle'
 
 log_blue "Deploying App Bundle"
 scp -i "${PINEPHONE_SSH_KEY}" "${BUNDLE_DEPLOYER}" "${PINEPHONE_ROOT_SSH}":/home/deploy/bundle_deployer.sh
-pv < "${APP_BUNDLE}" | ssh -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "/bin/bash /home/deploy/bundle_deployer.sh"
+pv < "${APP_BUNDLE}" | ssh -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "/bin/sudo /bin/bash /home/deploy/bundle_deployer.sh"
 
 log_blue "Deployment Status"
-ssh -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "systemctl -M hud@.host --user status"
+#ssh -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "systemctl -M hud@.host --user status"
