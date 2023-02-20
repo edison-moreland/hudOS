@@ -1,6 +1,0 @@
-exports_files(
-    [
-        "BUILD.libxkbcommon.bazel",
-    ],
-    visibility = ["//visibility:public"],
-)
