@@ -1,0 +1,18 @@
+{
+  "type": "raw",
+  "name": "weston",
+  "raw": {
+    "units": [
+      "hud.slice",
+      "hud.target",
+      "hud-apps.target",
+      "weston.service"
+    ],
+    "configs": [
+      "weston.ini"
+    ],
+    "scripts": [
+      "001-weston.sh"
+    ]
+  }
+}

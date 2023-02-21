@@ -20,10 +20,11 @@ StandardOutput=journal
 StandardInput=tty-fail
 StandardError=journal
 
+Slice=hud.slice
 Restart=always
 Environment=XDG_RUNTIME_DIR=/opt/hud/run
 ExecStartPre=/bin/chvt 7
-ExecStart=/usr/bin/weston --config=/opt/hud/.config/weston.ini --log=/var/log/hud/weston.log
+ExecStart=/usr/bin/weston --socket=wayland-0 --config=/opt/hud/.config/weston.ini --log=/var/log/hud/weston.log
 IgnoreSIGPIPE=no
 
 [Install]

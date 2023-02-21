@@ -1,0 +1,7 @@
+{
+  "type": "go",
+  "name": "bluetooth",
+  "go": {
+    "setcap": "cap_net_raw,cap_net_admin+eip"
+  }
+}

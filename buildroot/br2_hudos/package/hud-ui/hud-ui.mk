@@ -9,7 +9,10 @@ endef
 
 define HUD_UI_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 644 $(HUD_UI_PKGDIR)/50-disable_getty.preset \
-		$(TARGET_DIR)/etc/systemd/system-preset/50-disable_getty.preset;
+		$(TARGET_DIR)/etc/systemd/system-preset/50-disable_getty.preset; \
+	$(INSTALL) -D -m 644 $(HUD_UI_PKGDIR)/hud_unit_path.conf \
+		$(TARGET_DIR)/etc/systemd/system.conf.d/hud_unit_path.conf; \
+	mkdir -p $(TARGET_DIR)/opt/hud/systemd/system/;
 endef
 
 # These could probably find a better place to live

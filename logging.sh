@@ -10,21 +10,21 @@ ANSI_ITALIC="\033[3m"
 ANSI_RESET="\033[0m"
 
 function log() {
-    printf "$@\n"
+	printf "$@\n" >&2
 }
 
 function log_blue() {
-    log "${ANSI_BLUE}${ANSI_ITALIC}$@${ANSI_RESET}"
+	log "${ANSI_BLUE}${ANSI_ITALIC}$@${ANSI_RESET}"
 }
 
 function log_red() {
-    log "${ANSI_RED}${ANSI_BOLD}$@${ANSI_RESET}"
+	log "${ANSI_RED}${ANSI_BOLD}$@${ANSI_RESET}"
 }
 
 function log_green() {
-    log "${ANSI_GREEN}$@${ANSI_RESET}"
+	log "${ANSI_GREEN}$@${ANSI_RESET}"
 }
 
 function log_yellow() {
-    log "${ANSI_YELLOW}$@${ANSI_RESET}"
+	log "${ANSI_YELLOW}$@${ANSI_RESET}"
 }

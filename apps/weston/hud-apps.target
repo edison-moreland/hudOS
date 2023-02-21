@@ -1,5 +1,6 @@
 [Unit]
 Description=hudOS Apps
+After=hud.target
 
 [Install]
 WantedBy=hud.target

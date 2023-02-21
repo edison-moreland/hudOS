@@ -27,7 +27,6 @@ import "math/rand"
 import cairo "github.com/neurlang/wayland/cairoshim"
 import "github.com/neurlang/wayland/wl"
 import "github.com/neurlang/wayland/window"
-import xkb "github.com/neurlang/wayland/xkbcommon"
 import "fmt"
 
 type smoke struct {
@@ -385,11 +384,6 @@ func (smoke *smoke) Key(
 	data window.WidgetHandler,
 ) {
 	println(notUnicode)
-
-	if notUnicode == xkb.KeyQ || notUnicode == xkb.KEYq {
-		smoke.free()
-		smoke.display.Exit()
-	}
 }
 func (*smoke) Focus(window *window.Window, device *window.Input) {
 
