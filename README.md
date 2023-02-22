@@ -3,66 +3,52 @@ Experimental PinePhone distro to provide a heads-up display using the Nreal Air.
 
 This is very much a work in progress and not ready to be used.
 
+# hudOS
+HudOS should be compatible with all PinePhone hardware revisions. 
+Development is being done on a PinePhone v1.2b, with some testing done on a v1.1.
+Any revision before v1.2a will need [hardware modifications](https://wiki.pine64.org/wiki/PinePhone_v1.2#USB) to allow use of the Nreal Air. 
+
 # Phone setup
-NOTE: Setup was built on x86_64 Manjaro, running anywhere else might cause problems. 
+NOTE: Setup was built on x86_64 Manjaro. This should work on any modern linux distro, YMMV.
+
+Dependencies:
+    - [go 1.20](https://go.dev)
+    - [jq](https://stedolan.github.io/jq/)
+    - [Buildroot Dependencies](https://buildroot.org/downloads/manual/manual.html#requirement)
 
 1. Download images
     - `./images/download.sh`
 2. Install Tow-Boot
     1. Flash `images/mmcboot.installer.img` to an SD card.
-    2. Put the SD card in the pinephone, and boot.
+    2. Put the SD card in the PinePhone, and boot.
     3. Install Tow-Boot to the eMMC.
     4. Remove the SD card.
-3. Install Pine64-Arch
-    1. Plug the pinephone into your computer, it should start booting.
-    2. As soon as the pinephone vibrates start holding the volume up button.
-    3. Stop holding button once the blue LED turns on.
-    4. The pinephone's eMMC should now appear as a block device, `/dev/sdX`.
-    5. Flash `images/archlinux-pinephone-barebone-20230203.img` to the eMMC.
-    6. Reboot the pinephone.
-4. Connecting to Wi-Fi
-    1. Using a serial console, log in with `root:root`.
-    2. Connect to Wi-Fi using NetworkManager.
-        - `nmcli device wifi connect <SSID> password <PASSWORD>`
-    3. Get ip address.
-        - `ip addr`
-5. Provisioning OS
-    1. Test SSH connection using the default user: `alarm:123456`.
-    2. Run the provisioning script.
-        - You'll be asked to input a password several times, use `123456`.
-        - Encrypting the SSH key is optional.
-        - `./provision.sh <pinephone_ip>`
-6. Deploying the HUD
-    1. Run the deploy script.
-        - `./deploy.sh <pinephone_ip>`
+3. Building hudOS
+   1. Download buildroot
+      - `./buildroot/setup.sh`
+   2. Configure OS 
+      - `./buildroot/build.sh nconfig`
+      - Under `External options`, select `hud deploy user` and `hud network`
+      - Fill in WiFi settings
+   3. Build OS 
+      - `./buildroot/build.sh`
+      - This step will take 30 minutes to an hour and consume significant amounts of system resources.
+4. Flash the PinePhone 
+   1. Plug the PinePhone into your computer, it should start booting.
+   2. As soon as the PinePhone vibrates start holding the volume up button.
+   3. Stop holding button once the blue LED turns on.
+   4. The PinePhone's eMMC should now appear as a block device, `/dev/sdX`.
+   5. Flash `buildroot/hudOS.img` to the eMMC.
+   6. Reboot the PinePhone.
+5. Deploying the HUD
+   1. If the PinePhone was able to successfully connect to the WiFi, you should see it's ip address printed to the screen on boot.
+   2. Run the deploy script.
+      - `./deploy.sh <pinephone_ip>`
 
 # Notes
 ## Documentation
 - Tow-boot
     - https://tow-boot.org/devices/pine64-pinephoneA64.html
-- Arm Arch
-    - https://github.com/dreemurrs-embedded/Pine64-Arch
-    - NetworkManager
-        - https://wiki.archlinux.org/title/NetworkManager
 - Weston
     - https://wayland.pages.freedesktop.org/weston/toc/running-weston.html
     - https://wiki.archlinux.org/title/Weston
-
-
-## Syncing go deps with bazel
-```
-go mod tidy
-bazel run //:gazelle
-bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%go_dependencies
-bazel run //:gazelle
-```
-
-## Restart HUD
-```bash
-sudo loginctl terminate-user hud
-```
-
-## App logs
-```bash
-sudo journalctl _SYSTEMD_USER_UNIT=hud_<appname>.service
-```
