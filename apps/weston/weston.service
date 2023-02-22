@@ -21,6 +21,7 @@ StandardInput=tty-fail
 StandardError=journal
 
 Slice=hud.slice
+Type=notify
 Restart=always
 Environment=XDG_RUNTIME_DIR=/opt/hud/run
 ExecStartPre=/bin/chvt 7

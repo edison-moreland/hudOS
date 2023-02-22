@@ -35,6 +35,7 @@ go build -o "${RULE_WORKSPACE}/${APP_NAME}" "${APP_DIR}"
 cat <<EOF | envsubst >"${RULE_WORKSPACE}/hud-${APP_NAME}.service"
 [Unit]
 Description=${APP_NAME}, a HUD Application
+ConditionPathExists=/opt/hud/run/wayland-0
 PartOf=hud-apps.target
 
 [Service]
