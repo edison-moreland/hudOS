@@ -5,7 +5,6 @@ SCRIPT_DIR="$(dirname $(realpath $0))"
 source "${SCRIPT_DIR}"/../logging.sh
 
 BUILDROOT_DIR="${SCRIPT_DIR}/.buildroot"
-
 DEFCONFIG_PATH="${SCRIPT_DIR}/br2_hudos/configs/hudos_defconfig"
 
 log_blue "Saving configs to git repo"
