@@ -1,9 +1,7 @@
 # hudOS
 Experimental PinePhone distro to provide a heads-up display using the Nreal Air.
-
 This is very much a work in progress and not ready to be used.
 
-# hudOS
 HudOS should be compatible with all PinePhone hardware revisions. 
 Development is being done on a PinePhone v1.2b, with some testing done on a v1.1.
 Any revision before v1.2a will need [hardware modifications](https://wiki.pine64.org/wiki/PinePhone_v1.2#USB) to allow use of the Nreal Air. 
@@ -11,10 +9,10 @@ Any revision before v1.2a will need [hardware modifications](https://wiki.pine64
 # Phone setup
 NOTE: Setup was built on x86_64 Manjaro. This should work on any modern linux distro, YMMV.
 
-Dependencies:
-    - [go 1.20](https://go.dev)
-    - [jq](https://stedolan.github.io/jq/)
-    - [Buildroot Dependencies](https://buildroot.org/downloads/manual/manual.html#requirement)
+Dependencies
+  - [go 1.20](https://go.dev)
+  - [jq](https://stedolan.github.io/jq/)
+  - [Buildroot Dependencies](https://buildroot.org/downloads/manual/manual.html#requirement)
 
 1. Download images
     - `./images/download.sh`
