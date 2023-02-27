@@ -1,9 +1,11 @@
 package protocol
 
+import log "github.com/edison-moreland/nreal-hud/sdk/log"
+
 /*
 
 	DO NOT MODIFY!
-	This file was auto-generated on 2023-02-23 13:27:19.687152223 -0800 PST m=+0.004856949
+	This file was auto-generated on 2023-02-23 18:09:24.820761528 -0800 PST m=+0.004816623
 	protocol: wayland
 
 */
@@ -14,7 +16,14 @@ package protocol
 	is used for internal Wayland protocol features.
 */
 type WlDisplay struct {
-	WlDisplayListener
+	Proxy
+}
+
+func NewWlDisplay(p Proxy) WlDisplay {
+	return WlDisplay{Proxy: p}
+}
+func (w *WlDisplay) AttachListener(l WlDisplayListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlDisplayError global error values
@@ -51,7 +60,7 @@ const (
 */
 type WlDisplaySyncRequest struct {
 	// Callback  object for the sync request
-	Callback WlCallback `wayland:"new_id"`
+	Callback uint32 `wayland:"new_id"`
 }
 
 // WlDisplayGetRegistryRequest get global registry object
@@ -68,7 +77,7 @@ type WlDisplaySyncRequest struct {
 */
 type WlDisplayGetRegistryRequest struct {
 	// Registry global registry object
-	Registry WlRegistry `wayland:"new_id"`
+	Registry uint32 `wayland:"new_id"`
 }
 
 // WlDisplayErrorEvent fatal error event
@@ -91,6 +100,10 @@ type WlDisplayErrorEvent struct {
 }
 
 func (e *WlDisplayErrorEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.ObjectId = UnmarshallUint32(offset, d)
+	offset, e.Code = UnmarshallUint32(offset, d)
+	offset, e.Message = UnmarshallString(offset, d)
 	return nil
 }
 
@@ -108,6 +121,8 @@ type WlDisplayDeleteIdEvent struct {
 }
 
 func (e *WlDisplayDeleteIdEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Id = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -115,10 +130,22 @@ type WlDisplayListener interface {
 	Error(WlDisplayErrorEvent)
 	DeleteId(WlDisplayDeleteIdEvent)
 }
+type UnimplementedWlDisplayListener struct{}
+
+func (e *UnimplementedWlDisplayListener) Error(_ WlDisplayErrorEvent) {
+	return
+}
+func (e *UnimplementedWlDisplayListener) DeleteId(_ WlDisplayDeleteIdEvent) {
+	return
+}
+
 type WlDisplayDispatcher struct {
 	WlDisplayListener
 }
 
+func NewWlDisplayDispatcher() *WlDisplayDispatcher {
+	return &WlDisplayDispatcher{WlDisplayListener: &UnimplementedWlDisplayListener{}}
+}
 func (i *WlDisplayDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -139,6 +166,13 @@ func (i *WlDisplayDispatcher) Dispatch(h MessageHeader, b []byte) error {
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlDisplayDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlDisplayListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlDisplayListener = listener
 }
 
 // WlRegistry global registry object
@@ -165,7 +199,14 @@ func (i *WlDisplayDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	the object.
 */
 type WlRegistry struct {
-	WlRegistryListener
+	Proxy
+}
+
+func NewWlRegistry(p Proxy) WlRegistry {
+	return WlRegistry{Proxy: p}
+}
+func (w *WlRegistry) AttachListener(l WlRegistryListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlRegistryBindRequest bind an object to the display
@@ -198,6 +239,10 @@ type WlRegistryGlobalEvent struct {
 }
 
 func (e *WlRegistryGlobalEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Name = UnmarshallUint32(offset, d)
+	offset, e.Interface = UnmarshallString(offset, d)
+	offset, e.Version = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -220,6 +265,8 @@ type WlRegistryGlobalRemoveEvent struct {
 }
 
 func (e *WlRegistryGlobalRemoveEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Name = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -227,10 +274,22 @@ type WlRegistryListener interface {
 	Global(WlRegistryGlobalEvent)
 	GlobalRemove(WlRegistryGlobalRemoveEvent)
 }
+type UnimplementedWlRegistryListener struct{}
+
+func (e *UnimplementedWlRegistryListener) Global(_ WlRegistryGlobalEvent) {
+	return
+}
+func (e *UnimplementedWlRegistryListener) GlobalRemove(_ WlRegistryGlobalRemoveEvent) {
+	return
+}
+
 type WlRegistryDispatcher struct {
 	WlRegistryListener
 }
 
+func NewWlRegistryDispatcher() *WlRegistryDispatcher {
+	return &WlRegistryDispatcher{WlRegistryListener: &UnimplementedWlRegistryListener{}}
+}
 func (i *WlRegistryDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -252,6 +311,13 @@ func (i *WlRegistryDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlRegistryDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlRegistryListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlRegistryListener = listener
+}
 
 // WlCallback callback object
 /*
@@ -259,7 +325,14 @@ func (i *WlRegistryDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	the related request is done.
 */
 type WlCallback struct {
-	WlCallbackListener
+	Proxy
+}
+
+func NewWlCallback(p Proxy) WlCallback {
+	return WlCallback{Proxy: p}
+}
+func (w *WlCallback) AttachListener(l WlCallbackListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlCallbackDoneEvent done event
@@ -271,16 +344,27 @@ type WlCallbackDoneEvent struct {
 }
 
 func (e *WlCallbackDoneEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.CallbackData = UnmarshallUint32(offset, d)
 	return nil
 }
 
 type WlCallbackListener interface {
 	Done(WlCallbackDoneEvent)
 }
+type UnimplementedWlCallbackListener struct{}
+
+func (e *UnimplementedWlCallbackListener) Done(_ WlCallbackDoneEvent) {
+	return
+}
+
 type WlCallbackDispatcher struct {
 	WlCallbackListener
 }
 
+func NewWlCallbackDispatcher() *WlCallbackDispatcher {
+	return &WlCallbackDispatcher{WlCallbackListener: &UnimplementedWlCallbackListener{}}
+}
 func (i *WlCallbackDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -295,6 +379,13 @@ func (i *WlCallbackDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlCallbackDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlCallbackListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlCallbackListener = listener
+}
 
 // WlCompositor the compositor singleton
 /*
@@ -303,7 +394,14 @@ func (i *WlCallbackDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	surfaces into one displayable output.
 */
 type WlCompositor struct {
-	WlCompositorListener
+	Proxy
+}
+
+func NewWlCompositor(p Proxy) WlCompositor {
+	return WlCompositor{Proxy: p}
+}
+func (w *WlCompositor) AttachListener(l WlCompositorListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlCompositorCreateSurfaceRequest create new surface
@@ -311,7 +409,7 @@ type WlCompositor struct {
 //	Ask the compositor to create a new surface.
 type WlCompositorCreateSurfaceRequest struct {
 	// Id the new surface
-	Id WlSurface `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 }
 
 // WlCompositorCreateRegionRequest create new region
@@ -319,19 +417,30 @@ type WlCompositorCreateSurfaceRequest struct {
 //	Ask the compositor to create a new region.
 type WlCompositorCreateRegionRequest struct {
 	// Id the new region
-	Id WlRegion `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 }
 type WlCompositorListener interface{}
+type UnimplementedWlCompositorListener struct{}
 type WlCompositorDispatcher struct {
 	WlCompositorListener
 }
 
+func NewWlCompositorDispatcher() *WlCompositorDispatcher {
+	return &WlCompositorDispatcher{WlCompositorListener: &UnimplementedWlCompositorListener{}}
+}
 func (i *WlCompositorDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	default:
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlCompositorDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlCompositorListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlCompositorListener = listener
 }
 
 // WlShmPool a shared memory pool
@@ -345,7 +454,14 @@ func (i *WlCompositorDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	a surface or for many small buffers.
 */
 type WlShmPool struct {
-	WlShmPoolListener
+	Proxy
+}
+
+func NewWlShmPool(p Proxy) WlShmPool {
+	return WlShmPool{Proxy: p}
+}
+func (w *WlShmPool) AttachListener(l WlShmPoolListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlShmPoolCreateBufferRequest create a buffer from the pool
@@ -364,7 +480,7 @@ type WlShmPool struct {
 */
 type WlShmPoolCreateBufferRequest struct {
 	// Id buffer to create
-	Id WlBuffer `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 	// Offset buffer byte offset within the pool
 	Offset int32 `wayland:"int"`
 	// Width buffer width, in pixels
@@ -374,7 +490,7 @@ type WlShmPoolCreateBufferRequest struct {
 	// Stride number of bytes from the beginning of one row to the beginning of the next row
 	Stride int32 `wayland:"int"`
 	// Format buffer pixel format
-	Format WlShmFormat `wayland:"uint"`
+	Format uint32 `wayland:"uint"`
 }
 
 // WlShmPoolDestroyRequest destroy the pool
@@ -405,16 +521,27 @@ type WlShmPoolResizeRequest struct {
 	Size int32 `wayland:"int"`
 }
 type WlShmPoolListener interface{}
+type UnimplementedWlShmPoolListener struct{}
 type WlShmPoolDispatcher struct {
 	WlShmPoolListener
 }
 
+func NewWlShmPoolDispatcher() *WlShmPoolDispatcher {
+	return &WlShmPoolDispatcher{WlShmPoolListener: &UnimplementedWlShmPoolListener{}}
+}
 func (i *WlShmPoolDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	default:
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlShmPoolDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlShmPoolListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlShmPoolListener = listener
 }
 
 // WlShm shared memory support
@@ -430,7 +557,14 @@ func (i *WlShmPoolDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	that can be used for buffers.
 */
 type WlShm struct {
-	WlShmListener
+	Proxy
+}
+
+func NewWlShm(p Proxy) WlShm {
+	return WlShm{Proxy: p}
+}
+func (w *WlShm) AttachListener(l WlShmListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlShmError wl_shm error values
@@ -681,7 +815,7 @@ const (
 */
 type WlShmCreatePoolRequest struct {
 	// Id pool to create
-	Id WlShmPool `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 	// Fd file descriptor for the pool
 	Fd uintptr `wayland:"fd"`
 	// Size pool size, in bytes
@@ -696,20 +830,31 @@ type WlShmCreatePoolRequest struct {
 */
 type WlShmFormatEvent struct {
 	// Format buffer pixel format
-	Format WlShmFormat `wayland:"uint"`
+	Format uint32 `wayland:"uint"`
 }
 
 func (e *WlShmFormatEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Format = UnmarshallUint32(offset, d)
 	return nil
 }
 
 type WlShmListener interface {
 	Format(WlShmFormatEvent)
 }
+type UnimplementedWlShmListener struct{}
+
+func (e *UnimplementedWlShmListener) Format(_ WlShmFormatEvent) {
+	return
+}
+
 type WlShmDispatcher struct {
 	WlShmListener
 }
 
+func NewWlShmDispatcher() *WlShmDispatcher {
+	return &WlShmDispatcher{WlShmListener: &UnimplementedWlShmListener{}}
+}
 func (i *WlShmDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -723,6 +868,13 @@ func (i *WlShmDispatcher) Dispatch(h MessageHeader, b []byte) error {
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlShmDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlShmListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlShmListener = listener
 }
 
 // WlBuffer content for a wl_surface
@@ -739,7 +891,14 @@ func (i *WlShmDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	specified.
 */
 type WlBuffer struct {
-	WlBufferListener
+	Proxy
+}
+
+func NewWlBuffer(p Proxy) WlBuffer {
+	return WlBuffer{Proxy: p}
+}
+func (w *WlBuffer) AttachListener(l WlBufferListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlBufferDestroyRequest destroy a buffer
@@ -775,10 +934,19 @@ func (e *WlBufferReleaseEvent) UnmarshallBinary(d []byte) error {
 type WlBufferListener interface {
 	Release(WlBufferReleaseEvent)
 }
+type UnimplementedWlBufferListener struct{}
+
+func (e *UnimplementedWlBufferListener) Release(_ WlBufferReleaseEvent) {
+	return
+}
+
 type WlBufferDispatcher struct {
 	WlBufferListener
 }
 
+func NewWlBufferDispatcher() *WlBufferDispatcher {
+	return &WlBufferDispatcher{WlBufferListener: &UnimplementedWlBufferListener{}}
+}
 func (i *WlBufferDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -793,6 +961,13 @@ func (i *WlBufferDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlBufferDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlBufferListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlBufferListener = listener
+}
 
 // WlDataOffer offer to transfer data
 /*
@@ -804,8 +979,16 @@ func (i *WlBufferDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	data directly from the source client.
 */
 type WlDataOffer struct {
-	WlDataOfferListener
+	Proxy
 }
+
+func NewWlDataOffer(p Proxy) WlDataOffer {
+	return WlDataOffer{Proxy: p}
+}
+func (w *WlDataOffer) AttachListener(l WlDataOfferListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
+}
+
 type WlDataOfferError uint32
 
 const (
@@ -928,9 +1111,9 @@ type WlDataOfferFinishRequest struct{}
 */
 type WlDataOfferSetActionsRequest struct {
 	// DndActions actions supported by the destination client
-	DndActions WlDataDeviceManagerDndAction `wayland:"uint"`
+	DndActions uint32 `wayland:"uint"`
 	// PreferredAction action preferred by the destination client
-	PreferredAction WlDataDeviceManagerDndAction `wayland:"uint"`
+	PreferredAction uint32 `wayland:"uint"`
 }
 
 // WlDataOfferOfferEvent advertise offered mime type
@@ -944,6 +1127,8 @@ type WlDataOfferOfferEvent struct {
 }
 
 func (e *WlDataOfferOfferEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.MimeType = UnmarshallString(offset, d)
 	return nil
 }
 
@@ -955,10 +1140,12 @@ func (e *WlDataOfferOfferEvent) UnmarshallBinary(d []byte) error {
 */
 type WlDataOfferSourceActionsEvent struct {
 	// SourceActions actions offered by the data source
-	SourceActions WlDataDeviceManagerDndAction `wayland:"uint"`
+	SourceActions uint32 `wayland:"uint"`
 }
 
 func (e *WlDataOfferSourceActionsEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.SourceActions = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -1002,10 +1189,12 @@ func (e *WlDataOfferSourceActionsEvent) UnmarshallBinary(d []byte) error {
 */
 type WlDataOfferActionEvent struct {
 	// DndAction action selected by the compositor
-	DndAction WlDataDeviceManagerDndAction `wayland:"uint"`
+	DndAction uint32 `wayland:"uint"`
 }
 
 func (e *WlDataOfferActionEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.DndAction = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -1014,10 +1203,25 @@ type WlDataOfferListener interface {
 	SourceActions(WlDataOfferSourceActionsEvent)
 	Action(WlDataOfferActionEvent)
 }
+type UnimplementedWlDataOfferListener struct{}
+
+func (e *UnimplementedWlDataOfferListener) Offer(_ WlDataOfferOfferEvent) {
+	return
+}
+func (e *UnimplementedWlDataOfferListener) SourceActions(_ WlDataOfferSourceActionsEvent) {
+	return
+}
+func (e *UnimplementedWlDataOfferListener) Action(_ WlDataOfferActionEvent) {
+	return
+}
+
 type WlDataOfferDispatcher struct {
 	WlDataOfferListener
 }
 
+func NewWlDataOfferDispatcher() *WlDataOfferDispatcher {
+	return &WlDataOfferDispatcher{WlDataOfferListener: &UnimplementedWlDataOfferListener{}}
+}
 func (i *WlDataOfferDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -1046,6 +1250,13 @@ func (i *WlDataOfferDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlDataOfferDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlDataOfferListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlDataOfferListener = listener
+}
 
 // WlDataSource offer to transfer data
 /*
@@ -1055,8 +1266,16 @@ func (i *WlDataOfferDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	to requests to transfer the data.
 */
 type WlDataSource struct {
-	WlDataSourceListener
+	Proxy
 }
+
+func NewWlDataSource(p Proxy) WlDataSource {
+	return WlDataSource{Proxy: p}
+}
+func (w *WlDataSource) AttachListener(l WlDataSourceListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
+}
+
 type WlDataSourceError uint32
 
 const (
@@ -1100,7 +1319,7 @@ type WlDataSourceDestroyRequest struct{}
 */
 type WlDataSourceSetActionsRequest struct {
 	// DndActions actions supported by the data source
-	DndActions WlDataDeviceManagerDndAction `wayland:"uint"`
+	DndActions uint32 `wayland:"uint"`
 }
 
 // WlDataSourceTargetEvent a target accepts an offered mime type
@@ -1116,6 +1335,8 @@ type WlDataSourceTargetEvent struct {
 }
 
 func (e *WlDataSourceTargetEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.MimeType = UnmarshallString(offset, d)
 	return nil
 }
 
@@ -1133,6 +1354,9 @@ type WlDataSourceSendEvent struct {
 }
 
 func (e *WlDataSourceSendEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.MimeType = UnmarshallString(offset, d)
+	offset, e.Fd = UnmarshallFd(offset, d)
 	return nil
 }
 
@@ -1228,10 +1452,12 @@ func (e *WlDataSourceDndFinishedEvent) UnmarshallBinary(d []byte) error {
 */
 type WlDataSourceActionEvent struct {
 	// DndAction action selected by the compositor
-	DndAction WlDataDeviceManagerDndAction `wayland:"uint"`
+	DndAction uint32 `wayland:"uint"`
 }
 
 func (e *WlDataSourceActionEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.DndAction = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -1243,10 +1469,34 @@ type WlDataSourceListener interface {
 	DndFinished(WlDataSourceDndFinishedEvent)
 	Action(WlDataSourceActionEvent)
 }
+type UnimplementedWlDataSourceListener struct{}
+
+func (e *UnimplementedWlDataSourceListener) Target(_ WlDataSourceTargetEvent) {
+	return
+}
+func (e *UnimplementedWlDataSourceListener) Send(_ WlDataSourceSendEvent) {
+	return
+}
+func (e *UnimplementedWlDataSourceListener) Cancelled(_ WlDataSourceCancelledEvent) {
+	return
+}
+func (e *UnimplementedWlDataSourceListener) DndDropPerformed(_ WlDataSourceDndDropPerformedEvent) {
+	return
+}
+func (e *UnimplementedWlDataSourceListener) DndFinished(_ WlDataSourceDndFinishedEvent) {
+	return
+}
+func (e *UnimplementedWlDataSourceListener) Action(_ WlDataSourceActionEvent) {
+	return
+}
+
 type WlDataSourceDispatcher struct {
 	WlDataSourceListener
 }
 
+func NewWlDataSourceDispatcher() *WlDataSourceDispatcher {
+	return &WlDataSourceDispatcher{WlDataSourceListener: &UnimplementedWlDataSourceListener{}}
+}
 func (i *WlDataSourceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -1296,6 +1546,13 @@ func (i *WlDataSourceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlDataSourceDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlDataSourceListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlDataSourceListener = listener
+}
 
 // WlDataDevice data transfer device
 /*
@@ -1306,8 +1563,16 @@ func (i *WlDataSourceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	mechanisms such as copy-and-paste and drag-and-drop.
 */
 type WlDataDevice struct {
-	WlDataDeviceListener
+	Proxy
 }
+
+func NewWlDataDevice(p Proxy) WlDataDevice {
+	return WlDataDevice{Proxy: p}
+}
+func (w *WlDataDevice) AttachListener(l WlDataDeviceListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
+}
+
 type WlDataDeviceError uint32
 
 const (
@@ -1348,11 +1613,11 @@ const (
 */
 type WlDataDeviceStartDragRequest struct {
 	// Source data source for the eventual transfer
-	Source WlDataSource `wayland:"object"`
+	Source uint32 `wayland:"object"`
 	// Origin surface where the drag originates
-	Origin WlSurface `wayland:"object"`
+	Origin uint32 `wayland:"object"`
 	// Icon drag-and-drop icon surface
-	Icon WlSurface `wayland:"object"`
+	Icon uint32 `wayland:"object"`
 	// Serial  number of the implicit grab on the origin
 	Serial uint32 `wayland:"uint"`
 }
@@ -1366,7 +1631,7 @@ type WlDataDeviceStartDragRequest struct {
 */
 type WlDataDeviceSetSelectionRequest struct {
 	// Source data source for the selection
-	Source WlDataSource `wayland:"object"`
+	Source uint32 `wayland:"object"`
 	// Serial  number of the event that triggered this request
 	Serial uint32 `wayland:"uint"`
 }
@@ -1388,10 +1653,12 @@ type WlDataDeviceReleaseRequest struct{}
 */
 type WlDataDeviceDataOfferEvent struct {
 	// Id the new data_offer object
-	Id WlDataOffer `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 }
 
 func (e *WlDataDeviceDataOfferEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Id = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -1406,16 +1673,22 @@ type WlDataDeviceEnterEvent struct {
 	// Serial  number of the enter event
 	Serial uint32 `wayland:"uint"`
 	// Surface client surface entered
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 	// X surface-local x coordinate
-	X int32 `wayland:"fixed"`
+	X float64 `wayland:"fixed"`
 	// Y surface-local y coordinate
-	Y int32 `wayland:"fixed"`
+	Y float64 `wayland:"fixed"`
 	// Id source data_offer object
-	Id WlDataOffer `wayland:"object"`
+	Id uint32 `wayland:"object"`
 }
 
 func (e *WlDataDeviceEnterEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Surface = UnmarshallUint32(offset, d)
+	offset, e.X = UnmarshallFixed(offset, d)
+	offset, e.Y = UnmarshallFixed(offset, d)
+	offset, e.Id = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -1442,12 +1715,16 @@ type WlDataDeviceMotionEvent struct {
 	// Time stamp with millisecond granularity
 	Time uint32 `wayland:"uint"`
 	// X surface-local x coordinate
-	X int32 `wayland:"fixed"`
+	X float64 `wayland:"fixed"`
 	// Y surface-local y coordinate
-	Y int32 `wayland:"fixed"`
+	Y float64 `wayland:"fixed"`
 }
 
 func (e *WlDataDeviceMotionEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.X = UnmarshallFixed(offset, d)
+	offset, e.Y = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -1490,10 +1767,12 @@ func (e *WlDataDeviceDropEvent) UnmarshallBinary(d []byte) error {
 */
 type WlDataDeviceSelectionEvent struct {
 	// Id selection data_offer object
-	Id WlDataOffer `wayland:"object"`
+	Id uint32 `wayland:"object"`
 }
 
 func (e *WlDataDeviceSelectionEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Id = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -1505,10 +1784,34 @@ type WlDataDeviceListener interface {
 	Drop(WlDataDeviceDropEvent)
 	Selection(WlDataDeviceSelectionEvent)
 }
+type UnimplementedWlDataDeviceListener struct{}
+
+func (e *UnimplementedWlDataDeviceListener) DataOffer(_ WlDataDeviceDataOfferEvent) {
+	return
+}
+func (e *UnimplementedWlDataDeviceListener) Enter(_ WlDataDeviceEnterEvent) {
+	return
+}
+func (e *UnimplementedWlDataDeviceListener) Leave(_ WlDataDeviceLeaveEvent) {
+	return
+}
+func (e *UnimplementedWlDataDeviceListener) Motion(_ WlDataDeviceMotionEvent) {
+	return
+}
+func (e *UnimplementedWlDataDeviceListener) Drop(_ WlDataDeviceDropEvent) {
+	return
+}
+func (e *UnimplementedWlDataDeviceListener) Selection(_ WlDataDeviceSelectionEvent) {
+	return
+}
+
 type WlDataDeviceDispatcher struct {
 	WlDataDeviceListener
 }
 
+func NewWlDataDeviceDispatcher() *WlDataDeviceDispatcher {
+	return &WlDataDeviceDispatcher{WlDataDeviceListener: &UnimplementedWlDataDeviceListener{}}
+}
 func (i *WlDataDeviceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -1558,6 +1861,13 @@ func (i *WlDataDeviceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlDataDeviceDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlDataDeviceListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlDataDeviceListener = listener
+}
 
 // WlDataDeviceManager data transfer interface
 /*
@@ -1573,7 +1883,14 @@ func (i *WlDataDeviceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	wl_data_offer.accept and wl_data_offer.finish for details.
 */
 type WlDataDeviceManager struct {
-	WlDataDeviceManagerListener
+	Proxy
+}
+
+func NewWlDataDeviceManager(p Proxy) WlDataDeviceManager {
+	return WlDataDeviceManager{Proxy: p}
+}
+func (w *WlDataDeviceManager) AttachListener(l WlDataDeviceManagerListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlDataDeviceManagerDndAction drag and drop actions
@@ -1620,7 +1937,7 @@ const (
 //	Create a new data source.
 type WlDataDeviceManagerCreateDataSourceRequest struct {
 	// Id data source to create
-	Id WlDataSource `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 }
 
 // WlDataDeviceManagerGetDataDeviceRequest create a new data device
@@ -1628,21 +1945,32 @@ type WlDataDeviceManagerCreateDataSourceRequest struct {
 //	Create a new data device for a given seat.
 type WlDataDeviceManagerGetDataDeviceRequest struct {
 	// Id data device to create
-	Id WlDataDevice `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 	// Seat  associated with the data device
-	Seat WlSeat `wayland:"object"`
+	Seat uint32 `wayland:"object"`
 }
 type WlDataDeviceManagerListener interface{}
+type UnimplementedWlDataDeviceManagerListener struct{}
 type WlDataDeviceManagerDispatcher struct {
 	WlDataDeviceManagerListener
 }
 
+func NewWlDataDeviceManagerDispatcher() *WlDataDeviceManagerDispatcher {
+	return &WlDataDeviceManagerDispatcher{WlDataDeviceManagerListener: &UnimplementedWlDataDeviceManagerListener{}}
+}
 func (i *WlDataDeviceManagerDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	default:
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlDataDeviceManagerDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlDataDeviceManagerListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlDataDeviceManagerListener = listener
 }
 
 // WlShell create desktop-style surfaces
@@ -1658,8 +1986,16 @@ func (i *WlDataDeviceManagerDispatcher) Dispatch(h MessageHeader, b []byte) erro
 	should not implement this interface.
 */
 type WlShell struct {
-	WlShellListener
+	Proxy
 }
+
+func NewWlShell(p Proxy) WlShell {
+	return WlShell{Proxy: p}
+}
+func (w *WlShell) AttachListener(l WlShellListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
+}
+
 type WlShellError uint32
 
 const (
@@ -1677,21 +2013,32 @@ const (
 */
 type WlShellGetShellSurfaceRequest struct {
 	// Id shell surface to create
-	Id WlShellSurface `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 	// Surface  to be given the shell surface role
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 }
 type WlShellListener interface{}
+type UnimplementedWlShellListener struct{}
 type WlShellDispatcher struct {
 	WlShellListener
 }
 
+func NewWlShellDispatcher() *WlShellDispatcher {
+	return &WlShellDispatcher{WlShellListener: &UnimplementedWlShellListener{}}
+}
 func (i *WlShellDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	default:
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlShellDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlShellListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlShellListener = listener
 }
 
 // WlShellSurface desktop-style metadata interface
@@ -1709,7 +2056,14 @@ func (i *WlShellDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	the wl_surface object.
 */
 type WlShellSurface struct {
-	WlShellSurfaceListener
+	Proxy
+}
+
+func NewWlShellSurface(p Proxy) WlShellSurface {
+	return WlShellSurface{Proxy: p}
+}
+func (w *WlShellSurface) AttachListener(l WlShellSurfaceListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlShellSurfaceResize edge values for resizing
@@ -1793,7 +2147,7 @@ type WlShellSurfacePongRequest struct {
 */
 type WlShellSurfaceMoveRequest struct {
 	// Seat  whose pointer is used
-	Seat WlSeat `wayland:"object"`
+	Seat uint32 `wayland:"object"`
 	// Serial  number of the implicit grab on the pointer
 	Serial uint32 `wayland:"uint"`
 }
@@ -1808,11 +2162,11 @@ type WlShellSurfaceMoveRequest struct {
 */
 type WlShellSurfaceResizeRequest struct {
 	// Seat  whose pointer is used
-	Seat WlSeat `wayland:"object"`
+	Seat uint32 `wayland:"object"`
 	// Serial  number of the implicit grab on the pointer
 	Serial uint32 `wayland:"uint"`
 	// Edges which edge or corner is being dragged
-	Edges WlShellSurfaceResize `wayland:"uint"`
+	Edges uint32 `wayland:"uint"`
 }
 
 // WlShellSurfaceSetToplevelRequest make the surface a toplevel surface
@@ -1835,13 +2189,13 @@ type WlShellSurfaceSetToplevelRequest struct{}
 */
 type WlShellSurfaceSetTransientRequest struct {
 	// Parent  surface
-	Parent WlSurface `wayland:"object"`
+	Parent uint32 `wayland:"object"`
 	// X surface-local x coordinate
 	X int32 `wayland:"int"`
 	// Y surface-local y coordinate
 	Y int32 `wayland:"int"`
 	// Flags transient surface behavior
-	Flags WlShellSurfaceTransient `wayland:"uint"`
+	Flags uint32 `wayland:"uint"`
 }
 
 // WlShellSurfaceSetFullscreenRequest make the surface a fullscreen surface
@@ -1882,11 +2236,11 @@ type WlShellSurfaceSetTransientRequest struct {
 */
 type WlShellSurfaceSetFullscreenRequest struct {
 	// Method  for resolving size conflict
-	Method WlShellSurfaceFullscreenMethod `wayland:"uint"`
+	Method uint32 `wayland:"uint"`
 	// Framerate  in mHz
 	Framerate uint32 `wayland:"uint"`
 	// Output  on which the surface is to be fullscreen
-	Output WlOutput `wayland:"object"`
+	Output uint32 `wayland:"object"`
 }
 
 // WlShellSurfaceSetPopupRequest make the surface a popup surface
@@ -1913,17 +2267,17 @@ type WlShellSurfaceSetFullscreenRequest struct {
 */
 type WlShellSurfaceSetPopupRequest struct {
 	// Seat  whose pointer is used
-	Seat WlSeat `wayland:"object"`
+	Seat uint32 `wayland:"object"`
 	// Serial  number of the implicit grab on the pointer
 	Serial uint32 `wayland:"uint"`
 	// Parent  surface
-	Parent WlSurface `wayland:"object"`
+	Parent uint32 `wayland:"object"`
 	// X surface-local x coordinate
 	X int32 `wayland:"int"`
 	// Y surface-local y coordinate
 	Y int32 `wayland:"int"`
 	// Flags transient surface behavior
-	Flags WlShellSurfaceTransient `wayland:"uint"`
+	Flags uint32 `wayland:"uint"`
 }
 
 // WlShellSurfaceSetMaximizedRequest make the surface a maximized surface
@@ -1949,7 +2303,7 @@ type WlShellSurfaceSetPopupRequest struct {
 */
 type WlShellSurfaceSetMaximizedRequest struct {
 	// Output  on which the surface is to be maximized
-	Output WlOutput `wayland:"object"`
+	Output uint32 `wayland:"object"`
 }
 
 // WlShellSurfaceSetTitleRequest set surface title
@@ -1992,6 +2346,8 @@ type WlShellSurfacePingEvent struct {
 }
 
 func (e *WlShellSurfacePingEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -2017,7 +2373,7 @@ func (e *WlShellSurfacePingEvent) UnmarshallBinary(d []byte) error {
 */
 type WlShellSurfaceConfigureEvent struct {
 	// Edges how the surface was resized
-	Edges WlShellSurfaceResize `wayland:"uint"`
+	Edges uint32 `wayland:"uint"`
 	// Width new width of the surface
 	Width int32 `wayland:"int"`
 	// Height new height of the surface
@@ -2025,6 +2381,10 @@ type WlShellSurfaceConfigureEvent struct {
 }
 
 func (e *WlShellSurfaceConfigureEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Edges = UnmarshallUint32(offset, d)
+	offset, e.Width = UnmarshallInt32(offset, d)
+	offset, e.Height = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -2045,10 +2405,25 @@ type WlShellSurfaceListener interface {
 	Configure(WlShellSurfaceConfigureEvent)
 	PopupDone(WlShellSurfacePopupDoneEvent)
 }
+type UnimplementedWlShellSurfaceListener struct{}
+
+func (e *UnimplementedWlShellSurfaceListener) Ping(_ WlShellSurfacePingEvent) {
+	return
+}
+func (e *UnimplementedWlShellSurfaceListener) Configure(_ WlShellSurfaceConfigureEvent) {
+	return
+}
+func (e *UnimplementedWlShellSurfaceListener) PopupDone(_ WlShellSurfacePopupDoneEvent) {
+	return
+}
+
 type WlShellSurfaceDispatcher struct {
 	WlShellSurfaceListener
 }
 
+func NewWlShellSurfaceDispatcher() *WlShellSurfaceDispatcher {
+	return &WlShellSurfaceDispatcher{WlShellSurfaceListener: &UnimplementedWlShellSurfaceListener{}}
+}
 func (i *WlShellSurfaceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -2076,6 +2451,13 @@ func (i *WlShellSurfaceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlShellSurfaceDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlShellSurfaceListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlShellSurfaceListener = listener
 }
 
 // WlSurface an onscreen surface
@@ -2123,7 +2505,14 @@ func (i *WlShellSurfaceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switching is not allowed).
 */
 type WlSurface struct {
-	WlSurfaceListener
+	Proxy
+}
+
+func NewWlSurface(p Proxy) WlSurface {
+	return WlSurface{Proxy: p}
+}
+func (w *WlSurface) AttachListener(l WlSurfaceListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlSurfaceError wl_surface error values
@@ -2208,7 +2597,7 @@ type WlSurfaceDestroyRequest struct{}
 */
 type WlSurfaceAttachRequest struct {
 	// Buffer  of surface contents
-	Buffer WlBuffer `wayland:"object"`
+	Buffer uint32 `wayland:"object"`
 	// X surface-local x coordinate
 	X int32 `wayland:"int"`
 	// Y surface-local y coordinate
@@ -2287,7 +2676,7 @@ type WlSurfaceDamageRequest struct {
 */
 type WlSurfaceFrameRequest struct {
 	// Callback  object for the frame request
-	Callback WlCallback `wayland:"new_id"`
+	Callback uint32 `wayland:"new_id"`
 }
 
 // WlSurfaceSetOpaqueRegionRequest set opaque region
@@ -2319,7 +2708,7 @@ type WlSurfaceFrameRequest struct {
 */
 type WlSurfaceSetOpaqueRegionRequest struct {
 	// Region opaque region of the surface
-	Region WlRegion `wayland:"object"`
+	Region uint32 `wayland:"object"`
 }
 
 // WlSurfaceSetInputRegionRequest set input region
@@ -2349,7 +2738,7 @@ type WlSurfaceSetOpaqueRegionRequest struct {
 */
 type WlSurfaceSetInputRegionRequest struct {
 	// Region input region of the surface
-	Region WlRegion `wayland:"object"`
+	Region uint32 `wayland:"object"`
 }
 
 // WlSurfaceCommitRequest commit pending surface state
@@ -2520,10 +2909,12 @@ type WlSurfaceOffsetRequest struct {
 */
 type WlSurfaceEnterEvent struct {
 	// Output  entered by the surface
-	Output WlOutput `wayland:"object"`
+	Output uint32 `wayland:"object"`
 }
 
 func (e *WlSurfaceEnterEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Output = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -2541,10 +2932,12 @@ func (e *WlSurfaceEnterEvent) UnmarshallBinary(d []byte) error {
 */
 type WlSurfaceLeaveEvent struct {
 	// Output  left by the surface
-	Output WlOutput `wayland:"object"`
+	Output uint32 `wayland:"object"`
 }
 
 func (e *WlSurfaceLeaveEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Output = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -2552,10 +2945,22 @@ type WlSurfaceListener interface {
 	Enter(WlSurfaceEnterEvent)
 	Leave(WlSurfaceLeaveEvent)
 }
+type UnimplementedWlSurfaceListener struct{}
+
+func (e *UnimplementedWlSurfaceListener) Enter(_ WlSurfaceEnterEvent) {
+	return
+}
+func (e *UnimplementedWlSurfaceListener) Leave(_ WlSurfaceLeaveEvent) {
+	return
+}
+
 type WlSurfaceDispatcher struct {
 	WlSurfaceListener
 }
 
+func NewWlSurfaceDispatcher() *WlSurfaceDispatcher {
+	return &WlSurfaceDispatcher{WlSurfaceListener: &UnimplementedWlSurfaceListener{}}
+}
 func (i *WlSurfaceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -2577,6 +2982,13 @@ func (i *WlSurfaceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlSurfaceDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlSurfaceListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlSurfaceListener = listener
+}
 
 // WlSeat group of input devices
 /*
@@ -2586,7 +2998,14 @@ func (i *WlSurfaceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	maintains a keyboard focus and a pointer focus.
 */
 type WlSeat struct {
-	WlSeatListener
+	Proxy
+}
+
+func NewWlSeat(p Proxy) WlSeat {
+	return WlSeat{Proxy: p}
+}
+func (w *WlSeat) AttachListener(l WlSeatListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlSeatCapability seat capability bitmask
@@ -2628,7 +3047,7 @@ const (
 */
 type WlSeatGetPointerRequest struct {
 	// Id seat pointer
-	Id WlPointer `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 }
 
 // WlSeatGetKeyboardRequest return keyboard object
@@ -2644,7 +3063,7 @@ type WlSeatGetPointerRequest struct {
 */
 type WlSeatGetKeyboardRequest struct {
 	// Id seat keyboard
-	Id WlKeyboard `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 }
 
 // WlSeatGetTouchRequest return touch object
@@ -2660,7 +3079,7 @@ type WlSeatGetKeyboardRequest struct {
 */
 type WlSeatGetTouchRequest struct {
 	// Id seat touch interface
-	Id WlTouch `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 }
 
 // WlSeatReleaseRequest release the seat object
@@ -2699,10 +3118,12 @@ type WlSeatReleaseRequest struct{}
 */
 type WlSeatCapabilitiesEvent struct {
 	// Capabilities  of the seat
-	Capabilities WlSeatCapability `wayland:"uint"`
+	Capabilities uint32 `wayland:"uint"`
 }
 
 func (e *WlSeatCapabilitiesEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Capabilities = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -2731,6 +3152,8 @@ type WlSeatNameEvent struct {
 }
 
 func (e *WlSeatNameEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Name = UnmarshallString(offset, d)
 	return nil
 }
 
@@ -2738,10 +3161,22 @@ type WlSeatListener interface {
 	Capabilities(WlSeatCapabilitiesEvent)
 	Name(WlSeatNameEvent)
 }
+type UnimplementedWlSeatListener struct{}
+
+func (e *UnimplementedWlSeatListener) Capabilities(_ WlSeatCapabilitiesEvent) {
+	return
+}
+func (e *UnimplementedWlSeatListener) Name(_ WlSeatNameEvent) {
+	return
+}
+
 type WlSeatDispatcher struct {
 	WlSeatListener
 }
 
+func NewWlSeatDispatcher() *WlSeatDispatcher {
+	return &WlSeatDispatcher{WlSeatListener: &UnimplementedWlSeatListener{}}
+}
 func (i *WlSeatDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -2763,6 +3198,13 @@ func (i *WlSeatDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlSeatDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlSeatListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlSeatListener = listener
+}
 
 // WlPointer pointer input device
 /*
@@ -2776,8 +3218,16 @@ func (i *WlSeatDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	and scrolling.
 */
 type WlPointer struct {
-	WlPointerListener
+	Proxy
 }
+
+func NewWlPointer(p Proxy) WlPointer {
+	return WlPointer{Proxy: p}
+}
+func (w *WlPointer) AttachListener(l WlPointerListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
+}
+
 type WlPointerError uint32
 
 const (
@@ -2885,7 +3335,7 @@ type WlPointerSetCursorRequest struct {
 	// Serial  number of the enter event
 	Serial uint32 `wayland:"uint"`
 	// Surface pointer surface
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 	// HotspotX surface-local x coordinate
 	HotspotX int32 `wayland:"int"`
 	// HotspotY surface-local y coordinate
@@ -2915,14 +3365,19 @@ type WlPointerEnterEvent struct {
 	// Serial  number of the enter event
 	Serial uint32 `wayland:"uint"`
 	// Surface  entered by the pointer
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 	// SurfaceX surface-local x coordinate
-	SurfaceX int32 `wayland:"fixed"`
+	SurfaceX float64 `wayland:"fixed"`
 	// SurfaceY surface-local y coordinate
-	SurfaceY int32 `wayland:"fixed"`
+	SurfaceY float64 `wayland:"fixed"`
 }
 
 func (e *WlPointerEnterEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Surface = UnmarshallUint32(offset, d)
+	offset, e.SurfaceX = UnmarshallFixed(offset, d)
+	offset, e.SurfaceY = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -2938,10 +3393,13 @@ type WlPointerLeaveEvent struct {
 	// Serial  number of the leave event
 	Serial uint32 `wayland:"uint"`
 	// Surface  left by the pointer
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 }
 
 func (e *WlPointerLeaveEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Surface = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -2955,12 +3413,16 @@ type WlPointerMotionEvent struct {
 	// Time stamp with millisecond granularity
 	Time uint32 `wayland:"uint"`
 	// SurfaceX surface-local x coordinate
-	SurfaceX int32 `wayland:"fixed"`
+	SurfaceX float64 `wayland:"fixed"`
 	// SurfaceY surface-local y coordinate
-	SurfaceY int32 `wayland:"fixed"`
+	SurfaceY float64 `wayland:"fixed"`
 }
 
 func (e *WlPointerMotionEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.SurfaceX = UnmarshallFixed(offset, d)
+	offset, e.SurfaceY = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -2989,10 +3451,15 @@ type WlPointerButtonEvent struct {
 	// Button  that produced the event
 	Button uint32 `wayland:"uint"`
 	// State physical state of the button
-	State WlPointerButtonState `wayland:"uint"`
+	State uint32 `wayland:"uint"`
 }
 
 func (e *WlPointerButtonEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.Button = UnmarshallUint32(offset, d)
+	offset, e.State = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -3019,12 +3486,16 @@ type WlPointerAxisEvent struct {
 	// Time stamp with millisecond granularity
 	Time uint32 `wayland:"uint"`
 	// Axis  type
-	Axis WlPointerAxis `wayland:"uint"`
+	Axis uint32 `wayland:"uint"`
 	// Value length of vector in surface-local coordinate space
-	Value int32 `wayland:"fixed"`
+	Value float64 `wayland:"fixed"`
 }
 
 func (e *WlPointerAxisEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.Axis = UnmarshallUint32(offset, d)
+	offset, e.Value = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -3101,10 +3572,12 @@ func (e *WlPointerFrameEvent) UnmarshallBinary(d []byte) error {
 */
 type WlPointerAxisSourceEvent struct {
 	// AxisSource source of the axis event
-	AxisSource WlPointerAxisSource `wayland:"uint"`
+	AxisSource uint32 `wayland:"uint"`
 }
 
 func (e *WlPointerAxisSourceEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.AxisSource = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -3129,10 +3602,13 @@ type WlPointerAxisStopEvent struct {
 	// Time stamp with millisecond granularity
 	Time uint32 `wayland:"uint"`
 	// Axis the axis stopped with this event
-	Axis WlPointerAxis `wayland:"uint"`
+	Axis uint32 `wayland:"uint"`
 }
 
 func (e *WlPointerAxisStopEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.Axis = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -3171,12 +3647,15 @@ func (e *WlPointerAxisStopEvent) UnmarshallBinary(d []byte) error {
 */
 type WlPointerAxisDiscreteEvent struct {
 	// Axis  type
-	Axis WlPointerAxis `wayland:"uint"`
+	Axis uint32 `wayland:"uint"`
 	// Discrete number of steps
 	Discrete int32 `wayland:"int"`
 }
 
 func (e *WlPointerAxisDiscreteEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Axis = UnmarshallUint32(offset, d)
+	offset, e.Discrete = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -3206,12 +3685,15 @@ func (e *WlPointerAxisDiscreteEvent) UnmarshallBinary(d []byte) error {
 */
 type WlPointerAxisValue120Event struct {
 	// Axis  type
-	Axis WlPointerAxis `wayland:"uint"`
+	Axis uint32 `wayland:"uint"`
 	// Value120 scroll distance as fraction of 120
 	Value120 int32 `wayland:"int"`
 }
 
 func (e *WlPointerAxisValue120Event) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Axis = UnmarshallUint32(offset, d)
+	offset, e.Value120 = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -3227,10 +3709,46 @@ type WlPointerListener interface {
 	AxisDiscrete(WlPointerAxisDiscreteEvent)
 	AxisValue120(WlPointerAxisValue120Event)
 }
+type UnimplementedWlPointerListener struct{}
+
+func (e *UnimplementedWlPointerListener) Enter(_ WlPointerEnterEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) Leave(_ WlPointerLeaveEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) Motion(_ WlPointerMotionEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) Button(_ WlPointerButtonEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) Axis(_ WlPointerAxisEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) Frame(_ WlPointerFrameEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) AxisSource(_ WlPointerAxisSourceEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) AxisStop(_ WlPointerAxisStopEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) AxisDiscrete(_ WlPointerAxisDiscreteEvent) {
+	return
+}
+func (e *UnimplementedWlPointerListener) AxisValue120(_ WlPointerAxisValue120Event) {
+	return
+}
+
 type WlPointerDispatcher struct {
 	WlPointerListener
 }
 
+func NewWlPointerDispatcher() *WlPointerDispatcher {
+	return &WlPointerDispatcher{WlPointerListener: &UnimplementedWlPointerListener{}}
+}
 func (i *WlPointerDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -3308,6 +3826,13 @@ func (i *WlPointerDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlPointerDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlPointerListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlPointerListener = listener
+}
 
 // WlKeyboard keyboard input device
 /*
@@ -3315,7 +3840,14 @@ func (i *WlPointerDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	associated with a seat.
 */
 type WlKeyboard struct {
-	WlKeyboardListener
+	Proxy
+}
+
+func NewWlKeyboard(p Proxy) WlKeyboard {
+	return WlKeyboard{Proxy: p}
+}
+func (w *WlKeyboard) AttachListener(l WlKeyboardListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlKeyboardKeymapFormat keyboard mapping format
@@ -3358,7 +3890,7 @@ type WlKeyboardReleaseRequest struct{}
 */
 type WlKeyboardKeymapEvent struct {
 	// Format keymap format
-	Format WlKeyboardKeymapFormat `wayland:"uint"`
+	Format uint32 `wayland:"uint"`
 	// Fd keymap file descriptor
 	Fd uintptr `wayland:"fd"`
 	// Size keymap size, in bytes
@@ -3366,6 +3898,10 @@ type WlKeyboardKeymapEvent struct {
 }
 
 func (e *WlKeyboardKeymapEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Format = UnmarshallUint32(offset, d)
+	offset, e.Fd = UnmarshallFd(offset, d)
+	offset, e.Size = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -3381,12 +3917,16 @@ type WlKeyboardEnterEvent struct {
 	// Serial  number of the enter event
 	Serial uint32 `wayland:"uint"`
 	// Surface  gaining keyboard focus
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 	// Keys the currently pressed keys
 	Keys []byte `wayland:"array"`
 }
 
 func (e *WlKeyboardEnterEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Surface = UnmarshallUint32(offset, d)
+	offset, e.Keys = UnmarshallArray(offset, d)
 	return nil
 }
 
@@ -3405,10 +3945,13 @@ type WlKeyboardLeaveEvent struct {
 	// Serial  number of the leave event
 	Serial uint32 `wayland:"uint"`
 	// Surface  that lost keyboard focus
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 }
 
 func (e *WlKeyboardLeaveEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Surface = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -3432,10 +3975,15 @@ type WlKeyboardKeyEvent struct {
 	// Key  that produced the event
 	Key uint32 `wayland:"uint"`
 	// State physical state of the key
-	State WlKeyboardKeyState `wayland:"uint"`
+	State uint32 `wayland:"uint"`
 }
 
 func (e *WlKeyboardKeyEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.Key = UnmarshallUint32(offset, d)
+	offset, e.State = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -3458,6 +4006,12 @@ type WlKeyboardModifiersEvent struct {
 }
 
 func (e *WlKeyboardModifiersEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.ModsDepressed = UnmarshallUint32(offset, d)
+	offset, e.ModsLatched = UnmarshallUint32(offset, d)
+	offset, e.ModsLocked = UnmarshallUint32(offset, d)
+	offset, e.Group = UnmarshallUint32(offset, d)
 	return nil
 }
 
@@ -3484,6 +4038,9 @@ type WlKeyboardRepeatInfoEvent struct {
 }
 
 func (e *WlKeyboardRepeatInfoEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Rate = UnmarshallInt32(offset, d)
+	offset, e.Delay = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -3495,10 +4052,34 @@ type WlKeyboardListener interface {
 	Modifiers(WlKeyboardModifiersEvent)
 	RepeatInfo(WlKeyboardRepeatInfoEvent)
 }
+type UnimplementedWlKeyboardListener struct{}
+
+func (e *UnimplementedWlKeyboardListener) Keymap(_ WlKeyboardKeymapEvent) {
+	return
+}
+func (e *UnimplementedWlKeyboardListener) Enter(_ WlKeyboardEnterEvent) {
+	return
+}
+func (e *UnimplementedWlKeyboardListener) Leave(_ WlKeyboardLeaveEvent) {
+	return
+}
+func (e *UnimplementedWlKeyboardListener) Key(_ WlKeyboardKeyEvent) {
+	return
+}
+func (e *UnimplementedWlKeyboardListener) Modifiers(_ WlKeyboardModifiersEvent) {
+	return
+}
+func (e *UnimplementedWlKeyboardListener) RepeatInfo(_ WlKeyboardRepeatInfoEvent) {
+	return
+}
+
 type WlKeyboardDispatcher struct {
 	WlKeyboardListener
 }
 
+func NewWlKeyboardDispatcher() *WlKeyboardDispatcher {
+	return &WlKeyboardDispatcher{WlKeyboardListener: &UnimplementedWlKeyboardListener{}}
+}
 func (i *WlKeyboardDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -3548,6 +4129,13 @@ func (i *WlKeyboardDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlKeyboardDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlKeyboardListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlKeyboardListener = listener
+}
 
 // WlTouch touchscreen input device
 /*
@@ -3561,7 +4149,14 @@ func (i *WlKeyboardDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	contact point can be identified by the ID of the sequence.
 */
 type WlTouch struct {
-	WlTouchListener
+	Proxy
+}
+
+func NewWlTouch(p Proxy) WlTouch {
+	return WlTouch{Proxy: p}
+}
+func (w *WlTouch) AttachListener(l WlTouchListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlTouchReleaseRequest release the touch object
@@ -3580,16 +4175,23 @@ type WlTouchDownEvent struct {
 	// Time stamp with millisecond granularity
 	Time uint32 `wayland:"uint"`
 	// Surface  touched
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 	// Id the unique ID of this touch point
 	Id int32 `wayland:"int"`
 	// X surface-local x coordinate
-	X int32 `wayland:"fixed"`
+	X float64 `wayland:"fixed"`
 	// Y surface-local y coordinate
-	Y int32 `wayland:"fixed"`
+	Y float64 `wayland:"fixed"`
 }
 
 func (e *WlTouchDownEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.Surface = UnmarshallUint32(offset, d)
+	offset, e.Id = UnmarshallInt32(offset, d)
+	offset, e.X = UnmarshallFixed(offset, d)
+	offset, e.Y = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -3609,6 +4211,10 @@ type WlTouchUpEvent struct {
 }
 
 func (e *WlTouchUpEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Serial = UnmarshallUint32(offset, d)
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.Id = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -3621,12 +4227,17 @@ type WlTouchMotionEvent struct {
 	// Id the unique ID of this touch point
 	Id int32 `wayland:"int"`
 	// X surface-local x coordinate
-	X int32 `wayland:"fixed"`
+	X float64 `wayland:"fixed"`
 	// Y surface-local y coordinate
-	Y int32 `wayland:"fixed"`
+	Y float64 `wayland:"fixed"`
 }
 
 func (e *WlTouchMotionEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Time = UnmarshallUint32(offset, d)
+	offset, e.Id = UnmarshallInt32(offset, d)
+	offset, e.X = UnmarshallFixed(offset, d)
+	offset, e.Y = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -3694,12 +4305,16 @@ type WlTouchShapeEvent struct {
 	// Id the unique ID of this touch point
 	Id int32 `wayland:"int"`
 	// Major length of the major axis in surface-local coordinates
-	Major int32 `wayland:"fixed"`
+	Major float64 `wayland:"fixed"`
 	// Minor length of the minor axis in surface-local coordinates
-	Minor int32 `wayland:"fixed"`
+	Minor float64 `wayland:"fixed"`
 }
 
 func (e *WlTouchShapeEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Id = UnmarshallInt32(offset, d)
+	offset, e.Major = UnmarshallFixed(offset, d)
+	offset, e.Minor = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -3733,10 +4348,13 @@ type WlTouchOrientationEvent struct {
 	// Id the unique ID of this touch point
 	Id int32 `wayland:"int"`
 	// Orientation angle between major axis and positive surface y-axis in degrees
-	Orientation int32 `wayland:"fixed"`
+	Orientation float64 `wayland:"fixed"`
 }
 
 func (e *WlTouchOrientationEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Id = UnmarshallInt32(offset, d)
+	offset, e.Orientation = UnmarshallFixed(offset, d)
 	return nil
 }
 
@@ -3749,10 +4367,37 @@ type WlTouchListener interface {
 	Shape(WlTouchShapeEvent)
 	Orientation(WlTouchOrientationEvent)
 }
+type UnimplementedWlTouchListener struct{}
+
+func (e *UnimplementedWlTouchListener) Down(_ WlTouchDownEvent) {
+	return
+}
+func (e *UnimplementedWlTouchListener) Up(_ WlTouchUpEvent) {
+	return
+}
+func (e *UnimplementedWlTouchListener) Motion(_ WlTouchMotionEvent) {
+	return
+}
+func (e *UnimplementedWlTouchListener) Frame(_ WlTouchFrameEvent) {
+	return
+}
+func (e *UnimplementedWlTouchListener) Cancel(_ WlTouchCancelEvent) {
+	return
+}
+func (e *UnimplementedWlTouchListener) Shape(_ WlTouchShapeEvent) {
+	return
+}
+func (e *UnimplementedWlTouchListener) Orientation(_ WlTouchOrientationEvent) {
+	return
+}
+
 type WlTouchDispatcher struct {
 	WlTouchListener
 }
 
+func NewWlTouchDispatcher() *WlTouchDispatcher {
+	return &WlTouchDispatcher{WlTouchListener: &UnimplementedWlTouchListener{}}
+}
 func (i *WlTouchDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -3809,6 +4454,13 @@ func (i *WlTouchDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlTouchDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlTouchListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlTouchListener = listener
+}
 
 // WlOutput compositor output region
 /*
@@ -3820,7 +4472,14 @@ func (i *WlTouchDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	as global during start up, or when a monitor is hotplugged.
 */
 type WlOutput struct {
-	WlOutputListener
+	Proxy
+}
+
+func NewWlOutput(p Proxy) WlOutput {
+	return WlOutput{Proxy: p}
+}
+func (w *WlOutput) AttachListener(l WlOutputListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlOutputSubpixel subpixel geometry information
@@ -3940,6 +4599,15 @@ type WlOutputGeometryEvent struct {
 }
 
 func (e *WlOutputGeometryEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.X = UnmarshallInt32(offset, d)
+	offset, e.Y = UnmarshallInt32(offset, d)
+	offset, e.PhysicalWidth = UnmarshallInt32(offset, d)
+	offset, e.PhysicalHeight = UnmarshallInt32(offset, d)
+	offset, e.Subpixel = UnmarshallInt32(offset, d)
+	offset, e.Make = UnmarshallString(offset, d)
+	offset, e.Model = UnmarshallString(offset, d)
+	offset, e.Transform = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -3981,7 +4649,7 @@ func (e *WlOutputGeometryEvent) UnmarshallBinary(d []byte) error {
 */
 type WlOutputModeEvent struct {
 	// Flags bitfield of mode flags
-	Flags WlOutputMode `wayland:"uint"`
+	Flags uint32 `wayland:"uint"`
 	// Width  of the mode in hardware units
 	Width int32 `wayland:"int"`
 	// Height  of the mode in hardware units
@@ -3991,6 +4659,11 @@ type WlOutputModeEvent struct {
 }
 
 func (e *WlOutputModeEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Flags = UnmarshallUint32(offset, d)
+	offset, e.Width = UnmarshallInt32(offset, d)
+	offset, e.Height = UnmarshallInt32(offset, d)
+	offset, e.Refresh = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -4037,6 +4710,8 @@ type WlOutputScaleEvent struct {
 }
 
 func (e *WlOutputScaleEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Factor = UnmarshallInt32(offset, d)
 	return nil
 }
 
@@ -4077,6 +4752,8 @@ type WlOutputNameEvent struct {
 }
 
 func (e *WlOutputNameEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Name = UnmarshallString(offset, d)
 	return nil
 }
 
@@ -4103,6 +4780,8 @@ type WlOutputDescriptionEvent struct {
 }
 
 func (e *WlOutputDescriptionEvent) UnmarshallBinary(d []byte) error {
+	offset := 0
+	offset, e.Description = UnmarshallString(offset, d)
 	return nil
 }
 
@@ -4114,10 +4793,34 @@ type WlOutputListener interface {
 	Name(WlOutputNameEvent)
 	Description(WlOutputDescriptionEvent)
 }
+type UnimplementedWlOutputListener struct{}
+
+func (e *UnimplementedWlOutputListener) Geometry(_ WlOutputGeometryEvent) {
+	return
+}
+func (e *UnimplementedWlOutputListener) Mode(_ WlOutputModeEvent) {
+	return
+}
+func (e *UnimplementedWlOutputListener) Done(_ WlOutputDoneEvent) {
+	return
+}
+func (e *UnimplementedWlOutputListener) Scale(_ WlOutputScaleEvent) {
+	return
+}
+func (e *UnimplementedWlOutputListener) Name(_ WlOutputNameEvent) {
+	return
+}
+func (e *UnimplementedWlOutputListener) Description(_ WlOutputDescriptionEvent) {
+	return
+}
+
 type WlOutputDispatcher struct {
 	WlOutputListener
 }
 
+func NewWlOutputDispatcher() *WlOutputDispatcher {
+	return &WlOutputDispatcher{WlOutputListener: &UnimplementedWlOutputListener{}}
+}
 func (i *WlOutputDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	case 0:
@@ -4167,6 +4870,13 @@ func (i *WlOutputDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	}
 	return nil
 }
+func (i *WlOutputDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlOutputListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlOutputListener = listener
+}
 
 // WlRegion region interface
 /*
@@ -4176,7 +4886,14 @@ func (i *WlOutputDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	regions of a surface.
 */
 type WlRegion struct {
-	WlRegionListener
+	Proxy
+}
+
+func NewWlRegion(p Proxy) WlRegion {
+	return WlRegion{Proxy: p}
+}
+func (w *WlRegion) AttachListener(l WlRegionListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
 }
 
 // WlRegionDestroyRequest destroy region
@@ -4212,16 +4929,27 @@ type WlRegionSubtractRequest struct {
 	Height int32 `wayland:"int"`
 }
 type WlRegionListener interface{}
+type UnimplementedWlRegionListener struct{}
 type WlRegionDispatcher struct {
 	WlRegionListener
 }
 
+func NewWlRegionDispatcher() *WlRegionDispatcher {
+	return &WlRegionDispatcher{WlRegionListener: &UnimplementedWlRegionListener{}}
+}
 func (i *WlRegionDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	default:
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlRegionDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlRegionListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlRegionListener = listener
 }
 
 // WlSubcompositor sub-surface compositing
@@ -4247,8 +4975,16 @@ func (i *WlRegionDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	processing to dedicated overlay hardware when possible.
 */
 type WlSubcompositor struct {
-	WlSubcompositorListener
+	Proxy
 }
+
+func NewWlSubcompositor(p Proxy) WlSubcompositor {
+	return WlSubcompositor{Proxy: p}
+}
+func (w *WlSubcompositor) AttachListener(l WlSubcompositorListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
+}
+
 type WlSubcompositorError uint32
 
 const (
@@ -4284,23 +5020,34 @@ type WlSubcompositorDestroyRequest struct{}
 */
 type WlSubcompositorGetSubsurfaceRequest struct {
 	// Id the new sub-surface object ID
-	Id WlSubsurface `wayland:"new_id"`
+	Id uint32 `wayland:"new_id"`
 	// Surface the surface to be turned into a sub-surface
-	Surface WlSurface `wayland:"object"`
+	Surface uint32 `wayland:"object"`
 	// Parent the parent surface
-	Parent WlSurface `wayland:"object"`
+	Parent uint32 `wayland:"object"`
 }
 type WlSubcompositorListener interface{}
+type UnimplementedWlSubcompositorListener struct{}
 type WlSubcompositorDispatcher struct {
 	WlSubcompositorListener
 }
 
+func NewWlSubcompositorDispatcher() *WlSubcompositorDispatcher {
+	return &WlSubcompositorDispatcher{WlSubcompositorListener: &UnimplementedWlSubcompositorListener{}}
+}
 func (i *WlSubcompositorDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	default:
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlSubcompositorDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlSubcompositorListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlSubcompositorListener = listener
 }
 
 // WlSubsurface sub-surface interface to a wl_surface
@@ -4356,8 +5103,16 @@ func (i *WlSubcompositorDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	unmapped.
 */
 type WlSubsurface struct {
-	WlSubsurfaceListener
+	Proxy
 }
+
+func NewWlSubsurface(p Proxy) WlSubsurface {
+	return WlSubsurface{Proxy: p}
+}
+func (w *WlSubsurface) AttachListener(l WlSubsurfaceListener) {
+	w.Proxy.Dispatcher().AttachListener(l)
+}
+
 type WlSubsurfaceError uint32
 
 const (
@@ -4421,7 +5176,7 @@ type WlSubsurfaceSetPositionRequest struct {
 */
 type WlSubsurfacePlaceAboveRequest struct {
 	// Sibling the reference surface
-	Sibling WlSurface `wayland:"object"`
+	Sibling uint32 `wayland:"object"`
 }
 
 // WlSubsurfacePlaceBelowRequest restack the sub-surface
@@ -4431,7 +5186,7 @@ type WlSubsurfacePlaceAboveRequest struct {
 */
 type WlSubsurfacePlaceBelowRequest struct {
 	// Sibling the reference surface
-	Sibling WlSurface `wayland:"object"`
+	Sibling uint32 `wayland:"object"`
 }
 
 // WlSubsurfaceSetSyncRequest set sub-surface to synchronized mode
@@ -4476,14 +5231,25 @@ type WlSubsurfaceSetSyncRequest struct{}
 */
 type WlSubsurfaceSetDesyncRequest struct{}
 type WlSubsurfaceListener interface{}
+type UnimplementedWlSubsurfaceListener struct{}
 type WlSubsurfaceDispatcher struct {
 	WlSubsurfaceListener
 }
 
+func NewWlSubsurfaceDispatcher() *WlSubsurfaceDispatcher {
+	return &WlSubsurfaceDispatcher{WlSubsurfaceListener: &UnimplementedWlSubsurfaceListener{}}
+}
 func (i *WlSubsurfaceDispatcher) Dispatch(h MessageHeader, b []byte) error {
 	switch h.Opcode {
 	default:
 		return ErrInvalidOp
 	}
 	return nil
+}
+func (i *WlSubsurfaceDispatcher) AttachListener(l interface{}) {
+	listener, ok := l.(WlSubsurfaceListener)
+	if !ok {
+		log.Panic().Msg("listener is of wrong type!")
+	}
+	i.WlSubsurfaceListener = listener
 }

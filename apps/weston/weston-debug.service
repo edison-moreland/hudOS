@@ -1,0 +1,17 @@
+[Unit]
+Description=Weston Debug logs
+PartOf=hud.target
+After=weston.service
+
+[Service]
+User=hud
+Group=hud
+WorkingDirectory=/opt/hud
+
+Slice=hud.slice
+Restart=always
+Environment=XDG_RUNTIME_DIR=/opt/hud/run
+ExecStart=/usr/bin/weston-debug --all-streams
+
+[Install]
+WantedBy=hud.target

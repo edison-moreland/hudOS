@@ -9,7 +9,24 @@ import (
 	"os/signal"
 )
 
+type registryListener struct {
+	protocol.UnimplementedWlRegistryListener
+}
+
+func (r *registryListener) Global(e protocol.WlRegistryGlobalEvent) {
+	log.Info().
+		Uint32("name", e.Name).
+		Str("interface", e.Interface).
+		Uint32("version", e.Version).
+		Msg("Global")
+}
+
 func main() {
+	defer log.PanicHandler()
+
+	defer log.Info().Msg("sdktest done.")
+	log.Info().Msg("sdktest starting!")
+
 	client, err := wayland.NewClient()
 	if err != nil {
 		log.Panic().
@@ -18,13 +35,17 @@ func main() {
 	}
 	defer client.Close()
 
+	client.GetDisplay()
+	registry := client.Registry.NewWlRegistry()
+	registry.AttachListener(&registryListener{})
+
 	body := make([]byte, 4)
-	binary.LittleEndian.PutUint32(body, 2)
+	binary.LittleEndian.PutUint32(body, registry.GetId())
 
 	header := protocol.MessageHeader{
 		ObjectID:      1,
 		MessageLength: 4,
-		Opcode:        protocol.WlDisplayGetRegistryRequestOp,
+		Opcode:        0,
 	}
 	message := protocol.Message{
 		MessageHeader: header,

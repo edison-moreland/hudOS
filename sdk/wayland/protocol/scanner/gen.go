@@ -11,9 +11,18 @@ import (
 	"time"
 )
 
+// These types should already be defined in the package
 const (
-	MessageHeaderType = "MessageHeader"
-	ErrInvalidOpType  = "ErrInvalidOp"
+	LogImportPath        = "github.com/edison-moreland/nreal-hud/sdk/log"
+	MessageHeaderType    = "MessageHeader"
+	ProxyType            = "Proxy"
+	ErrInvalidOpType     = "ErrInvalidOp"
+	UnmarshallInt32Func  = "UnmarshallInt32"
+	UnmarshallUint32Func = "UnmarshallUint32"
+	UnmarshallStringFunc = "UnmarshallString"
+	UnmarshallArrayFunc  = "UnmarshallArray"
+	UnmarshallFdFunc     = "UnmarshallFd"
+	UnmarshallFixedFunc  = "UnmarshallFixed"
 )
 
 var toTitle = cases.Title(language.English)
@@ -84,12 +93,30 @@ func genInterface(f *jen.File, i XMLInterface) {
 
 	// Type
 	interfaceIdentifier := identifier(i.Name)
-	interfaceListenerIdentifier := identifier(i.Name, "Listener")
-
 	typeDoc(f, interfaceIdentifier, i.Description.Summary, i.Description.Value)
 	f.Type().Id(interfaceIdentifier).StructFunc(func(g *jen.Group) {
-		g.Id(interfaceListenerIdentifier)
+		g.Id(ProxyType)
 	})
+	f.Func().
+		Id(identifier("New", i.Name)).
+		Params(jen.Id("p").Id(ProxyType)).
+		Params(jen.Id(interfaceIdentifier)).
+		Block(
+			jen.Return(jen.Id(interfaceIdentifier).Values(jen.Dict{
+				jen.Id(ProxyType): jen.Id("p"),
+			})),
+		)
+
+	eventListenerIdentifier := identifier(i.Name, "Listener")
+	f.Func().
+		Params(jen.Id("w").Op("*").Id(interfaceIdentifier)).
+		Id("AttachListener").
+		Params(jen.Id("l").Id(eventListenerIdentifier)).
+		Block(
+			jen.Id("w").Dot(ProxyType).
+				Dot("Dispatcher").Call().
+				Dot("AttachListener").Call(jen.Id("l")),
+		)
 
 	genEnums(f, i)
 	genRequests(f, i)
@@ -130,6 +157,34 @@ func genEvent(f *jen.File, i XMLInterface) {
 			Params(jen.Id("d").Index().Id("byte")).
 			Params(jen.Id("error")).
 			BlockFunc(func(g *jen.Group) {
+				if len(e.Arguments) == 0 {
+					g.Return(jen.Id("nil"))
+					return
+				}
+
+				g.Id("offset").Op(":=").Lit(0)
+				for _, a := range e.Arguments {
+					g.List(
+						jen.Id("offset"),
+						jen.Id("e").Dot(identifier(a.Name)),
+					).Op("=").Do(func(s *jen.Statement) {
+						switch a.Type {
+						case "int":
+							s.Id(UnmarshallInt32Func)
+						case "uint", "object", "new_id", "enum":
+							s.Id(UnmarshallUint32Func)
+						case "string":
+							s.Id(UnmarshallStringFunc)
+						case "array":
+							s.Id(UnmarshallArrayFunc)
+						case "fixed":
+							s.Id(UnmarshallFixedFunc)
+						case "fd":
+							s.Id(UnmarshallFdFunc)
+						}
+					}).Call(jen.Id("offset"), jen.Id("d"))
+				}
+
 				g.Return(jen.Id("nil"))
 			})
 	}
@@ -139,18 +194,42 @@ func genEvent(f *jen.File, i XMLInterface) {
 	f.Type().Id(eventListenerIdentifier).InterfaceFunc(func(g *jen.Group) {
 		for _, e := range i.Events {
 			eventHandlerIdentifier := identifier(e.Name)
+			eventIdentifier := identifier(i.Name, e.Name, "Event")
 			g.Id(eventHandlerIdentifier).ParamsFunc(func(g *jen.Group) {
-				eventIdentifier := identifier(i.Name, e.Name, "Event")
 				g.Id(eventIdentifier)
 			})
 		}
 	})
+
+	// Create unimplemented event listener
+	unimplementedEventListenerIdentifier := identifier("Unimplemented", i.Name, "Listener")
+	f.Type().Id(unimplementedEventListenerIdentifier).Struct()
+	for _, e := range i.Events {
+		eventHandlerIdentifier := identifier(e.Name)
+		eventIdentifier := identifier(i.Name, e.Name, "Event")
+		f.Func().
+			Params(jen.Id("e").Op("*").Id(unimplementedEventListenerIdentifier)).
+			Id(eventHandlerIdentifier).
+			Params(jen.Id("_").Id(eventIdentifier)).
+			Block(jen.Return())
+	}
 
 	// Create event dispatcher
 	eventDispatcherIdentifier := identifier(i.Name, "Dispatcher")
 	f.Type().Id(eventDispatcherIdentifier).Struct(
 		jen.Id(eventListenerIdentifier),
 	)
+
+	newEventDispatcherIdentifier := identifier("New", i.Name, "Dispatcher")
+	f.Func().
+		Id(newEventDispatcherIdentifier).
+		Params().
+		Params(jen.Op("*").Id(eventDispatcherIdentifier)).
+		Block(
+			jen.Return(jen.Op("&").Id(eventDispatcherIdentifier).Values(jen.Dict{
+				jen.Id(eventListenerIdentifier): jen.Op("&").Id(unimplementedEventListenerIdentifier).Values(),
+			})),
+		)
 
 	f.Func().
 		Params(jen.Id("i").Op("*").Id(eventDispatcherIdentifier)).
@@ -180,6 +259,24 @@ func genEvent(f *jen.File, i XMLInterface) {
 			})
 
 			g.Return(jen.Id("nil"))
+		})
+
+	f.Func().
+		Params(jen.Id("i").Op("*").Id(eventDispatcherIdentifier)).
+		Id("AttachListener").
+		Params(jen.Id("l").Id("interface").Values()).
+		BlockFunc(func(g *jen.Group) {
+			// Assert
+			g.List(jen.Id("listener"), jen.Id("ok")).
+				Op(":=").
+				Id("l").Dot("").Parens(jen.Id(eventListenerIdentifier))
+
+			g.If(jen.Op("!").Id("ok")).Block(
+				jen.Qual(LogImportPath, "Panic").Call().
+					Dot("Msg").Call(jen.Lit("listener is of wrong type!")),
+			)
+
+			g.Id("i").Dot(eventListenerIdentifier).Op("=").Id("listener")
 		})
 }
 
@@ -213,24 +310,28 @@ func argumentType(parent string, a XMLArgument) *jen.Statement {
 	case "int":
 		argType = jen.Int32()
 	case "uint":
-		if a.Enum != "" {
-			components := strings.Split(a.Enum, ".")
-			if len(components) == 1 {
-				components = append([]string{parent}, components...)
-			}
-
-			argType = jen.Id(identifier(components...))
-		} else {
-			argType = jen.Uint32()
-		}
+		argType = jen.Uint32()
+		// TODO: Auto resolve enum?
+		//if a.Enum != "" {
+		//	components := strings.Split(a.Enum, ".")
+		//	if len(components) == 1 {
+		//		components = append([]string{parent}, components...)
+		//	}
+		//
+		//	argType = jen.Id(identifier(components...))
+		//} else {
+		//	argType = jen.Uint32()
+		//}
 	case "fixed":
-		argType = jen.Int32()
+		argType = jen.Float64()
 	case "object", "new_id":
-		if a.Interface == "" {
-			argType = jen.Uint32()
-		} else {
-			argType = jen.Id(snakeToCamel(a.Interface))
-		}
+		argType = jen.Uint32()
+		// TODO: Auto resolve objects?
+		//if a.Interface == "" {
+		//	argType = jen.Uint32()
+		//} else {
+		//	argType = jen.Id(snakeToCamel(a.Interface))
+		//}
 	case "fd":
 		argType = jen.Uintptr()
 	case "string":

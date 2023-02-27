@@ -33,8 +33,8 @@ func (m *MessageHeader) UnmarshallBinary(data []byte) error {
 	}
 
 	m.ObjectID = nativeEndian.Uint32(data[0:4])
-	m.MessageLength = nativeEndian.Uint16(data[4:6])
-	m.Opcode = nativeEndian.Uint16(data[6:8])
+	m.Opcode = nativeEndian.Uint16(data[4:6])
+	m.MessageLength = nativeEndian.Uint16(data[6:8]) - 8
 
 	return nil
 }
@@ -42,8 +42,8 @@ func (m *MessageHeader) UnmarshallBinary(data []byte) error {
 func (m *MessageHeader) MarshalBinary() ([]byte, error) {
 	data := make([]byte, 8)
 	nativeEndian.PutUint32(data[0:4], m.ObjectID)
-	nativeEndian.PutUint16(data[4:6], m.MessageLength)
-	nativeEndian.PutUint16(data[6:8], m.Opcode)
+	nativeEndian.PutUint16(data[4:6], m.Opcode)
+	nativeEndian.PutUint16(data[6:8], m.MessageLength+8)
 
 	return data, nil
 }

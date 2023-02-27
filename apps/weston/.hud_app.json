@@ -6,7 +6,8 @@
       "hud.slice",
       "hud.target",
       "hud-apps.target",
-      "weston.service"
+      "weston.service",
+      "weston-debug.service"
     ],
     "configs": [
       "weston.ini"
