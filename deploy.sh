@@ -17,7 +17,7 @@ if [ ! -f "${PINEPHONE_SSH_KEY}" ]; then
 fi
 
 log_blue "Building App Bundle"
-"${REPO_ROOT}"/build.sh -e bluetooth
+"${REPO_ROOT}"/build.sh
 
 log_blue "Deploying App Bundle"
 scp -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null -i "${PINEPHONE_SSH_KEY}" "${BUNDLE_DEPLOYER}" "${PINEPHONE_ROOT_SSH}":/home/deploy/bundle_deployer.sh

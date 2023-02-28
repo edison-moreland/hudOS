@@ -28,63 +28,39 @@ while getopts i:e: opt; do
 done
 shift $((OPTIND - 1))
 
+APP_BUILDER="${REPO_ROOT}/app_builder/app_builder.sh"
 APPS_DIR="${REPO_ROOT}/apps"
-RULES_DIR="${REPO_ROOT}/app_rules"
 BUILD_OUTPUT="${REPO_ROOT}/.build"
-CACHE_DIR="${BUILD_OUTPUT}/cache"
-VENDOR_DIR="${BUILD_OUTPUT}/vendor"
-APP_BUNDLE="${BUILD_OUTPUT}/bundle.tar"
-
-if [ ! -d "${BUILD_OUTPUT}" ]; then
-	mkdir "${BUILD_OUTPUT}"
-	mkdir "${BUILD_CACHE}"
-else 
-	rm -fr "${BUILD_OUTPUT}/app/"
-fi
+FINAL_BUNDLE="${BUILD_OUTPUT}/bundle.tar"
 
 log_blue "Updating vendor"
 "${REPO_ROOT}"/update_vendor.sh
 
 log_blue "Building apps"
 for app_manifest in "${APPS_DIR}"/**/.hud_app.json; do
-	app_dir="$(dirname "${app_manifest}")"
-	app_name="$(jq -r '.name' "${app_manifest}")"
-	app_type="$(jq -r '.type' "${app_manifest}")"
-	build_rule="${RULES_DIR}/${app_type}.sh"
-	rule_config="$(jq -c --arg type "${app_type}" '.[$type]' "${app_manifest}" | base64 -w 0)"
-	# This is a workspace that the build rule can use however it wants
-	rule_workspace="${BUILD_OUTPUT}/app/${app_name}/build"
-	# This is where the build rule is expected to put the final app bundle
-	rule_bundle_out="${BUILD_OUTPUT}/app/${app_name}/bundle.tar"
+	app_name="$(jq -r '.app.name' "${app_manifest}")"
+	bundle_out="${BUILD_OUTPUT}/app/${app_name}/bundle.tar"
 
 	if [[ "${INCLUDE_APPS}" != "" ]]; then
 		if ! [[ "${INCLUDE_APPS}" =~ ${app_name} ]]; then
-			log_yellow "Not Included $app_name ($app_type)"
+			log_yellow "Not Included $app_name"
 			continue
 		fi
 	else
 		if [[ "${EXCLUDE_APPS}" =~ ${app_name} ]]; then
-			log_yellow "Excluding $app_name ($app_type)"
+			log_yellow "Excluding $app_name"
 			continue
 		fi
 	fi
-	log_blue "Building $app_name ($app_type)"
 
-	if [ ! -f "${build_rule}" ]; then
-		log_red "No implementation for $app_type rule"
-		exit 1
-	fi
-
-	mkdir -p "${rule_workspace}"
-
-	if "${build_rule}" "${app_name}" "${app_dir}" "${rule_config}" "${rule_workspace}" "${rule_bundle_out}" "${VENDOR_DIR}" "${CACHE_DIR}"; then
-		if [ ! -f "${rule_bundle_out}" ]; then
-			log_yellow "Rule did NOT produce an app bundle!"
+	if "${APP_BUILDER}" -i "${app_manifest}" -o "${bundle_out}"; then
+		if [ ! -f "${bundle_out}" ]; then
+			log_yellow "Build did NOT produce an app bundle! (${app_name})"
 		else
-			log_green "Success!"
+			log_green "Success! (${app_name})"
 		fi
 	else
-		log_red "Failure :("
+		log_red "Failure! (${app_name})"
 		exit 1
 	fi
 done
@@ -100,4 +76,4 @@ for app_bundle in "${BUILD_OUTPUT}"/app/**/bundle.tar; do
 	tar --concatenate --file="${TEMP_BUNDLE}" "${app_bundle}"
 done
 
-cp "${TEMP_BUNDLE}" "${APP_BUNDLE}"
+cp "${TEMP_BUNDLE}" "${FINAL_BUNDLE}"

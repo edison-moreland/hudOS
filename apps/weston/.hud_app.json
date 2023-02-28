@@ -1,18 +1,22 @@
 {
-  "type": "raw",
-  "name": "weston",
-  "raw": {
-    "units": [
-      "hud.slice",
-      "hud.target",
-      "hud-apps.target",
-      "weston.service"
-    ],
-    "configs": [
-      "weston.ini"
-    ],
-    "scripts": [
-      "001-weston.sh"
-    ]
-  }
+  "app": {
+    "name": "weston"
+  },
+  "build": [
+    {
+      "step": "bundle_app",
+      "units": [
+        "${SOURCE_DIR}/hud.slice",
+        "${SOURCE_DIR}/hud.target",
+        "${SOURCE_DIR}/hud-apps.target",
+        "${SOURCE_DIR}/weston.service"
+      ],
+      "configs": [
+        "${SOURCE_DIR}/weston.ini"
+      ],
+      "scripts": [
+        "${SOURCE_DIR}/001-weston.sh"
+      ]
+    }
+  ]
 }

@@ -1,4 +1,43 @@
 {
-    "type": "zig",
-    "name": "clock"
+    "app": {
+        "name": "clock"
+    },
+    "build": [
+        {
+            "step": "copy",
+            "source": "${SOURCE_DIR}",
+            "destination": "${WORKSPACE_DIR}"
+        },
+        {
+            "step": "link_vendor",
+            "target": "${WORKSPACE_DIR}/vendor"
+        },
+        {
+            "step": "build_zig",
+            "build_file": "${WORKSPACE_DIR}/build.zig"
+        },
+        {
+            "step": "generate_service",
+            "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+        },
+        {
+            "step": "generate_install",
+            "enable_units": [
+                "hud-${APP_NAME}.service"
+            ],
+            "out": "${WORKSPACE_DIR}/50-${APP_NAME}.sh"
+        },
+        {
+            "step": "bundle_app",
+            "binaries": [
+                "${WORKSPACE_DIR}/zig-out/bin/${APP_NAME}"
+            ],
+            "units": [
+                "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+            ],
+            "scripts": [
+                "${WORKSPACE_DIR}/50-${APP_NAME}.sh"
+            ]
+        }
+    ]
 }
