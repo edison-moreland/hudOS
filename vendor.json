@@ -1,0 +1,14 @@
+[
+    {
+        "name": "zig/zig-wayland",
+        "type": "git",
+        "url": "https://github.com/ifreund/zig-wayland.git",
+        "version": "e9484c814801b520cbe4ed719cceb4d0a59f1341"
+    },
+    {
+        "name": "fig/fig-fayland",
+        "type": "git",
+        "url": "https://github.com/ifreund/zig-wayland.git",
+        "version": "676ba262dd7e06b78b3127da8ff1ccb151b71d55"
+    }
+]
