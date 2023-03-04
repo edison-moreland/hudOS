@@ -19,7 +19,7 @@ else
 	setenv bootdir "/boot"
 fi
 
-setenv bootargs loglevel=4 console=${console} console=tty0 root=/dev/mmcblk${linux_mmcdev}p${rootpart} rw rootwait quiet systemd.journald.forward_to_console=true systemd.log_target=console
+setenv bootargs loglevel=4 console=${console} console=tty0 root=/dev/mmcblk${linux_mmcdev}p${rootpart} rw rootwait systemd.journald.forward_to_console=true systemd.log_target=console
 
 echo "Loading kernel..."
 load mmc ${mmc_bootdev}:1 ${ramdisk_addr_r} ${bootdir}/Image.gz
