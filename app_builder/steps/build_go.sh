@@ -5,6 +5,8 @@ STEP_CONFIG="$1"
 TARGET="$(echo "${STEP_CONFIG}" | jq -r '.target')"
 OUT="$(echo "${STEP_CONFIG}" | jq -r '.out')"
 
+GO="${VENDOR_DIR}/go/go/bin/go"
+
 export GOOS=linux
 export GOARCH=arm64
 export GOARM=7 # Pinephone processor is Armv8-A, but go only supports up to v7
@@ -16,4 +18,4 @@ export AR=aarch64-none-linux-gnu-ar
 export CC=aarch64-none-linux-gnu-gcc
 export CXX=aarch64-none-linux-gnu-g++
 export FC=aarch64-none-linux-gnu-gfortran
-go build -o "${OUT}" "${TARGET}"
+$GO build -o "${OUT}" "${TARGET}"

@@ -61,7 +61,7 @@ for step in "${BUILD_STEPS[@]}"; do
     step_subst="$(echo "${step}" | envsubst)"
     step_type="$(echo "${step_subst}" | jq -r '.step')"
 
-    if [ "${DEBUG_STEP_CONFIG}" == "1" ]; then
+    if [ "${DEBUG_STEP_CONFIG:-0}" == "1" ]; then
         echo "${step_subst}" | jq '.'
     else
         log_blue " - ${step_type}"

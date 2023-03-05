@@ -4,9 +4,11 @@ set -euo pipefail
 STEP_CONFIG="$1"
 BUILD_FILE="$(echo "${STEP_CONFIG}" | jq -r '.build_file')"
 
+ZIG="${VENDOR_DIR}/zig/zig/zig"
+
 # Make sure zig uses the pkg-config from buildroot
 export PATH="${BUILDROOT_HOST_DIR}/bin:${PATH}"
-zig build \
+$ZIG build \
 	--build-file "${BUILD_FILE}" \
     --cache-dir "${CACHE_DIR}/${APP_NAME}/zig-cache" \
     --global-cache-dir "${CACHE_DIR}/zig-global-cache" \
