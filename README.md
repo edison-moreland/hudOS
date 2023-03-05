@@ -10,14 +10,13 @@ Any revision before v1.2a will need [hardware modifications](https://wiki.pine64
 NOTE: Setup was built on x86_64 Manjaro. This should work on any modern linux distro, YMMV.
 
 Dependencies
-  - [go 1.20](https://go.dev)
   - [jq](https://stedolan.github.io/jq/)
   - [Buildroot Dependencies](https://buildroot.org/downloads/manual/manual.html#requirement)
 
-1. Download images
-    - `./images/download.sh`
+1. Download dependencies
+    - `./update_vendor.sh`
 2. Install Tow-Boot
-    1. Flash `images/mmcboot.installer.img` to an SD card.
+    1. Flash `.build/vendor/towboot/mmcboot.installer.img` to an SD card.
     2. Put the SD card in the PinePhone, and boot.
     3. Install Tow-Boot to the eMMC.
     4. Remove the SD card.
