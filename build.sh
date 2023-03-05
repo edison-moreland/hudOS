@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(dirname $(realpath $0))"
+REPO_ROOT="$(dirname "$(realpath "$0")")"
 source "${REPO_ROOT}"/logging.sh
 
 if ! which jq >/dev/null; then
@@ -21,7 +21,6 @@ while getopts i:e: opt; do
 	i)
 		INCLUDE_APPS=$OPTARG
 		;;
-
 	\?) ;;
 	:) ;;
 	esac

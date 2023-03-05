@@ -9,8 +9,14 @@
             "destination": "${WORKSPACE_DIR}"
         },
         {
-            "step": "link_vendor",
+            "step": "link",
+            "source": "${VENDOR_DIR}",
             "target": "${WORKSPACE_DIR}/vendor"
+        },
+        {
+            "step": "link",
+            "source": "${BUILDROOT_SYSROOT_DIR}/usr/share/vulkan/registry/vk.xml",
+            "target": "${WORKSPACE_DIR}/vk.xml"
         },
         {
             "step": "build_zig",
