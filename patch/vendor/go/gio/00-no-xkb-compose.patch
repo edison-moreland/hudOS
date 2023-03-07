@@ -1,0 +1,99 @@
+--- ./app/internal/xkb/xkb_unix.go	2023-03-07 15:03:41.459999959 -0800
++++ ./xkb_unix.go	2023-03-07 15:01:37.519999959 -0800
+@@ -9,7 +9,6 @@
+ import (
+ 	"errors"
+ 	"fmt"
+-	"os"
+ 	"syscall"
+ 	"unicode"
+ 	"unicode/utf8"
+@@ -31,12 +30,10 @@
+ import "C"
+ 
+ type Context struct {
+-	Ctx       *C.struct_xkb_context
+-	keyMap    *C.struct_xkb_keymap
+-	state     *C.struct_xkb_state
+-	compTable *C.struct_xkb_compose_table
+-	compState *C.struct_xkb_compose_state
+-	utf8Buf   []byte
++	Ctx     *C.struct_xkb_context
++	keyMap  *C.struct_xkb_keymap
++	state   *C.struct_xkb_state
++	utf8Buf []byte
+ }
+ 
+ var (
+@@ -47,14 +44,6 @@
+ )
+ 
+ func (x *Context) Destroy() {
+-	if x.compState != nil {
+-		C.xkb_compose_state_unref(x.compState)
+-		x.compState = nil
+-	}
+-	if x.compTable != nil {
+-		C.xkb_compose_table_unref(x.compTable)
+-		x.compTable = nil
+-	}
+ 	x.DestroyKeymapState()
+ 	if x.Ctx != nil {
+ 		C.xkb_context_unref(x.Ctx)
+@@ -69,28 +58,6 @@
+ 	if ctx.Ctx == nil {
+ 		return nil, errors.New("newXKB: xkb_context_new failed")
+ 	}
+-	locale := os.Getenv("LC_ALL")
+-	if locale == "" {
+-		locale = os.Getenv("LC_CTYPE")
+-	}
+-	if locale == "" {
+-		locale = os.Getenv("LANG")
+-	}
+-	if locale == "" {
+-		locale = "C"
+-	}
+-	cloc := C.CString(locale)
+-	defer C.free(unsafe.Pointer(cloc))
+-	ctx.compTable = C.xkb_compose_table_new_from_locale(ctx.Ctx, cloc, C.XKB_COMPOSE_COMPILE_NO_FLAGS)
+-	if ctx.compTable == nil {
+-		ctx.Destroy()
+-		return nil, errors.New("newXKB: xkb_compose_table_new_from_locale failed")
+-	}
+-	ctx.compState = C.xkb_compose_state_new(ctx.compTable, C.XKB_COMPOSE_STATE_NO_FLAGS)
+-	if ctx.compState == nil {
+-		ctx.Destroy()
+-		return nil, errors.New("newXKB: xkb_compose_state_new failed")
+-	}
+ 	return ctx, nil
+ }
+ 
+@@ -173,24 +140,10 @@
+ 		}
+ 		events = append(events, cmd)
+ 	}
+-	C.xkb_compose_state_feed(x.compState, sym)
+ 	var str []byte
+-	switch C.xkb_compose_state_get_status(x.compState) {
+-	case C.XKB_COMPOSE_CANCELLED, C.XKB_COMPOSE_COMPOSING:
+-		return
+-	case C.XKB_COMPOSE_COMPOSED:
+-		size := C.xkb_compose_state_get_utf8(x.compState, (*C.char)(unsafe.Pointer(&x.utf8Buf[0])), C.size_t(len(x.utf8Buf)))
+-		if int(size) >= len(x.utf8Buf) {
+-			x.utf8Buf = make([]byte, size+1)
+-			size = C.xkb_compose_state_get_utf8(x.compState, (*C.char)(unsafe.Pointer(&x.utf8Buf[0])), C.size_t(len(x.utf8Buf)))
+-		}
+-		C.xkb_compose_state_reset(x.compState)
+-		str = x.utf8Buf[:size]
+-	case C.XKB_COMPOSE_NOTHING:
+-		mod := x.Modifiers()
+-		if mod&(key.ModCtrl|key.ModAlt|key.ModSuper) == 0 {
+-			str = x.charsForKeycode(kc)
+-		}
++	mod := x.Modifiers()
++	if mod&(key.ModCtrl|key.ModAlt|key.ModSuper) == 0 {
++		str = x.charsForKeycode(kc)
+ 	}
+ 	// Report only printable runes.
+ 	var n int

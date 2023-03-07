@@ -1,27 +1,18 @@
 [
     {
-        "name": "zig/zig-wayland",
-        "type": "git",
-        "url": "https://github.com/ifreund/zig-wayland.git",
-        "version": "e9484c814801b520cbe4ed719cceb4d0a59f1341"
-    },
-    {
-        "name": "zig/vulkan-zig",
-        "type": "git",
-        "url": "https://github.com/Snektron/vulkan-zig.git",
-        "version": "782d75ac4c3cef5bed2a6d475fd16c8d91393f5d"
-    },
-    {
-        "name": "zig/zig",
-        "type": "tar",
-        "url": "https://ziglang.org/download/0.10.1/zig-linux-x86_64-0.10.1.tar.xz",
-        "version": "6699f0e7293081b42428f32c9d9c983854094bd15fee5489f12c4cf4518cc380"
-    },
-    {
         "name": "go/go",
         "type": "tar",
         "url": "https://go.dev/dl/go1.20.1.linux-amd64.tar.gz",
         "version": "000a5b1fca4f75895f78befeb2eecf10bfff3c428597f3f1e69133b63b911b02"
+    },
+    {
+        "name": "go/gio",
+        "type": "git",
+        "url": "https://git.sr.ht/~eliasnaur/gio",
+        "version": "5f818bc5e7f9d49464fab0d282b7e40768e9203a",
+        "patches": [
+            "patch/vendor/go/gio/00-no-xkb-compose.patch"
+        ]
     },
     {
         "name": "towboot",
