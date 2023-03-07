@@ -148,6 +148,7 @@ for dep in "${VENDOR[@]}"; do
     dep_type="$(echo "${dep}" | jq -r '.type')"
     dep_url="$(echo "${dep}" | jq -r '.url')"
     dep_version="$(echo "${dep}" | jq -r '.version')"
+    dep_patches=($(echo "${dep}" | jq -r '.patches // [] | .[]'))
 
     dep_dir="${VENDOR_DIR}/${dep_name}"
 
@@ -166,6 +167,11 @@ for dep in "${VENDOR[@]}"; do
     "update")
         log_blue "Updating ${dep_name} (${dep_type})"
         update "${dep_type}" "${dep_dir}" "${dep_version}" "${dep_url}"
+
+        if (( ${#dep_patches[@]} != 0 )); then
+            log_yellow "Updating a dependency with patches may not work properly!"
+        fi
+
         ;;
     "download")
         log_blue "Downloading ${dep_name} (${dep_type})"
@@ -174,6 +180,14 @@ for dep in "${VENDOR[@]}"; do
         fi
 
         download "${dep_type}" "${dep_dir}" "${dep_version}" "${dep_url}"
+
+        if (( ${#dep_patches[@]} != 0 )); then
+            log_blue "Applying patches..."
+            for dep_patch in "${dep_patches[@]}"; do
+                log_blue "- $(basename "${dep_patch}")"
+                patch -p1 -d "${dep_dir}" < "${REPO_ROOT}/${dep_patch}"
+            done
+        fi
         ;;
     "nothing")
         log_yellow "Up to date! ${dep_name} (${dep_type})"
