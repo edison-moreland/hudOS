@@ -12,7 +12,8 @@ fi
 
 EXCLUDE_APPS=""
 INCLUDE_APPS=""
-while getopts i:e: opt; do
+CLEAR_CACHE="false"
+while getopts i:e:c opt; do
 	case $opt in
 	e)
 		EXCLUDE_APPS=$OPTARG
@@ -20,6 +21,8 @@ while getopts i:e: opt; do
 
 	i)
 		INCLUDE_APPS=$OPTARG
+		;;
+	c)  CLEAR_CACHE="true"
 		;;
 	\?) ;;
 	:) ;;
@@ -31,6 +34,15 @@ APP_BUILDER="${REPO_ROOT}/app_builder/app_builder.sh"
 APPS_DIR="${REPO_ROOT}/apps"
 BUILD_OUTPUT="${REPO_ROOT}/.build"
 FINAL_BUNDLE="${BUILD_OUTPUT}/bundle.tar"
+
+if [ -d "${BUILD_OUTPUT}/app" ]; then
+	rm -rf "${BUILD_OUTPUT}/app"
+fi
+
+if [ "${CLEAR_CACHE}" == "true" ]; then
+	log_blue "Clearing cache..."
+	rm -rf "${BUILD_OUTPUT}/cache"
+fi
 
 log_blue "Updating vendor"
 "${REPO_ROOT}"/update_vendor.sh
@@ -45,11 +57,10 @@ for app_manifest in "${APPS_DIR}"/**/.hud_app.json; do
 			log_yellow "Not Included $app_name"
 			continue
 		fi
-	else
-		if [[ "${EXCLUDE_APPS}" =~ ${app_name} ]]; then
-			log_yellow "Excluding $app_name"
-			continue
-		fi
+	fi
+	if [[ "${EXCLUDE_APPS}" =~ ${app_name} ]]; then
+		log_yellow "Excluding $app_name"
+		continue
 	fi
 
 	if "${APP_BUILDER}" -i "${app_manifest}" -o "${bundle_out}"; then
