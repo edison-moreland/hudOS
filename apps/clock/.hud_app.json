@@ -1,49 +1,39 @@
 {
-    "app": {
-        "name": "clock"
+  "app": {
+    "name": "clock"
+  },
+  "build": [
+    {
+      "step": "build_go",
+      "target": "${SOURCE_DIR}/",
+      "out": "${WORKSPACE_DIR}/${APP_NAME}",
+      "tags": [
+        "nox11"
+      ]
     },
-    "build": [
-        {
-            "step": "copy",
-            "source": "${SOURCE_DIR}",
-            "destination": "${WORKSPACE_DIR}"
-        },
-        {
-            "step": "link",
-            "source": "${VENDOR_DIR}",
-            "target": "${WORKSPACE_DIR}/vendor"
-        },
-        {
-            "step": "link",
-            "source": "${BUILDROOT_SYSROOT_DIR}/usr/share/vulkan/registry/vk.xml",
-            "target": "${WORKSPACE_DIR}/vk.xml"
-        },
-        {
-            "step": "build_zig",
-            "build_file": "${WORKSPACE_DIR}/build.zig"
-        },
-        {
-            "step": "generate_service",
-            "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
-        },
-        {
-            "step": "generate_install",
-            "enable_units": [
-                "hud-${APP_NAME}.service"
-            ],
-            "out": "${WORKSPACE_DIR}/50-${APP_NAME}.sh"
-        },
-        {
-            "step": "bundle_app",
-            "binaries": [
-                "${WORKSPACE_DIR}/zig-out/bin/${APP_NAME}"
-            ],
-            "units": [
-                "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
-            ],
-            "scripts": [
-                "${WORKSPACE_DIR}/50-${APP_NAME}.sh"
-            ]
-        }
-    ]
+    {
+      "step": "generate_service",
+      "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+    },
+    {
+      "step": "generate_install",
+      "enable_units": [
+          "hud-${APP_NAME}.service"
+      ],
+      "setcap": "cap_net_raw,cap_net_admin+eip",
+      "out": "${WORKSPACE_DIR}/50-${APP_NAME}.sh"
+    },
+    {
+      "step": "bundle_app",
+      "binaries": [
+          "${WORKSPACE_DIR}/${APP_NAME}"
+      ],
+      "units": [
+          "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+      ],
+      "scripts": [
+          "${WORKSPACE_DIR}/50-${APP_NAME}.sh"
+      ]
+    }
+  ]
 }

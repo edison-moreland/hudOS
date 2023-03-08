@@ -8,6 +8,7 @@ DESTINATION="$(echo "${STEP_CONFIG}" | jq -r '.destination')"
 mkdir -p "$(dirname "${DESTINATION}")"
 
 if [ -d "${SOURCE}" ]; then
+    mkdir -p "${DESTINATION}"
     cp -ar "${SOURCE}"/* "${DESTINATION}"
 else
     cp -a "${SOURCE}" "${DESTINATION}"

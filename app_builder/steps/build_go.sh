@@ -4,8 +4,20 @@ set -euo pipefail
 STEP_CONFIG="$1"
 TARGET="$(echo "${STEP_CONFIG}" | jq -r '.target')"
 OUT="$(echo "${STEP_CONFIG}" | jq -r '.out')"
+TAGS=($(echo "${STEP_CONFIG}" | jq -r '.tags // [] | .[]'))
 
 GO="${VENDOR_DIR}/go/go/bin/go"
+
+ARG_TAGS=""
+if (( ${#TAGS[@]} != 0 )); then
+    ARG_TAGS="--tags "
+
+    for tag in "${TAGS[@]}"; do
+        ARG_TAGS+="${tag},"
+    done
+
+    ARG_TAGS="${ARG_TAGS::-1}"
+fi
 
 export GOOS=linux
 export GOARCH=arm64
@@ -18,4 +30,4 @@ export AR=aarch64-none-linux-gnu-ar
 export CC=aarch64-none-linux-gnu-gcc
 export CXX=aarch64-none-linux-gnu-g++
 export FC=aarch64-none-linux-gnu-gfortran
-$GO build -o "${OUT}" "${TARGET}"
+$GO build ${ARG_TAGS} -o "${OUT}" "${TARGET}"
