@@ -36,7 +36,7 @@ function sync_bundle_dir {
 	BUNDLE_DIR=$1
 	DESTINATION_DIR=$2
 	
-	full_bundle_dir="${BUNDLE}/${BUNDLE_DIR}"
+	full_bundle_dir="${BUNDLE}/${BUNDLE_DIR}/"
 	if [ -d "${full_bundle_dir}" ]; then
 		echo "Syncing ${BUNDLE_DIR}"
 		
