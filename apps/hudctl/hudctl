@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euo pipefail
+
+export HUD_USER="hud"
+export HUD_PREFIX="/opt/hud"
+export HUD_BIN_DIR="${HUD_PREFIX}/bin"
+export HUD_UNIT_DIR="${HUD_PREFIX}/systemd/system"
+export HUD_CONFIG_DIR="${HUD_PREFIX}/.config"
+export HUD_DATA_DIR="${HUD_PREFIX}/.local/share"
+export HUD_APPS_DIR="${HUD_PREFIX}/apps"
+export HUD_APPS_CATALOG="${HUD_PREFIX}/apps/catalog.json"
+
+source "${HUD_DATA_DIR}/logging.sh"
+
+if [ "${USER}" != "${HUD_USER}" ]; then
+    log_yellow "hudctl is not running as ${HUD_USER}"
+fi
+
+ctl_command="hudctl-$1"
+
+if ! which "${ctl_command}" > /dev/null; then
+    log_red "Unknown command $1"
+    exit 1
+fi
+
+"${ctl_command}" "${@:2}"

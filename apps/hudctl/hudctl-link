@@ -1,0 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/logging.sh"
+
+APP_NAME="$1"
+
+hudctl-catalog "${APP_NAME}"

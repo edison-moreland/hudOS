@@ -17,7 +17,8 @@ trap remove_staging_bundle EXIT
 MANIFEST="$(jq -ncM --arg app_name "${APP_NAME}" '{"name":$app_name}')"
 function add_to_bundle {
 	DIR_IN_BUNDLE="${1}"
-	FILE="${2}"
+	MODE="${2}"
+	FILE="${3}"
 
 	MANIFEST="$(
 		echo "${MANIFEST}" | \
@@ -29,29 +30,39 @@ function add_to_bundle {
 
 	path_transform="s,^,${DIR_IN_BUNDLE}/,"
 
-	tar -rf "${STAGING_BUNDLE}" -C "$(dirname "${FILE}")" --transform "${path_transform}" "$(basename "${FILE}")"
+	tar -rf "${STAGING_BUNDLE}" \
+	    -C "$(dirname "${FILE}")" \
+		--mode "${MODE}" \
+		--transform "${path_transform}" \
+		"$(basename "${FILE}")"
 }
 
 for binary in "${BINARIES[@]}"; do
-	add_to_bundle 'binaries' "${binary}"
+	add_to_bundle 'binaries' '755' "${binary}"
 done
 
 for unit in "${UNITS[@]}"; do
-	add_to_bundle 'units' "${unit}"
+	add_to_bundle 'units' '644' "${unit}"
 done
 
 for config in "${CONFIGS[@]}"; do
-	add_to_bundle 'configs' "${config}"
+	add_to_bundle 'configs' '640' "${config}"
 done
 
 for script in "${SCRIPTS[@]}"; do
-	add_to_bundle 'scripts' "${script}"
+	add_to_bundle 'scripts' '755' "${script}"
 done
 
 for data in "${DATAS[@]}"; do
-	add_to_bundle 'data' "${data}"
+	add_to_bundle 'data' '644' "${data}"
 done
 
-cp "${STAGING_BUNDLE}" "${OUTPUT_BUNDLE}"
+manifest_file="$(mktemp)"
+echo "${MANIFEST}" | jq -M '.' > "${manifest_file}"
+tar -rf "${STAGING_BUNDLE}" \
+	--mode "644" \
+	--transform 's:.*:manifest.json:' \
+	"${manifest_file}"
+rm "${manifest_file}"
 
-echo "${MANIFEST}" | jq '.'
+cp "${STAGING_BUNDLE}" "${OUTPUT_BUNDLE}"

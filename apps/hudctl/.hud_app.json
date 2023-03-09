@@ -1,0 +1,19 @@
+{
+  "app": {
+    "name": "hudctl"
+  },
+  "build": [
+    {
+      "step": "bundle_app",
+      "binaries": [
+        "${SOURCE_DIR}/hudctl",
+        "${SOURCE_DIR}/hudctl-status",
+        "${SOURCE_DIR}/hudctl-link",
+        "${SOURCE_DIR}/hudctl-catalog"
+      ],
+      "data": [
+        "${SOURCE_DIR}/logging.sh"
+      ]
+    }
+  ]
+}

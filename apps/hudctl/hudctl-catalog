@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/logging.sh"
+
+APP_NAME="${1:-}"
+
+if [ "${APP_NAME}" != "" ]; then
+    jq --arg app_name "hudctl" \
+       '.[] // [] | select(.name = $app_name)' \
+       "${HUD_APPS_CATALOG}"
+else
+    jq '.[] // []' \
+       "${HUD_APPS_CATALOG}"
+fi

@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+
+source "${HUD_DATA_DIR}/logging.sh"
+
+log_green "huzzah!"
