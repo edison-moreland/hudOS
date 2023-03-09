@@ -1,71 +1,79 @@
 #!/bin/bash
+set -euo pipefail
 
 # Deploys an app_bundle.tar on the pinephone
 # Use:
 #   ssh root@pinephone "bundle_deployer.sh" < app_bundle.tar
 
 # App bundle structure
-# bin/
+# binaries/
 #    ...app binaries
-# services/
+# units/
 #    ...systemd unit files
-# post_deploy/
+# scripts/
 #    ...post_deploy scripts
 # configs/
 #    ...app configs
+# data/
+#    ...app resources/static data
 
-WORKSPACE=$(mktemp -d)
-tar xf - -C "${WORKSPACE}" <&0
+BUNDLE=$(mktemp -d)
+tar xf - -C "${BUNDLE}" <&0
 
-function clean_workspace {
-	rm -r "${WORKSPACE}"
+function clean_bundle {
+	rm -r "${BUNDLE}"
 }
-trap clean_workspace EXIT
+trap clean_bundle EXIT
 
 HUD_USER="hud"
 HUD_PREFIX="/opt/hud"
 HUD_BIN_DIR="${HUD_PREFIX}/bin"
 HUD_UNIT_DIR="${HUD_PREFIX}/systemd/system"
 HUD_CONFIG_DIR="${HUD_PREFIX}/.config"
+HUD_DATA_DIR="${HUD_PREFIX}/.local/share"
 
-function sync_folder {
-	SOURCE=$1
-	DESTINATION=$2
-
-	if [ ! -d "${DESTINATION}" ]; then
-		mkdir -p "${DESTINATION}"
+function sync_bundle_dir {
+	BUNDLE_DIR=$1
+	DESTINATION_DIR=$2
+	
+	full_bundle_dir="${BUNDLE}/${BUNDLE_DIR}"
+	if [ -d "${full_bundle_dir}" ]; then
+		echo "Syncing ${BUNDLE_DIR}"
+		
+		if [ ! -d "${DESTINATION_DIR}" ]; then
+			mkdir -p "${DESTINATION_DIR}"
+		fi
+		rsync -ap --delete "${full_bundle_dir}" "${DESTINATION_DIR}"
+		
+		return 0
 	fi
-	rsync -ap --delete "${SOURCE}" "${DESTINATION}"
+
+	echo "No ${BUNDLE_DIR} to sync..."
+	return 1
 }
 
-if [ -d "${WORKSPACE}/bin" ]; then
-	echo "Syncing binaries"
-	sync_folder "${WORKSPACE}/bin/" "${HUD_BIN_DIR}"
-	chmod +x "${WORKSPACE}"/bin/*
-else
-	echo "No binaries to sync..."
+if sync_bundle_dir "binaries" "${HUD_BIN_DIR}"; then
+	chmod +x "${HUD_BIN_DIR}"/*
 fi
 
-if [ -d "${WORKSPACE}/services" ]; then
-	echo "Syncing systemd units"
-	sync_folder "${WORKSPACE}/services/" "${HUD_UNIT_DIR}"
+if sync_bundle_dir "units" "${HUD_UNIT_DIR}"; then
 	systemctl daemon-reload
-else
-	echo "No systemd units to sync..."
 fi
 
-if [ -d "${WORKSPACE}/configs" ]; then
-	echo "Syncing configs"
-	sync_folder "${WORKSPACE}/configs/" "${HUD_CONFIG_DIR}"
-else
-	echo "No configs to sync..."
+if sync_bundle_dir "configs" "${HUD_CONFIG_DIR}"; then
+	: # Intentionally left blank
+fi
+
+if sync_bundle_dir "data" "${HUD_DATA_DIR}"; then 
+	: # Intentionally left blank
 fi
 
 chown -R ${HUD_USER}:${HUD_USER} ${HUD_PREFIX}
 
-if [ -d "${WORKSPACE}/post_deploy" ]; then
+bundle_scripts="${BUNDLE}/scripts"
+if [ -d "${bundle_scripts}" ]; then
 	echo "Running post deploy scripts"
-	for post_deploy_script in "${WORKSPACE}"/post_deploy/*.sh; do
+	for post_deploy_script in "${bundle_scripts}"/*.sh; do
 		echo "- $(basename "${post_deploy_script}")"
 		if bash "${post_deploy_script}"; then
 			echo "Success!"

@@ -48,9 +48,10 @@ log_blue "Updating vendor"
 "${REPO_ROOT}"/update_vendor.sh
 
 log_blue "Building apps"
+bundles=()
 for app_manifest in "${APPS_DIR}"/**/.hud_app.json; do
 	app_name="$(jq -r '.app.name' "${app_manifest}")"
-	bundle_out="${BUILD_OUTPUT}/app/${app_name}/bundle.tar"
+	bundle_out="${BUILD_OUTPUT}/app/${app_name}.tar"
 
 	if [[ "${INCLUDE_APPS}" != "" ]]; then
 		if ! [[ "${INCLUDE_APPS}" =~ ${app_name} ]]; then
@@ -68,6 +69,7 @@ for app_manifest in "${APPS_DIR}"/**/.hud_app.json; do
 			log_yellow "Build did NOT produce an app bundle! (${app_name})"
 		else
 			log_green "Success! (${app_name})"
+			bundles+=("${bundle_out}")
 		fi
 	else
 		log_red "Failure! (${app_name})"
@@ -82,7 +84,7 @@ function remove_temp_bundle {
 }
 trap remove_temp_bundle EXIT
 
-for app_bundle in "${BUILD_OUTPUT}"/app/**/bundle.tar; do
+for app_bundle in "${bundles[@]}"; do
 	tar --concatenate --file="${TEMP_BUNDLE}" "${app_bundle}"
 done
 
