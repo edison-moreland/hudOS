@@ -8,7 +8,7 @@ PINEPHONE_HOST=$1
 PINEPHONE_ROOT_SSH="deploy@${PINEPHONE_HOST}"
 PINEPHONE_SSH_KEY="${REPO_ROOT}/buildroot/deploy_ed25519"
 
-APP_BUNDLE="${REPO_ROOT}/.build/bundle.tar"
+APP_BUNDLE="${REPO_ROOT}/.build/bundle.tar.gz"
 BUNDLE_DEPLOYER="${REPO_ROOT}/bundle_deployer.sh"
 
 if [ ! -f "${PINEPHONE_SSH_KEY}" ]; then

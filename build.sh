@@ -89,3 +89,4 @@ for app_bundle in "${bundles[@]}"; do
 done
 
 cp "${TEMP_BUNDLE}" "${FINAL_BUNDLE}"
+gzip -f "${FINAL_BUNDLE}"

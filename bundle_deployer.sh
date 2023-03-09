@@ -18,7 +18,7 @@ set -euo pipefail
 #    ...app resources/static data
 
 BUNDLE=$(mktemp -d)
-tar xf - -C "${BUNDLE}" <&0
+tar -xzf - -C "${BUNDLE}" <&0
 
 function clean_bundle {
 	rm -r "${BUNDLE}"
