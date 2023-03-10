@@ -1,1 +1,6 @@
-#todo
+#!/bin/bash
+set -euo pipefail
+
+# Export all variables starting with HUD_
+export $(compgen -A variable | grep 'HUD_*')
+export -p | grep 'declare -x HUD_*'

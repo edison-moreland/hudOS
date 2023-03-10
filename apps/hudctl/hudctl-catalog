@@ -3,12 +3,67 @@ set -euo pipefail
 source "${HUD_DATA_DIR}/logging.sh"
 
 APP_NAME="${1:-}"
+ACTION="${2:-}"
+KEY="${3:-}"
+VAL="${4:-}"
 
 if [ "${APP_NAME}" != "" ]; then
-    jq --arg app_name "hudctl" \
-       '.[] // [] | select(.name = $app_name)' \
+    if [ "${ACTION}" != "" ]; then
+        if [ "${KEY}" == "" ]; then
+            log_red "Missing key for action"
+            exit 1
+        fi
+
+        case "${ACTION}" in
+        "get")
+            # Get field from app catalog entry
+            jq -re \
+               --arg app_name "${APP_NAME}" \
+               --arg app_key "${KEY}" \
+               '.[] // [] | select(.name == $app_name) | .[$app_key]' \
+               "${HUD_APPS_CATALOG}" 
+            ;;
+        "set") 
+            if [ "${VAL}" == "" ]; then
+                log_red "Missing value for set action"
+                exit 1
+            fi
+
+            # Set field on app catalog entry
+            catalog_tmp="$(mktemp)"
+            jq -e --arg app_name "${APP_NAME}" \
+                  --arg app_key "${KEY}" \
+                  --arg app_val "${VAL}" \
+                  'map(if (.name == $app_name) then (.[$app_key] = $app_val) else (.) end)' \
+                  "${HUD_APPS_CATALOG}" > "${catalog_tmp}"
+            cat "${catalog_tmp}" > "${HUD_APPS_CATALOG}" # cat > to preserve file permissions
+            ;;
+        "new")
+            # Create a new catalog entry
+            # key should the manifest path
+
+            catalog_tmp="$(mktemp)"
+            jq -e --arg app_name "${APP_NAME}" \
+                  --arg app_manifest "${KEY}" \
+                  '. += [{ "name": $app_name, "manifest": $app_manifest, "enabled": false }]' \
+                  "${HUD_APPS_CATALOG}" > "${catalog_tmp}"
+            cat "${catalog_tmp}" > "${HUD_APPS_CATALOG}" # cat > to preserve file permissions
+            ;; 
+        *)
+            log_red "Unknown action ${ACTION}"
+            exit 1
+            ;;
+        esac
+
+        exit 0
+    fi
+
+    # Return catalog for a specific app
+    jq --arg app_name "${APP_NAME}" \
+       '.[] // [] | select(.name == $app_name)' \
        "${HUD_APPS_CATALOG}"
 else
+    # Return entire catalog
     jq '.[] // []' \
        "${HUD_APPS_CATALOG}"
 fi

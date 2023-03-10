@@ -85,7 +85,9 @@ function remove_temp_bundle {
 trap remove_temp_bundle EXIT
 
 for app_bundle in "${bundles[@]}"; do
-	tar --concatenate --file="${TEMP_BUNDLE}" "${app_bundle}"
+	tar -rf "${TEMP_BUNDLE}" \
+		-C "$(dirname "${app_bundle}")" \
+		"$(basename "${app_bundle}")"
 done
 
 cp "${TEMP_BUNDLE}" "${FINAL_BUNDLE}"

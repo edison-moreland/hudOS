@@ -23,4 +23,11 @@ if ! which "${ctl_command}" > /dev/null; then
     exit 1
 fi
 
-"${ctl_command}" "${@:2}"
+{ 
+    if ! flock -n 9; then
+        log_red "Could not obtain lock"
+        exit 1
+    fi
+
+    "${ctl_command}" "${@:2}"
+} 9>/var/lock/.hudctl

@@ -1,1 +1,130 @@
-# Should install an app bundle, maybe updating some database
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/logging.sh"
+source "${HUD_DATA_DIR}/json.sh"
+
+# APP_BUNDLE is a tar (possibly gz compressed) file
+# Structure:
+# manifest.json -- app metadata & file listing
+# binaries/
+#    ...app binaries
+# units/
+#    ...systemd unit files
+# scripts/
+#    ...post_deploy scripts
+# configs/
+#    ...app configs
+# data/
+#    ...app resources/static data
+
+# Install process
+# If app is not already installed, or installed and disabled:
+# - Create app folder
+# - Rsync contents of bundle to app folder
+# - Add new catalog entry for app
+
+# If app is enabled:
+# - Compare manifest bundle and app folder
+# - Unlink any files that are being removed
+# - Rsync contents of bundle to app folder
+# - hudctl-enable app
+
+APP_BUNDLE="$1"
+
+BUNDLE=$(mktemp -d)
+tar -xaf "${APP_BUNDLE}" -C "${BUNDLE}"
+trap "rm -rf ${BUNDLE}" EXIT
+
+BUNDLE_MANIFEST="${BUNDLE}/manifest.json"
+if [ ! -f "${BUNDLE_MANIFEST}" ]; then
+    log_red "Bundle does not contain a manifest"
+    exit 1
+fi
+
+BUNDLE_NAME="$(query_file "${BUNDLE_MANIFEST}" '.name')"
+APP_INSTALL_DIR="${HUD_APPS_DIR}/${BUNDLE_NAME}"
+
+function sync_bundle() {
+    BUNDLE_ROOT=$1
+    INSTALL_ROOT=$2
+
+    mkdir -p "${INSTALL_ROOT}"
+    rsync -ap --chown="${HUD_USER}:${HUD_USER}" \
+          --delete "${BUNDLE_ROOT}/" \
+          "${INSTALL_ROOT}"
+    chmod 755 "${INSTALL_ROOT}" 
+}
+
+function unlink_removed_files() {
+    # Unlink any files that will be removed when the new bundle is installed
+    BUNDLE_FOLDER="${1}"
+    LINKED_FOLDER="${2}" # System folder that these files are linked to
+    OLD_MANIFEST="${APP_MANIFEST}"
+    NEW_MANIFEST="${BUNDLE_MANIFEST}"
+
+    OLD_FILES="$(jq -Mcr \
+                    --arg section "${BUNDLE_FOLDER}" \
+                    '.[$section] // []' \
+                    "${OLD_MANIFEST}" )"
+
+    NEW_FILES="$(jq -Mcr \
+                    --arg section "${BUNDLE_FOLDER}" \
+                    '.[$section] // []' \
+                    "${NEW_MANIFEST}" )"
+
+    
+    REMOVED_FILES_JSON="$(json_set_difference "${OLD_FILES}" "${NEW_FILES}")"
+    mapfile -t REMOVED_FILES < <(query_blob "${REMOVED_FILES_JSON}" '.[]')
+
+    for removed_file in "${REMOVED_FILES[@]}"; do
+        full_path="${LINKED_FOLDER}/${removed_file}"
+
+        log_blue "Unlinking ${full_path}"
+
+        if [ ! -f "${full_path}" ]; then
+            log_red "${full_path} does not exist!"
+            exit 1
+        fi
+
+        unlink "${full_path}"
+    done
+}
+
+
+if hudctl-catalog "${BUNDLE_NAME}"; then
+    if [ "$(hudctl-catalog "${BUNDLE_NAME}" get enabled)" == "true" ]; then
+        # App is installed and enabled
+        log_yellow "App installed and enabled"
+    else
+        # App is installed and not enabled
+        log_yellow "App installed not enabled"
+    fi
+else
+    # App not installed
+    log_yellow "App not installed"
+fi
+exit 1
+
+if [ "$(hudctl-catalog "${BUNDLE_NAME}" get enabled)" == "true" ]; then
+    log_blue "Reinstalling ${BUNDLE_NAME} to ${APP_INSTALL_DIR}"
+    
+    # First, we need to unlink any files that are going to be removed
+    APP_MANIFEST="$(hudctl-catalog "${BUNDLE_NAME}" get manifest)"
+    
+    unlink_removed_files "binaries" "${HUD_BIN_DIR}"
+    unlink_removed_files "units" "${HUD_UNIT_DIR}"
+    unlink_removed_files "configs" "${HUD_CONFIG_DIR}"
+    unlink_removed_files "data" "${HUD_DATA_DIR}"
+
+    # Now we can sync the app folders and re-enable the app
+    sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
+    hudctl-enable "${BUNDLE_NAME}"
+
+else
+    log_blue "Installing ${BUNDLE_NAME} to ${APP_INSTALL_DIR}"
+
+    sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
+    # This is added an extra entry \/
+    hudctl-catalog "${BUNDLE_NAME}" new "${APP_INSTALL_DIR}/manifest.json"
+    hudctl-enable "${BUNDLE_NAME}"
+fi

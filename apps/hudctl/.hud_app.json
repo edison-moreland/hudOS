@@ -8,11 +8,14 @@
       "binaries": [
         "${SOURCE_DIR}/hudctl",
         "${SOURCE_DIR}/hudctl-status",
-        "${SOURCE_DIR}/hudctl-link",
-        "${SOURCE_DIR}/hudctl-catalog"
+        "${SOURCE_DIR}/hudctl-enable",
+        "${SOURCE_DIR}/hudctl-catalog",
+        "${SOURCE_DIR}/hudctl-install",
+        "${SOURCE_DIR}/hudctl-appenv"
       ],
       "data": [
-        "${SOURCE_DIR}/logging.sh"
+        "${SOURCE_DIR}/logging.sh",
+        "${SOURCE_DIR}/json.sh"
       ]
     }
   ]
