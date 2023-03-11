@@ -60,9 +60,15 @@ done
 manifest_file="$(mktemp)"
 echo "${MANIFEST}" | jq -M '.' > "${manifest_file}"
 tar -rf "${STAGING_BUNDLE}" \
+	-C "$(dirname "${manifest_file}")" \
 	--mode "644" \
 	--transform 's:.*:manifest.json:' \
-	"${manifest_file}"
+	"$(basename "${manifest_file}")"
+
+# tar -rf "${manifest_file}" \
+# 	--mode "644" \
+# 	--transform 's:.*:manifest.json:' \
+# 	"${manifest_file}"
 rm "${manifest_file}"
 
 cp "${STAGING_BUNDLE}" "${OUTPUT_BUNDLE}"

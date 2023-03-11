@@ -13,12 +13,12 @@ EOF
 
 for unit in "${ENABLE_UNITS[@]}"; do
 cat <<EOF | envsubst >> "${OUT}"
-systemctl enable ${unit}
+# systemctl enable ${unit}
 EOF
 done
 
 if [[ "${SETCAP}" != "" ]]; then
 cat <<EOF | envsubst >> "${OUT}"
-setcap '${SETCAP}' /opt/hud/bin/${APP_NAME}
+# setcap '${SETCAP}' /opt/hud/bin/${APP_NAME}
 EOF
 fi

@@ -5,14 +5,16 @@ source "${HUD_DATA_DIR}/json.sh"
 
 APP_NAME="$1"
 source <(hudctl-appenv "${APP_NAME}")
-query_file_array "${APP_MANIFEST_PATH}" APP_BINARIES '.binaries // [] | .[]'
-query_file_array "${APP_MANIFEST_PATH}" APP_UNITS '.units // [] | .[]'
-query_file_array "${APP_MANIFEST_PATH}" APP_CONFIGS '.configs // [] | .[]'
-query_file_array "${APP_MANIFEST_PATH}" APP_SCRIPTS '.scripts // [] | .[]'
-query_file_array "${APP_MANIFEST_PATH}" APP_DATA '.data // [] | .[]'
+json_query_file_array "${APP_MANIFEST_PATH}" APP_BINARIES '.binaries // [] | .[]'
+json_query_file_array "${APP_MANIFEST_PATH}" APP_UNITS '.units // [] | .[]'
+json_query_file_array "${APP_MANIFEST_PATH}" APP_CONFIGS '.configs // [] | .[]'
+json_query_file_array "${APP_MANIFEST_PATH}" APP_SCRIPTS '.scripts // [] | .[]'
+json_query_file_array "${APP_MANIFEST_PATH}" APP_DATA '.data // [] | .[]'
 
 if [ "$(hudctl-catalog "${APP_NAME}" get enabled)" == "true" ]; then
-    log_yellow "App is already enabled, reenabling"
+    log_section "Re-enabling ${APP_NAME}"
+else
+    log_section "Enabling ${APP_NAME}"
 fi
 
 function link_app_file() {
@@ -22,48 +24,73 @@ function link_app_file() {
     FULL_PATH="${APP_ROOT}/${FILENAME}"
     DEST_PATH="${DESTINATION_DIR}/$(basename "${FULL_PATH}")"
 
-    log_blue "Link ${DEST_PATH} -> ${FULL_PATH}"
+    log_action "link" "${DEST_PATH}"
+
+    mkdir -p "${DESTINATION_DIR}"
+    chown -h "${HUD_USER}:${HUD_USER}" "${DESTINATION_DIR}"
+    chmod 755 "${DESTINATION_DIR}"
+
     ln -sf "${FULL_PATH}" "${DEST_PATH}"
     chown -h "${HUD_USER}:${HUD_USER}" "${DEST_PATH}"
 }
 
 # First step, link all app files
-for binary in "${APP_BINARIES[@]}"; do
-    link_app_file "binaries/${binary}" "${HUD_BIN_DIR}"
-done
+if (( ${#APP_BINARIES[@]} != 0 )); then
+    log_section "Linking binaries"
+    for binary in "${APP_BINARIES[@]}"; do
+        link_app_file "binaries/${binary}" "${HUD_BIN_DIR}"
+    done
+fi
 
-for unit in "${APP_UNITS[@]}"; do
-    link_app_file "units/${unit}" "${HUD_UNIT_DIR}"
-done
+if (( ${#APP_UNITS[@]} != 0 )); then
+    log_section "Linking units"
+    for unit in "${APP_UNITS[@]}"; do
+        link_app_file "units/${unit}" "${HUD_UNIT_DIR}"
+    done
+fi
 
-for config in "${APP_CONFIGS[@]}"; do
-    link_app_file "configs/${config}" "${HUD_CONFIG_DIR}"
-done
+if (( ${#APP_CONFIGS[@]} != 0 )); then
+    log_section "Linking configs"
+    for config in "${APP_CONFIGS[@]}"; do
+        link_app_file "configs/${config}" "${HUD_CONFIG_DIR}"
+    done
+fi
 
-for data in "${APP_DATA[@]}"; do
-    link_app_file "data/${data}" "${HUD_DATA_DIR}"
-done
+if (( ${#APP_DATA[@]} != 0 )); then
+    log_section "Linking data"
+    for data in "${APP_DATA[@]}"; do
+        link_app_file "data/${data}" "${HUD_DATA_DIR}"
+    done
+fi
 
 # Second step, enable units
 if (( ${#APP_UNITS[@]} != 0 )); then
+    log_section "Enabling systemd units"
     systemctl daemon-reload
     for unit in "${APP_UNITS[@]}"; do
+        if [[ "${unit}" == *.slice ]]; then
+            continue # There are probably more units to skip than just slice
+        fi
+
+        log_action "enable" "${unit}"
         systemctl enable "${unit}"
     done
 fi
 
 # Third step, run any scripts
-for script in "${APP_SCRIPTS[@]}"; do
-    SCRIPT_PATH="${APP_ROOT}/scripts/${script}"
+if (( ${#APP_SCRIPTS[@]} != 0 )); then
+    log_section "Running scripts"
+    for script in "${APP_SCRIPTS[@]}"; do
+        SCRIPT_PATH="${APP_ROOT}/scripts/${script}"
 	
-    echo "- $(basename "${SCRIPT_PATH}")"
-	if bash "${SCRIPT_PATH}"; then
-		echo "Success!"
-	else
-		echo "Failure :("
-		exit 1
-	fi
-done
+        log_subsection "$(basename "${SCRIPT_PATH}")"
+	    if bash "${SCRIPT_PATH}"; then
+		    log_success
+	    else
+            log_fatal
+	    fi 
+    done
+fi
 
 # Final step, set state to linked
 hudctl-catalog "${APP_NAME}" set enabled true

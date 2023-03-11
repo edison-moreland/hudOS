@@ -9,24 +9,24 @@ VAL="${4:-}"
 
 if [ "${APP_NAME}" != "" ]; then
     if [ "${ACTION}" != "" ]; then
-        if [ "${KEY}" == "" ]; then
-            log_red "Missing key for action"
-            exit 1
-        fi
-
         case "${ACTION}" in
         "get")
+            if [ "${KEY}" == "" ]; then
+                log_fatal "Missing key for action"
+            fi
             # Get field from app catalog entry
             jq -re \
                --arg app_name "${APP_NAME}" \
                --arg app_key "${KEY}" \
-               '.[] // [] | select(.name == $app_name) | .[$app_key]' \
+               '. // [] | .[] | select(.name == $app_name) | .[$app_key]' \
                "${HUD_APPS_CATALOG}" 
             ;;
         "set") 
+            if [ "${KEY}" == "" ]; then
+                log_fatal "Missing key for action"
+            fi
             if [ "${VAL}" == "" ]; then
-                log_red "Missing value for set action"
-                exit 1
+                log_fatal "Missing value for set action"
             fi
 
             # Set field on app catalog entry
@@ -39,19 +39,27 @@ if [ "${APP_NAME}" != "" ]; then
             cat "${catalog_tmp}" > "${HUD_APPS_CATALOG}" # cat > to preserve file permissions
             ;;
         "new")
+            if [ "${KEY}" == "" ]; then
+                log_fatal "Missing key for action"
+            fi
+
             # Create a new catalog entry
             # key should the manifest path
-
             catalog_tmp="$(mktemp)"
             jq -e --arg app_name "${APP_NAME}" \
                   --arg app_manifest "${KEY}" \
-                  '. += [{ "name": $app_name, "manifest": $app_manifest, "enabled": false }]' \
+                  '. // [] | . += [{ "name": $app_name, "manifest": $app_manifest, "enabled": false }]' \
                   "${HUD_APPS_CATALOG}" > "${catalog_tmp}"
             cat "${catalog_tmp}" > "${HUD_APPS_CATALOG}" # cat > to preserve file permissions
-            ;; 
+            ;;
+        # "installed")
+        #     # If app is installed, exit 0. Otherwise, exit 1
+        #     jq -e --arg app_name "${APP_NAME}" \
+        #        '. // [] | .[] | select()' \
+        #        "${HUD_APPS_CATALOG}" 
+        #     ;; 
         *)
-            log_red "Unknown action ${ACTION}"
-            exit 1
+            log_fatal "Unknown action ${ACTION}"
             ;;
         esac
 
@@ -59,11 +67,11 @@ if [ "${APP_NAME}" != "" ]; then
     fi
 
     # Return catalog for a specific app
-    jq --arg app_name "${APP_NAME}" \
-       '.[] // [] | select(.name == $app_name)' \
+    jq -e --arg app_name "${APP_NAME}" \
+       '. // [] | .[] | select(.name == $app_name)' \
        "${HUD_APPS_CATALOG}"
 else
     # Return entire catalog
-    jq '.[] // []' \
+    jq '. // [] | .[]' \
        "${HUD_APPS_CATALOG}"
 fi

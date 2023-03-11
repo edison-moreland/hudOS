@@ -12,15 +12,14 @@ export HUD_APPS_CATALOG="${HUD_PREFIX}/apps/catalog.json"
 
 source "${HUD_DATA_DIR}/logging.sh"
 
-if [ "${USER}" != "${HUD_USER}" ]; then
-    log_yellow "hudctl is not running as ${HUD_USER}"
-fi
+# if [ "${USER}" != "${HUD_USER}" ]; then
+#     log_yellow "hudctl is not running as ${HUD_USER}"
+# fi
 
 ctl_command="hudctl-$1"
 
 if ! which "${ctl_command}" > /dev/null; then
-    log_red "Unknown command $1"
-    exit 1
+    log_fatal "Unknown command $1"
 fi
 
 { 

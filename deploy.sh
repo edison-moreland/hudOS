@@ -8,6 +8,8 @@ PINEPHONE_HOST=$1
 PINEPHONE_ROOT_SSH="deploy@${PINEPHONE_HOST}"
 PINEPHONE_SSH_KEY="${REPO_ROOT}/buildroot/deploy_ed25519"
 
+TARGET="${2:-}"
+
 APP_BUNDLE="${REPO_ROOT}/.build/bundle.tar.gz"
 BUNDLE_DEPLOYER="${REPO_ROOT}/bundle_deployer.sh"
 
@@ -17,11 +19,16 @@ if [ ! -f "${PINEPHONE_SSH_KEY}" ]; then
 fi
 
 log_blue "Building App Bundle"
-"${REPO_ROOT}"/build.sh -e bluetooth
+buildargs='-e bluetooth'
+if [ "${TARGET}" != "" ]; then
+	buildargs+=" -i ${TARGET}"
+fi
+
+"${REPO_ROOT}"/build.sh ${buildargs}
 
 log_blue "Deploying App Bundle"
 scp -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null -i "${PINEPHONE_SSH_KEY}" "${BUNDLE_DEPLOYER}" "${PINEPHONE_ROOT_SSH}":/home/deploy/bundle_deployer.sh
 pv <"${APP_BUNDLE}" | ssh -o StrictHostKeychecking=no -o UserKnownHostsFile=/dev/null -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "/bin/sudo /bin/bash /home/deploy/bundle_deployer.sh"
 
-log_blue "Deployment Status"
+# log_blue "Deployment Status"
 #ssh -i "${PINEPHONE_SSH_KEY}" "${PINEPHONE_ROOT_SSH}" "systemctl -M hud@.host --user status"

@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/logging.sh"
+source "${HUD_DATA_DIR}/json.sh"
+
+APP_NAME="$1"
+source <(hudctl-appenv "${APP_NAME}")
+
+json_query_file "${APP_MANIFEST_PATH}" '.'

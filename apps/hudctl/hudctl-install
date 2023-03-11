@@ -41,13 +41,14 @@ if [ ! -f "${BUNDLE_MANIFEST}" ]; then
     exit 1
 fi
 
-BUNDLE_NAME="$(query_file "${BUNDLE_MANIFEST}" '.name')"
+BUNDLE_NAME="$(json_query_file "${BUNDLE_MANIFEST}" '.name')"
 APP_INSTALL_DIR="${HUD_APPS_DIR}/${BUNDLE_NAME}"
 
 function sync_bundle() {
     BUNDLE_ROOT=$1
     INSTALL_ROOT=$2
 
+    log_section "Syncing bundle files"
     mkdir -p "${INSTALL_ROOT}"
     rsync -ap --chown="${HUD_USER}:${HUD_USER}" \
           --delete "${BUNDLE_ROOT}/" \
@@ -59,7 +60,7 @@ function unlink_removed_files() {
     # Unlink any files that will be removed when the new bundle is installed
     BUNDLE_FOLDER="${1}"
     LINKED_FOLDER="${2}" # System folder that these files are linked to
-    OLD_MANIFEST="${APP_MANIFEST}"
+    OLD_MANIFEST="${3}"
     NEW_MANIFEST="${BUNDLE_MANIFEST}"
 
     OLD_FILES="$(jq -Mcr \
@@ -73,58 +74,51 @@ function unlink_removed_files() {
                     "${NEW_MANIFEST}" )"
 
     
-    REMOVED_FILES_JSON="$(json_set_difference "${OLD_FILES}" "${NEW_FILES}")"
-    mapfile -t REMOVED_FILES < <(query_blob "${REMOVED_FILES_JSON}" '.[]')
+    REMOVED_FILES_JSON="$(json_array_difference "${OLD_FILES}" "${NEW_FILES}")"
+    json_array_into REMOVED_FILES "${REMOVED_FILES_JSON}"
+    
+    if (( ${#REMOVED_FILES[@]} != 0 )); then
+        log_section "Unlinking removed ${BUNDLE_FOLDER}"
+        for removed_file in "${REMOVED_FILES[@]}"; do
+            full_path="${LINKED_FOLDER}/${removed_file}"
 
-    for removed_file in "${REMOVED_FILES[@]}"; do
-        full_path="${LINKED_FOLDER}/${removed_file}"
+            log_action "unlink" "${full_path}"
 
-        log_blue "Unlinking ${full_path}"
+            if [ ! -f "${full_path}" ]; then
+                log_failure "${full_path} does not exist!"
+            fi
 
-        if [ ! -f "${full_path}" ]; then
-            log_red "${full_path} does not exist!"
-            exit 1
-        fi
-
-        unlink "${full_path}"
-    done
+            unlink "${full_path}"
+        done
+    fi
 }
 
-
-if hudctl-catalog "${BUNDLE_NAME}"; then
+if hudctl-catalog "${BUNDLE_NAME}" >/dev/null; then
+    log_section "Reinstalling ${BUNDLE_NAME}"
+    
     if [ "$(hudctl-catalog "${BUNDLE_NAME}" get enabled)" == "true" ]; then
-        # App is installed and enabled
-        log_yellow "App installed and enabled"
+        # If the app is already enabled, we first need to unlink any files 
+        # that don't exist in the new bundle
+        APP_MANIFEST="$(hudctl-catalog "${BUNDLE_NAME}" get manifest)"
+        unlink_removed_files "binaries" "${HUD_BIN_DIR}" "${APP_MANIFEST}"
+        unlink_removed_files "units" "${HUD_UNIT_DIR}" "${APP_MANIFEST}"
+        unlink_removed_files "configs" "${HUD_CONFIG_DIR}" "${APP_MANIFEST}"
+        unlink_removed_files "data" "${HUD_DATA_DIR}" "${APP_MANIFEST}"
+
+        sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
+        hudctl-enable "${BUNDLE_NAME}"
+
     else
-        # App is installed and not enabled
-        log_yellow "App installed not enabled"
+        # If the app is disabled, we don't want to renable it 
+        sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
     fi
 else
     # App not installed
-    log_yellow "App not installed"
-fi
-exit 1
-
-if [ "$(hudctl-catalog "${BUNDLE_NAME}" get enabled)" == "true" ]; then
-    log_blue "Reinstalling ${BUNDLE_NAME} to ${APP_INSTALL_DIR}"
-    
-    # First, we need to unlink any files that are going to be removed
-    APP_MANIFEST="$(hudctl-catalog "${BUNDLE_NAME}" get manifest)"
-    
-    unlink_removed_files "binaries" "${HUD_BIN_DIR}"
-    unlink_removed_files "units" "${HUD_UNIT_DIR}"
-    unlink_removed_files "configs" "${HUD_CONFIG_DIR}"
-    unlink_removed_files "data" "${HUD_DATA_DIR}"
-
-    # Now we can sync the app folders and re-enable the app
-    sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
-    hudctl-enable "${BUNDLE_NAME}"
-
-else
-    log_blue "Installing ${BUNDLE_NAME} to ${APP_INSTALL_DIR}"
+    log_section "Installing ${BUNDLE_NAME}"
 
     sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
-    # This is added an extra entry \/
     hudctl-catalog "${BUNDLE_NAME}" new "${APP_INSTALL_DIR}/manifest.json"
+
+    # This should be temporary, or put behind a flag
     hudctl-enable "${BUNDLE_NAME}"
 fi

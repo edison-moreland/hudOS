@@ -4,8 +4,7 @@ source "${HUD_DATA_DIR}/logging.sh"
 
 APP_NAME="$1"
 if ! hudctl-catalog "${APP_NAME}" >/dev/null; then
-    log_red "App ${APP_NAME} does not exist"
-    exit 1 
+    log_fatal "App ${APP_NAME} does not exist"
 fi
 
 APP_MANIFEST_PATH="$(hudctl-catalog "${APP_NAME}" get manifest)"

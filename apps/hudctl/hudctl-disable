@@ -1,0 +1,62 @@
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/logging.sh"
+source "${HUD_DATA_DIR}/json.sh"
+
+APP_NAME="$1"
+source <(hudctl-appenv "${APP_NAME}")
+json_query_file_array "${APP_MANIFEST_PATH}" APP_UNITS '.units // [] | .[]'
+
+if [ "$(hudctl-catalog "${APP_NAME}" get enabled)" == "false" ]; then
+    log_section "App ${APP_NAME} is already disabled"
+    exit 0
+fi
+log_section "Disabling ${APP_NAME}"
+
+function unlink_app_files() {
+    BUNDLE_SECTION="${1}" 
+    LINKED_FOLDER="${2}" # System folder that these files are linked to
+
+    REMOVED_FILES_JSON="$(jq -Mcr \
+                             --arg section "${BUNDLE_SECTION}" \
+                             '.[$section] // []' \
+                             "${APP_MANIFEST_PATH}" )"
+
+    json_array_into REMOVED_FILES "${REMOVED_FILES_JSON}"
+
+    if (( ${#REMOVED_FILES[@]} != 0 )); then
+        log_section "Unlinking ${BUNDLE_SECTION}"
+        for removed_file in "${REMOVED_FILES[@]}"; do
+            full_path="${LINKED_FOLDER}/${removed_file}"
+
+            log_action "Unlink" "${full_path}"
+
+            if [ ! -f "${full_path}" ]; then
+                log_fatal "${full_path} does not exist!"
+            fi
+
+            unlink "${full_path}"
+        done
+    fi
+}
+
+# Disable/stop any units
+if (( ${#APP_UNITS[@]} != 0 )); then
+    log_section "Disabling systemd units"
+    for unit in "${APP_UNITS[@]}"; do
+        if [[ "${unit}" == *.slice ]]; then
+            continue # There are probably more units to skip than just slice
+        fi
+        log_action "disable" "${unit}"
+        systemctl stop "${unit}"
+        systemctl disable "${unit}"
+    done
+fi
+
+unlink_app_files "binaries" "${HUD_BIN_DIR}"
+unlink_app_files "units" "${HUD_UNIT_DIR}"
+unlink_app_files "configs" "${HUD_CONFIG_DIR}"
+unlink_app_files "data" "${HUD_DATA_DIR}"
+
+# Final step, set state to linked
+hudctl-catalog "${APP_NAME}" set enabled false

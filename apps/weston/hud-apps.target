@@ -1,6 +1,7 @@
 [Unit]
 Description=hudOS Apps
 After=hud.target
+After=weston.target
 
 [Install]
 WantedBy=hud.target

@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/logging.sh"
+source "${HUD_DATA_DIR}/json.sh"
+
+APP_NAME="$1"
+source <(hudctl-appenv "${APP_NAME}")
+json_query_file_array "${APP_MANIFEST_PATH}" APP_UNITS '.units // [] | .[]'
+
+if [ "$(hudctl-catalog "${APP_NAME}" get enabled)" == "false" ]; then
+    log_fatal "App ${APP_NAME} is disabled"
+fi
+
+if (( ${#APP_UNITS[@]} != 0 )); then
+    log_section "Enabling systemd units"
+    for unit in "${APP_UNITS[@]}"; do
+        if [[ "${unit}" == *.slice ]]; then
+            continue # There are probably more units to skip than just slice
+        fi
+
+        log_action "stop" "${unit}"
+        systemctl stop "${unit}"
+    done
+fi
