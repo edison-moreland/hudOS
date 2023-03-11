@@ -5,6 +5,16 @@ config BR2_PACKAGE_PINE_FIRMWARE
 
 if BR2_PACKAGE_PINE_FIRMWARE
 
+config BR2_PACKAGE_PINE_FIRMWARE_ROCKCHIP_DPTX
+    bool "Rockchip dptx"
+    help
+        Firmware for display port maybe?
+
+config BR2_PACKAGE_PINE_FIRMWARE_BCM43
+    bool "BCM43 chips"
+    help
+        Firmware for Broadcom BCM43
+
 config BR2_PACKAGE_PINE_FIRMWARE_ANX7688
     bool "ANX7688 HDMI to USB Type-C Bridge"
     help

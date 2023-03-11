@@ -1,10 +1,8 @@
 # hudOS
-Experimental PinePhone distro to provide a heads-up display using the Nreal Air.
+Experimental PinePhone Pro distro to provide a heads-up display using the Nreal Air.
 This is very much a work in progress and not ready to be used.
 
-HudOS should be compatible with all PinePhone hardware revisions. 
-Development is being done on a PinePhone v1.2b, with some testing done on a v1.1.
-Any revision before v1.2a will need [hardware modifications](https://wiki.pine64.org/wiki/PinePhone_v1.2#USB) to allow use of the Nreal Air. 
+In theory PinePhone support should be possible, but I haven't been able to get the Nreal glasses to work.
 
 # Phone setup
 NOTE: Setup was built on x86_64 Manjaro. This should work on any modern linux distro, YMMV.
@@ -15,10 +13,11 @@ Dependencies
 
 1. Download dependencies
     - `./update_vendor.sh`
-2. Install Tow-Boot
-    1. Flash `.build/vendor/towboot/mmcboot.installer.img` to an SD card.
+2. Install Tow-Boot (optional)
+    - All PinePhone Pros sold after July 2022 should come with Tow-Boot preinstalled to the SPI flash.
+    1. Flash `.build/vendor/towboot/spi.installer.img` to an SD card.
     2. Put the SD card in the PinePhone, and boot.
-    3. Install Tow-Boot to the eMMC.
+    3. Install Tow-Boot to the SPI.
     4. Remove the SD card.
 3. Building hudOS
    1. Download buildroot
@@ -45,7 +44,7 @@ Dependencies
 # Notes
 ## Documentation
 - Tow-boot
-    - https://tow-boot.org/devices/pine64-pinephoneA64.html
+    - https://tow-boot.org/devices/pine64-pinephonePro.html
 - Weston
     - https://wayland.pages.freedesktop.org/weston/toc/running-weston.html
     - https://wiki.archlinux.org/title/Weston

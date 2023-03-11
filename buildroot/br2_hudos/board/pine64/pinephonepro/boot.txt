@@ -1,0 +1,46 @@
+#
+# This is the description of the GPIO lines that can be used for indication:
+# GPIO pins:
+# 105 - vibrator motor
+# 154 - red LED
+# 157 - green LED
+# 158 - blue LED
+
+gpio set 105
+gpio set 157
+
+if test ${devnum} -eq 1; then
+    echo "Booting from SD"
+    setenv linux_mmcdev 1
+else
+    echo "Booting from eMMC"
+    setenv linux_mmcdev 2
+fi
+
+# If we have at least 2 partitions, then the 1st one is /boot, and / is #2
+#if part size mmc ${mmc_bootdev} 2 none; then
+# 	setenv rootpart 2
+#else
+#	setenv rootpart 1
+#	setenv bootdir "/boot"
+#fi
+setenv rootpart 2
+
+# Todo: Should we copy some boot args from postmarketos?
+# https://gitlab.com/postmarketOS/pmaports/-/blob/master/device/community/device-pine64-pinephonepro/deviceinfo
+setenv bootargs loglevel=4 console=ttyS2,115200 console=tty0 root=/dev/mmcblk${linux_mmcdev}p${rootpart} rw rootwait systemd.journald.forward_to_console=true systemd.log_target=console
+
+echo "Loading kernel..."
+load mmc ${devnum}:1 ${ramdisk_addr_r} ${bootdir}/Image.gz
+
+echo "Uncompressing kernel..."
+unzip ${ramdisk_addr_r} ${kernel_addr_r}
+
+echo "Loading dtb..."
+load mmc ${devnum}:1 ${fdt_addr_r} ${bootdir}/dtbs/${fdtfile}
+
+echo "Booting..."
+gpio clear 157
+gpio clear 105 # Disable vibrator
+
+booti ${kernel_addr_r} - ${fdt_addr_r}

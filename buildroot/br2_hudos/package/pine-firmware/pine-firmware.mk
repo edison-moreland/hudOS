@@ -22,6 +22,16 @@ PINE_FIRMWARE_FILES += \
 	rtl_bt/rtl8723cs_xx_fw.bin
 endif
 
+ifeq ($(BR2_PACKAGE_PINE_FIRMWARE_BCM43),y)
+PINE_FIRMWARE_FILES += \
+    brcm/brcmfmac43362-sdio.bin \
+    brcm/brcmfmac43455-sdio.pine64,pinephone-pro.txt
+endif
+
+ifeq ($(BR2_PACKAGE_PINE_FIRMWARE_ROCKCHIP_DPTX),y)
+PINE_FIRMWARE_FILES += \
+    rockchip/dptx.bin
+endif
 
 ifneq ($(PINE_FIRMWARE_FILES),)
 

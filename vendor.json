@@ -17,7 +17,7 @@
     {
         "name": "towboot",
         "type": "tar",
-        "url": "https://github.com/Tow-Boot/Tow-Boot/releases/download/release-2021.10-005/pine64-pinephoneA64-2021.10-005.tar.xz",
-        "version": "b9c004362a11a8baa73b5ed7b708291e3c9340c0d5e35ea573dc6f679a6c663e"
+        "url": "https://github.com/Tow-Boot/Tow-Boot/releases/download/release-2021.10-005/pine64-pinephonePro-2021.10-005.tar.xz",
+        "version": "8fd7db9c10c43f5899651b688131cb190fc202ba7f023d6adec5e45d55c49dcd"
     }
 ]
