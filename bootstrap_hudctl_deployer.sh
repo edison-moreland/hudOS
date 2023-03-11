@@ -12,8 +12,8 @@ trap clean_bundle EXIT
 HUD_USER="hud"
 HUD_PREFIX="/opt/hud"
 HUD_APPS_DIR="${HUD_PREFIX}/apps"
-HUD_BIN_DIR="${HUD_PREFIX}/bin"
-HUD_DATA_DIR="${HUD_PREFIX}/.local/share"
+HUD_BIN_DIR="/usr/bin"
+HUD_DATA_DIR="/usr/share"
 
 HUDCTL_APP_DIR="${HUD_APPS_DIR}/hudctl"
 
@@ -26,8 +26,8 @@ function mkdir_hud() {
 
 mkdir_hud "${HUDCTL_APP_DIR}"
 mkdir_hud "${HUD_APPS_DIR}"
-mkdir_hud "${HUD_BIN_DIR}"
-mkdir_hud "${HUD_DATA_DIR}"
+mkdir -p "${HUD_BIN_DIR}"
+mkdir -p "${HUD_DATA_DIR}"
 
 rsync -ap --chown="${HUD_USER}:${HUD_USER}" --delete "${BUNDLE}/" "${HUDCTL_APP_DIR}"
 chmod 755 "${HUDCTL_APP_DIR}"

@@ -9,7 +9,7 @@ function clean_bundle {
 trap clean_bundle EXIT
 
 # Temporary until app link locations get changed
-export PATH="/opt/hud/bin:${PATH}"
+# export PATH="/opt/hud/bin:${PATH}"
 
 if [ -f "${BUNDLE}/weston.tar" ]; then
 	# Special case, weston always gets installed first

@@ -3,10 +3,10 @@ set -euo pipefail
 
 export HUD_USER="hud"
 export HUD_PREFIX="/opt/hud"
-export HUD_BIN_DIR="${HUD_PREFIX}/bin"
-export HUD_UNIT_DIR="${HUD_PREFIX}/systemd/system"
-export HUD_CONFIG_DIR="${HUD_PREFIX}/.config"
-export HUD_DATA_DIR="${HUD_PREFIX}/.local/share"
+export HUD_BIN_DIR="/usr/bin"
+export HUD_UNIT_DIR="/usr/lib/systemd/system/"
+export HUD_CONFIG_DIR="/etc"
+export HUD_DATA_DIR="/usr/share"
 export HUD_APPS_DIR="${HUD_PREFIX}/apps"
 export HUD_APPS_CATALOG="${HUD_PREFIX}/apps/catalog.json"
 
@@ -24,8 +24,7 @@ fi
 
 { 
     if ! flock -n 9; then
-        log_red "Could not obtain lock"
-        exit 1
+        log_fatal "Could not obtain lock"
     fi
 
     "${ctl_command}" "${@:2}"

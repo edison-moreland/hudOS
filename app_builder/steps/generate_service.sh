@@ -17,8 +17,8 @@ WorkingDirectory=/opt/hud
 
 Slice=hud.slice
 Type=simple
-Environment=XDG_RUNTIME_DIR=/opt/hud/run XCOMPOSEFILE=/dev/null
-ExecStart=/opt/hud/bin/${APP_NAME}
+Environment=XDG_RUNTIME_DIR=/opt/hud/run
+ExecStart=/usr/bin/${APP_NAME}
 Restart=always
 
 [Install]

@@ -26,9 +26,9 @@ function link_app_file() {
 
     log_action "link" "${DEST_PATH}"
 
-    mkdir -p "${DESTINATION_DIR}"
-    chown -h "${HUD_USER}:${HUD_USER}" "${DESTINATION_DIR}"
-    chmod 755 "${DESTINATION_DIR}"
+    # mkdir -p "${DESTINATION_DIR}"
+    # chown -h "${HUD_USER}:${HUD_USER}" "${DESTINATION_DIR}"
+    # chmod 755 "${DESTINATION_DIR}"
 
     ln -sf "${FULL_PATH}" "${DEST_PATH}"
     chown -h "${HUD_USER}:${HUD_USER}" "${DEST_PATH}"
