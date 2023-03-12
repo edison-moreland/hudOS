@@ -31,14 +31,18 @@ source "${HUD_DATA_DIR}/json.sh"
 
 APP_BUNDLE="$1"
 
+OUTPUT="{}"
+function output() {
+    OUTPUT="$(echo "${OUTPUT}" | jq --arg c "$2" "${1}"' = $c')"
+}
+
 BUNDLE=$(mktemp -d)
 tar -xaf "${APP_BUNDLE}" -C "${BUNDLE}"
 trap "rm -rf ${BUNDLE}" EXIT
 
 BUNDLE_MANIFEST="${BUNDLE}/manifest.json"
 if [ ! -f "${BUNDLE_MANIFEST}" ]; then
-    log_red "Bundle does not contain a manifest"
-    exit 1
+    log_failure "Bundle does not contain a manifest"
 fi
 
 BUNDLE_NAME="$(json_query_file "${BUNDLE_MANIFEST}" '.name')"
@@ -93,10 +97,15 @@ function unlink_removed_files() {
     fi
 }
 
+output '.name' "${BUNDLE_NAME}"
+output '.enabled' "false"
+
 if hudctl-catalog "${BUNDLE_NAME}" >/dev/null; then
     log_section "Reinstalling ${BUNDLE_NAME}"
     
     if [ "$(hudctl-catalog "${BUNDLE_NAME}" get enabled)" == "true" ]; then
+        output '.enabled' "true"
+
         # If the app is already enabled, we first need to unlink any files 
         # that don't exist in the new bundle
         APP_MANIFEST="$(hudctl-catalog "${BUNDLE_NAME}" get manifest)"
@@ -107,7 +116,6 @@ if hudctl-catalog "${BUNDLE_NAME}" >/dev/null; then
 
         sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
         hudctl-enable "${BUNDLE_NAME}"
-
     else
         # If the app is disabled, we don't want to renable it 
         sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
@@ -118,7 +126,6 @@ else
 
     sync_bundle "${BUNDLE}" "${APP_INSTALL_DIR}"
     hudctl-catalog "${BUNDLE_NAME}" new "${APP_INSTALL_DIR}/manifest.json"
-
-    # This should be temporary, or put behind a flag
-    hudctl-enable "${BUNDLE_NAME}"
 fi
+
+echo "${OUTPUT}" | jq -M '.'

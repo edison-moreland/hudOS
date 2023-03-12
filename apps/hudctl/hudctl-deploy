@@ -1,0 +1,37 @@
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/logging.sh"
+source "${HUD_DATA_DIR}/json.sh"
+
+# Used by the deploy script to deploy a bundle of app bundles
+# Accepts a gz compressed tar through stdin
+# That should contain a set of app bundles
+
+BUNDLE=$(mktemp -d)
+tar -xzf - -C "${BUNDLE}" <&0
+function clean_bundle {
+	rm -r "${BUNDLE}"
+}
+trap clean_bundle EXIT
+
+function install() {
+    result="$(hudctl-install "$1")"
+
+    if [ "$(json_query_blob "${result}" '.enabled' )" == "false" ]; then
+        hudctl-enable "$(json_query_blob "${result}" '.name' )"
+    fi
+}
+
+if [ -f "${BUNDLE}/weston.tar" ]; then
+	# Special case, weston always gets installed first
+	# It would be nice if apps could have dependecies on each other
+	install "${BUNDLE}/weston.tar"
+	rm "${BUNDLE}/weston.tar"
+fi
+
+for app_bundle in "${BUNDLE}"/*.tar; do
+	install "${app_bundle}"
+done
+
+systemctl restart hud.target 
+systemctl restart hud-apps.target

@@ -17,7 +17,8 @@
         "${SOURCE_DIR}/hudctl-stop",
         "${SOURCE_DIR}/hudctl-catalog",
         "${SOURCE_DIR}/hudctl-env",
-        "${SOURCE_DIR}/hudctl-manifest"
+        "${SOURCE_DIR}/hudctl-manifest",
+        "${SOURCE_DIR}/hudctl-deploy"
       ],
       "data": [
         "${SOURCE_DIR}/logging.sh",
