@@ -24,8 +24,9 @@ Dependencies
       - `./buildroot/setup.sh`
    2. Configure OS 
       - `./buildroot/build.sh nconfig`
-      - Under `External options`, select `hud deploy user` and `hud network`
-      - Fill in WiFi settings
+      - Under `External options`
+         - Select `hudOS deploy user`
+         - Fill in WiFi settings
    3. Build OS 
       - `./buildroot/build.sh`
       - This step will take 30 minutes to an hour and consume significant amounts of system resources.
