@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	"image/color"
 	"log"
 	"os"
 	"time"
@@ -11,11 +12,25 @@ import (
 	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
+	"gioui.org/op/clip"
+	"gioui.org/op/paint"
 	"gioui.org/widget/material"
 )
 
+type fill struct {
+	col color.NRGBA
+}
+
+func (f fill) Layout(gtx layout.Context, sz image.Point) layout.Dimensions {
+	defer clip.Rect(image.Rectangle{Max: sz}).Push(gtx.Ops).Pop()
+	paint.ColorOp{Color: f.col}.Add(gtx.Ops)
+	paint.PaintOp{}.Add(gtx.Ops)
+	return layout.Dimensions{Size: sz}
+}
+
 type clock struct {
 	material.LabelStyle
+	background color.NRGBA
 }
 
 func Clock(th *material.Theme) clock {
@@ -25,8 +40,15 @@ func Clock(th *material.Theme) clock {
 			th.TextSize*6,
 			"12:00 PM",
 		),
+		background: th.Bg,
 	}
 	label.Font.Variant = "Mono"
+	label.Color = color.NRGBA{
+		R: 255,
+		G: 255,
+		B: 255,
+		A: 255,
+	}
 
 	return label
 }
@@ -37,6 +59,13 @@ func (cs *clock) Layout(gtx layout.Context) layout.Dimensions {
 	op.InvalidateOp{
 		At: gtx.Now.Add((time.Second * 60) - (time.Second * time.Duration(gtx.Now.Second()))),
 	}.Add(gtx.Ops)
+
+	fill{color.NRGBA{
+		R: 0,
+		G: 0,
+		B: 0,
+		A: 255,
+	}}.Layout(gtx, gtx.Constraints.Max)
 
 	return cs.LabelStyle.Layout(gtx)
 }
@@ -63,6 +92,13 @@ func main() {
 
 func run(w *app.Window) error {
 	theme := material.NewTheme(gofont.Collection())
+	{
+		fg := theme.Fg
+		bg := theme.Bg
+		theme.Fg = fg
+		theme.Bg = bg
+	}
+
 	clock := Clock(theme)
 
 	var ops op.Ops
@@ -74,7 +110,7 @@ func run(w *app.Window) error {
 		case system.FrameEvent:
 			gtx := layout.NewContext(&ops, e)
 
-			NoMinimum(gtx, clock.Layout)
+			clock.Layout(gtx)
 
 			e.Frame(gtx.Ops)
 		}
