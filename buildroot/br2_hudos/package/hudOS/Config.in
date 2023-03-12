@@ -1,0 +1,8 @@
+config BR2_PACKAGE_HUDOS
+    bool "hudOS"
+    depends on BR2_PACKAGE_SYSTEMD
+    select BR2_PACKAGE_HUDCTL
+    select BR2_PACKAGE_HUDOS_NETWORK
+    select BR2_PACKAGE_HUDOS_FIRST_BOOT
+    help
+        HudOS base package

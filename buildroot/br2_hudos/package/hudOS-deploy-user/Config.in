@@ -1,4 +1,4 @@
-config BR2_PACKAGE_HUD_DEPLOY_USER
-    bool "hud deploy user"
+config BR2_PACKAGE_HUDOS_DEPLOY_USER
+    bool "hudOS deploy user"
     help
         Create user account and ssh key for hud development

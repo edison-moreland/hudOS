@@ -1,5 +1,0 @@
-config BR2_PACKAGE_HUD_FIRST_BOOT
-	bool "first-boot"
-	depends on BR2_PACKAGE_HUD_UI
-	help
-	    Runs all scripts under /opt/hud/first-boot when hudOS boots for the first time
