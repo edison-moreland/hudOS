@@ -2,7 +2,7 @@
 set -euo pipefail
 
 BUNDLE=$(mktemp -d)
-tar -xf - -C "${BUNDLE}" <&0
+tar -xf /opt/hud/bootstrap/hudctl.tar -C "${BUNDLE}"
 
 function clean_bundle {
 	rm -r "${BUNDLE}"

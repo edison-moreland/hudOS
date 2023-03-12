@@ -1,0 +1,5 @@
+config BR2_PACKAGE_HUDCTL
+	bool "hudctl"
+	depends on BR2_PACKAGE_HUD_FIRST_BOOT
+	help
+	    hudOS control

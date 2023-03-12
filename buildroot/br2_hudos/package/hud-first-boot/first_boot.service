@@ -1,0 +1,11 @@
+[Unit]
+Description=First Boot
+Before=default.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/first_boot.sh
+StandardOutput=tty
+
+[Install]
+WantedBy=default.target
