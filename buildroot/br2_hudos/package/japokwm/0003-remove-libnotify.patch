@@ -1,0 +1,11 @@
+--- a/meson.build
++++ b/meson.build
+@@ -166,7 +166,7 @@
+     dependency('wlroots', version: ['>=0.15' ,'<0.17']),
+     dependency('x11', required: false),
+     dependency('json-c'),
+-    dependency('libnotify'),
++    dependency('libnotify', required: false),
+     dependency('threads'),
+     dependency('libinput'),
+     dependency('libuv'),
