@@ -56,6 +56,12 @@ Deploy a single app the the phone:
 ./deploy.sh <pinephone_ip> <app_name>
 ```
 
+Incorporate hudctl changes into the base image:
+```
+./buildroot/build.sh hudctl-rebuild # Clean the output of the previous build
+./buildroot/build.sh # rebuild the image
+```
+
 ## Documentation
 - Tow-boot
     - https://tow-boot.org/devices/pine64-pinephonePro.html
