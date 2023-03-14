@@ -1,7 +1,6 @@
 config BR2_PACKAGE_HUDOS
     bool "hudOS"
     depends on BR2_PACKAGE_SYSTEMD
-    depends on HOST_UBOOT_TOOLS
     select BR2_PACKAGE_HUDCTL
     select BR2_PACKAGE_HUDOS_NETWORK
     select BR2_PACKAGE_HUDOS_FIRST_BOOT
