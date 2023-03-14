@@ -67,10 +67,15 @@ for step in "${BUILD_STEPS[@]}"; do
         log_blue " - ${step_type}"
     fi
 
-    if [ ! -f "${STEP_DIR}/${step_type}.sh" ]; then
+    
+    if [ -f "${SOURCE_DIR}/.build_steps/${step_type}.sh" ]; then
+        step_file="${SOURCE_DIR}/.build_steps/${step_type}.sh"
+    elif [ -f "${STEP_DIR}/${step_type}.sh" ]; then
+        step_file="${STEP_DIR}/${step_type}.sh"
+    else
         log_red "Step ${step_type} is not implemented"
         exit 1
     fi
 
-    "${STEP_DIR}/${step_type}.sh" "${step_subst}"
+    "${step_file}" "${step_subst}"
 done
