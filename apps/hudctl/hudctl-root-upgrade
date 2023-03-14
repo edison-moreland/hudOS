@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+source "${HUD_DATA_DIR}/json.sh"
+
+ROOT_INFO="$(hudctl-root-info)"
+OFF_PARTITION="$(json_query_blob "${ROOT_INFO}" '.[] | select(.current == false)')"
+DEVICE="$(json_query_blob "${OFF_PARTITION}" '.device')"
+UBOOT_VAL="$(json_query_blob "${OFF_PARTITION}" '.uboot')"
+
+zcat <&0 > "${DEVICE}"
+fw_setenv "${HR_UBOOT_VAR}" "${UBOOT_VAL}"
+reboot now

@@ -11,7 +11,6 @@ PINEPHONE_SSH_KEY="${REPO_ROOT}/buildroot/deploy_ed25519"
 TARGET="${2:-}"
 
 APP_BUNDLE="${REPO_ROOT}/.build/bundle.tar.gz"
-BUNDLE_DEPLOYER="${REPO_ROOT}/bundle_deployer.sh"
 
 if [ ! -f "${PINEPHONE_SSH_KEY}" ]; then
 	log_red "Deploy key not generated. Did you enable deploy user in buildroot?"

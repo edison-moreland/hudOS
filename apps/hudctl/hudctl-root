@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+
+source "${HUD_DATA_DIR}/logging.sh"
+
+# u boot variable is used in boot script:
+# buildroot/br2_hudos/board/pine64/pinephonepro/boot.txt
+export HR_UBOOT_VAR="hudOS_root_partition"
+export HR_ROOT_PART_A="2"
+export HR_ROOT_PART_B="3"
+export HR_BLOCK_DEVICE="/dev/mmcblk2"
+
+CMD="${1:-info}"
+root_command="hudctl-root-${CMD}"
+
+if ! which "${root_command}" > /dev/null; then
+    log_fatal "Unknown command $CMD"
+fi
+
+"${root_command}" "${@:2}"

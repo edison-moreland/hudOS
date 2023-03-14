@@ -1,0 +1,39 @@
+#!/bin/bash
+set -euo pipefail
+
+source "${HUD_DATA_DIR}/logging.sh"
+
+
+OUTPUT="{}"
+
+function add_partition() {
+    NAME="$1"
+    UBOOT_VAL="$2"
+
+    OUTPUT="$(
+        echo "${OUTPUT}" | \
+        jq -M \
+           --arg n "${NAME}" \
+           --arg u "${UBOOT_VAL}" \
+           --arg d "${HR_BLOCK_DEVICE}p${UBOOT_VAL}" \
+           '.[$n] = {"uboot": $u, "device": $d}'
+    )"
+}
+
+function set_current_partition() {
+    CURRENT_PARTITION="$(fw_printenv "${HR_UBOOT_VAR}" | cut -d'=' -f2)"
+
+    OUTPUT="$(
+        echo "${OUTPUT}" | \
+        jq -M \
+           --arg c "${CURRENT_PARTITION}" \
+           'map(if (.uboot == $c) then (.current = true) else (.current = false) end)'
+    )"
+}
+
+
+add_partition "A" "${HR_ROOT_PART_A}"
+add_partition "B" "${HR_ROOT_PART_B}"
+set_current_partition
+
+echo "${OUTPUT}" | jq -M '.'

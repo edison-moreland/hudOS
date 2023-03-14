@@ -7,22 +7,10 @@
       "step": "bundle_app",
       "binaries": [
         "${SOURCE_DIR}/hudctl",
-        "${SOURCE_DIR}/hudctl-status",
-        "${SOURCE_DIR}/hudctl-enable",
-        "${SOURCE_DIR}/hudctl-disable",
-        "${SOURCE_DIR}/hudctl-catalog",
-        "${SOURCE_DIR}/hudctl-install",
-        "${SOURCE_DIR}/hudctl-appenv",
-        "${SOURCE_DIR}/hudctl-start",
-        "${SOURCE_DIR}/hudctl-stop",
-        "${SOURCE_DIR}/hudctl-catalog",
-        "${SOURCE_DIR}/hudctl-env",
-        "${SOURCE_DIR}/hudctl-manifest",
-        "${SOURCE_DIR}/hudctl-deploy"
+        "${SOURCE_DIR}/hudctl-*"
       ],
       "data": [
-        "${SOURCE_DIR}/logging.sh",
-        "${SOURCE_DIR}/json.sh"
+        "${SOURCE_DIR}/*.sh"
       ]
     }
   ]

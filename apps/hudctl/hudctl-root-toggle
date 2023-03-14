@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+source "${HUD_DATA_DIR}/logging.sh"
+
+ROOT_INFO="$(hudctl-root-info)"
+
+NOT_CURRENT_ROOT_UBOOT="$(echo "${ROOT_INFO}" | jq -r '.[] | select(.current == false) | .uboot')"
+
+fw_setenv "${HR_UBOOT_VAR}" "${NOT_CURRENT_ROOT_UBOOT}"

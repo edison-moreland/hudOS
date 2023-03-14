@@ -43,6 +43,19 @@ Dependencies
       - `./deploy.sh <pinephone_ip>`
 
 # Notes
+## Development
+Deploy a new buildroot image to the phone:
+```
+./buildroot/build.sh # Buildroot produces a new rootfs
+./buildroot/upgrade.sh <pinephone_ip> # Rootfs is written to an unused partition on the phone
+# The phone should now reboot into the new image
+```
+
+Deploy a single app the the phone:
+```
+./deploy.sh <pinephone_ip> <app_name>
+```
+
 ## Documentation
 - Tow-boot
     - https://tow-boot.org/devices/pine64-pinephonePro.html
