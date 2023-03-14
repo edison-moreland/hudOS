@@ -20,6 +20,12 @@ function add_to_bundle {
 	MODE="${2}"
 	FILE="${3}"
 
+	if [ ! -f "${FILE}" ]; then
+		echo "File does not exist: ${FILE}"
+		exit 1
+	fi
+	echo "   - ${DIR_IN_BUNDLE}/$(basename "${FILE}")"
+
 	MANIFEST="$(
 		echo "${MANIFEST}" | \
 		jq -Mc \
