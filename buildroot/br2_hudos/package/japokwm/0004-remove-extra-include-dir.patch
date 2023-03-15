@@ -1,0 +1,11 @@
+--- a/meson.build
++++ b/meson.build
+@@ -47,7 +47,7 @@
+ # generate needed protocol files
+ src_dir = 'src/'
+ include_dir = 'include/'
+-include_dirs = include_directories(include_dir, '/usr/include/json-c/')
++include_dirs = include_directories(include_dir)
+ 
+ scdoc = dependency('scdoc', version: '>=1.9.2', native: true, required: false)
+ if scdoc.found()

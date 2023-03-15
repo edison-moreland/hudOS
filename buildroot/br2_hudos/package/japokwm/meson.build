@@ -1,182 +1,103 @@
-project('japokwm', 'c', version: '0.4')
-pkg = import('pkgconfig')
+add_project_arguments('-rdynamic', '-DWLR_USE_UNSTABLE',
+'-Wno-unused-function', '-Wno-uninitialized', '-Wno-sizeof-pointer-div', language: 'c')
 
-wayland_scanner = find_program('wayland-scanner', native: true)
-
-root = meson.source_root()
-
-cc = meson.get_compiler('c')
-
-link_args = ['-lm', '-lrt']
-
-# add version macro
-version = '"@0@"'.format(meson.project_version())
-git = find_program('git', native: true, required: false)
-if git.found()
-    git_commit = run_command([git, 'rev-parse', '--short', 'HEAD'])
-    git_branch = run_command([git, 'rev-parse', '--abbrev-ref', 'HEAD'])
-    if git_commit.returncode() == 0 and git_branch.returncode() == 0
-        version = '"@0@-@1@ (" __DATE__ ", branch \'@2@\')"'.format(
-            meson.project_version(),
-            git_commit.stdout().strip(),
-            git_branch.stdout().strip(),
-        )
+foreach name : ['lua', 'lua5.3', 'lua-5.3', 'lua53']
+    luaDep = dependency(name, version: '>=5.3', required: false)
+    if luaDep.found()
+        break
     endif
+endforeach
+if not luaDep.found()
+    error('Lua could not be found!')
 endif
-add_project_arguments('-DJAPOKWM_VERSION=@0@'.format(version), language: 'c')
+deps += [luaDep]
 
-if get_option('xwayland')
-  add_project_arguments('-DJAPOKWM_HAS_XWAYLAND=1'.format(version), language: 'c')
-else
-  add_project_arguments('-DJAPOKWM_HAS_XWAYLAND=0'.format(version), language: 'c')
-endif
-
-if get_option('debug')
-  add_project_arguments('-DDEBUG=1'.format(version), language: 'c')
-else
-  add_project_arguments('-DDEBUG=0'.format(version), language: 'c')
-endif
-
-
-datadir = get_option('datadir')
-install_data(
-    'japokwm.desktop',
-    install_dir: join_paths(datadir, 'wayland-sessions')
-)
-
-# generate needed protocol files
-src_dir = 'src/'
-include_dir = 'include/'
-include_dirs = include_directories(include_dir, '/usr/include/json-c/')
-
-scdoc = dependency('scdoc', version: '>=1.9.2', native: true, required: false)
-if scdoc.found()
-    scdoc_prog = find_program(scdoc.get_pkgconfig_variable('scdoc'), native: true)
-    sh = find_program('sh', native: true)
-    mandir = get_option('mandir')
-    man_files = [
-        'man/japokwm-cheatsheet.5.scd',
-        'man/japokmsg.1.scd',
-        'man/japokwm-action.5.scd',
-        'man/japokwm-bitset.5.scd',
-        'man/japokwm-color.5.scd',
-        'man/japokwm-container.5.scd',
-        'man/japokwm-cursor.5.scd',
-        'man/japokwm-cursor_mode.5.scd',
-        'man/japokwm-direction.5.scd',
-        'man/japokwm-event_handler.5.scd',
-        'man/japokwm-focus_set.5.scd',
-        'man/japokwm-geom.5.scd',
-        'man/japokwm-info.5.scd',
-        'man/japokwm-layout.5.scd',
-        'man/japokwm-list.5.scd',
-        'man/japokwm-monitor.5.scd',
-        'man/japokwm-options.5.scd',
-        'man/japokwm-output_transform.5.scd',
-        'man/japokwm-ring_buffer.5.scd',
-        'man/japokwm-root.5.scd',
-        'man/japokwm-server.5.scd',
-        'man/japokwm-tag.5.scd',
-        'man/japokwm.1.scd',
-        'man/japokwm.5.scd',
-    ]
-    foreach filename : man_files
-        topic = filename.split('.')[-3].split('/')[-1]
-        section = filename.split('.')[-2]
-        output = '@0@.@1@'.format(topic, section)
-
-        custom_target(
-            output,
-            input: filename,
-            output: output,
-            command: [
-                sh, '-c', '@0@ < @INPUT@ > @1@'.format(scdoc_prog.path(), output)
-            ],
-            install: true,
-            install_dir: '@0@/man@1@'.format(mandir, section)
-        )
-    endforeach
-endif
-
-bash_comp = dependency('bash-completion', required: false)
-fish_comp = dependency('fish', required: false)
-
-if get_option('zsh-completions')
-    zsh_files = files(
-        'completions/zsh/_japokwm',
-        'completions/zsh/_japokmsg',
-    )
-    zsh_install_dir = join_paths(datadir, 'zsh', 'site-functions')
-
-    install_data(zsh_files, install_dir: zsh_install_dir)
-endif
-
-if get_option('bash-completions')
-    bash_files = files(
-        'completions/bash/japokwm',
-        'completions/bash/japokmsg',
-    )
-
-    if bash_comp.found()
-        bash_install_dir = bash_comp.get_variable(
-            pkgconfig: 'completionsdir',
-            pkgconfig_define: ['datadir', datadir]
-        )
-    else
-        bash_install_dir = join_paths(datadir, 'bash-completion', 'completions')
-    endif
-
-    install_data(bash_files, install_dir: bash_install_dir)
-endif
-
-if get_option('fish-completions')
-    fish_files = files(
-        'completions/fish/japokwm.fish',
-        'completions/fish/japokmsg.fish',
-    )
-
-    if fish_comp.found()
-        fish_install_dir = fish_comp.get_variable(
-            pkgconfig: 'completionsdir',
-            pkgconfig_define: ['datadir', datadir]
-        )
-    else
-        fish_install_dir = join_paths(datadir, 'fish', 'vendor_completions.d')
-    endif
-
-    install_data(fish_files, install_dir: fish_install_dir)
-endif
-
-
-commonSrcs = files(
-  'common/stringop.c'
+main = files('main.c')
+srcs = files(
+    'client.c',
+    'color.c',
+    'command.c',
+    'container.c',
+    'subsurface.c',
+    'cursor.c',
+    'event_handler.c',
+    'input_manager.c',
+    'ipc-json.c',
+    'ipc-server.c',
+    'keybinding.c',
+    'keyboard.c',
+    'tablet.c',
+    'layer_shell.c',
+    'layout.c',
+    'main.c',
+    'monitor.c',
+    'options.c',
+    'output.c',
+    'popup.c',
+    'root.c',
+    'scratchpad.c',
+    'seat.c',
+    'server.c',
+    'tagset.c',
+    'translationLayer.c',
+    'wlr_signal.c',
+    'tag.c',
+    'xdg_shell.c',
+    'xwayland.c',
+    'bitset/bitset.c',
+    'command/commands.c',
+    'lib/lib_action.c',
+    'lib/lib_bitset.c',
+    'lib/lib_color.c',
+    'lib/lib_gmp.c',
+    'lib/lib_container.c',
+    'lib/lib_cursor.c',
+    'lib/lib_cursor_mode.c',
+    'lib/lib_direction.c',
+    'lib/lib_event_handler.c',
+    'lib/lib_focus_set.c',
+    'lib/lib_geom.c',
+    'lib/lib_info.c',
+    'lib/lib_layout.c',
+    'lib/lib_list.c',
+    'lib/lib_list2D.c',
+    'lib/lib_monitor.c',
+    'lib/lib_options.c',
+    'lib/lib_output_transform.c',
+    'lib/lib_server.c',
+    'lib/lib_root.c',
+    'lib/lib_tag.c',
+    'lib/lib_container_property.c',
+    'lib/lib_container_list.c',
+    'lib/lib_container_property_list.c',
+    'ring_buffer.c',
+    'lib/lib_ring_buffer.c',
+    'list_sets/container_stack_set.c',
+    'list_sets/focus_stack_set.c',
+    'list_sets/list_set.c',
+    'render/render.c',
+    'rules/mon_rule.c',
+    'rules/rule.c',
+    'tile/tileUtils.c',
+    'utils/coreUtils.c',
+    'utils/gapUtils.c',
+    'utils/parseConfigUtils.c',
+    'utils/stringUtils.c',
+    'utils/writeFile.c',
   )
 
-wayland_server = dependency('wayland-server')
-wayland_protos = dependency('wayland-protocols', version: '>=1.14')
-wayland_client = dependency('wayland-client')
-deps = [\
-    dependency('xcb', required: false),
-    dependency('xkbcommon'),
-    dependency('wayland-egl'),
-    wayland_server,
-    wayland_client,
-    wayland_protos,
-    dependency('pixman-1'),
-    dependency('wlroots', version: ['>=0.15' ,'<0.17']),
-    dependency('x11', required: false),
-    dependency('json-c'),
-    dependency('libnotify', required: false),
-    dependency('threads'),
-    dependency('libinput'),
-    dependency('libuv'),
-    dependency('mpfr'),
-    ]
-
-# meson.add_install_script('install.sh')
-# config files
-subdir('src')
-subdir('protocols')
-subdir('config')
-subdir('test')
-subdir('japokmsg')
+libName = 'japokwm_lib'
+wmlib = static_library(libName,
+              [srcs, commonSrcs],
+              dependencies: deps,
+              include_directories: include_dirs,
+              link_args: link_args,
+              )
+executable('japokwm',
+      [main],
+      dependencies: deps,
+      include_directories: include_dirs,
+      link_args: link_args,
+      link_with: [wmlib],
+      install: true,
+      )

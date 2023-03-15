@@ -7,5 +7,7 @@ config BR2_PACKAGE_JAPOKWM
     depends on BR2_PACKAGE_WAYLAND_PROTOCOLS
     depends on BR2_PACKAGE_MPFR
     depends on BR2_PACKAGE_JSON_C
+    depends on BR2_PACKAGE_XORG7
+    depends on BR2_PACKAGE_LIBNOTIFY
 	help
 	    Japokwm is a dynamic tiling wayland compositor
