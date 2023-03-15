@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#-Help: Get/set the default device
+#-Use: [<device-name>]
+set -euo pipefail
+source "${HB_LIB_DIR}/logging.sh"
+
+device_name="${1:-}"
+
+if [[ "${device_name}" != "" ]]; then
+    # Set default
+    hb-devices-list "${device_name}" > /dev/null
+
+    catalog_tmp="$(mktemp)"
+    trap "rm ${catalog_tmp}" EXIT
+    jq --arg d "${device_name}" \
+       '.default = $d' \
+       "${HB_DEVICES_CATALOG}" > "${catalog_tmp}"
+    cat "${catalog_tmp}" > "${HB_DEVICES_CATALOG}"
+
+else
+    # Get default
+    default_name="$(if ! jq -re '.default' "${HB_DEVICES_CATALOG}"; then
+        log_fatal "No default device has been set"
+    fi)"
+
+    hb-devices-list "${default_name}"
+fi

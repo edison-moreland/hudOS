@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+#-Help: Add a new development device
+#-Use: [(-h/--host) <host>]
+#-Extended: If no default device is set, the new device will become the default
+set -euo pipefail
+source "${HB_LIB_DIR}/logging.sh"
+source "${HB_LIB_DIR}/name-generator.sh"
+
+device_host=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -h|--host)
+      if [ "$#" -gt 1 ]; then
+        device_host="$2"
+        shift 2
+      else
+        log_fatal "-h or --host requires a value"
+      fi
+      ;;
+    -*)
+      log_fatal "Error: Unknown option $1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+device_name="$(random_name)"
+device_key_dir="${HB_DEVICES_KEYS_DIR}/${device_name}"
+mkdir -p "${device_key_dir}"
+
+log_section "New device name ${device_name}"
+
+ssh-keygen -q -t ed25519 \
+           -N "" \
+           -C "${device_name}" \
+           -f "${device_key_dir}/ed25519"
+
+
+device="$(
+  jq -Mn \
+     --arg n "${device_name}" \
+     --arg ik "${device_key_dir}/ed25519" \
+     --arg uk "${device_key_dir}/ed25519.pub" \
+     '{"name": $n, "keys": {"private": $ik, "public": $uk}}'
+)"
+
+if [[ "${device_host}" != "" ]]; then
+  device="$(
+    echo "${device}" | jq -M \
+      --arg h "${device_host}" \
+      '.["host"] = $h'
+  )"
+fi
+
+catalog_tmp="$(mktemp)"
+trap "rm ${catalog_tmp}" EXIT
+jq -e \
+   --argjson d "${device}" \
+   '.devices += [$d]' \
+   "${HB_DEVICES_CATALOG}" > "${catalog_tmp}"
+cat "${catalog_tmp}" > "${HB_DEVICES_CATALOG}"
+
+echo "${device}" | jq '.'

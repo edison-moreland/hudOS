@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#-Help: Get/set host for a device
+#-Use: <device-name> [<host>]
+set -euo pipefail
+
+device_name="$1"
+device_host="${2:-}"
+
+hb-devices-list "${device_name}" > /dev/null
+
+if [[ "${device_host}" != "" ]]; then
+    # Set host
+    catalog_tmp="$(mktemp)"
+    trap "rm ${catalog_tmp}" EXIT
+    jq --arg d "${device_name}" \
+       --arg h "${device_host}" \
+       '.devices |= map(if (.name == $d) then (.host = $h) else (.) end)' \
+       "${HB_DEVICES_CATALOG}" > "${catalog_tmp}"
+    cat "${catalog_tmp}" > "${HB_DEVICES_CATALOG}"
+else
+    # Get host
+    jq -re \
+       --arg d "${device_name}" \
+       '.devices[] | select(.name == $d) | .host' \
+       "${HB_DEVICES_CATALOG}"
+fi

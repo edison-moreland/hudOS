@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#-Help: Manage development devices
+set -euo pipefail
+source "${HB_LIB_DIR}/logging.sh"
+
+export HB_DEVICES_DIR="${HB_BUILD_DIR}/devices"
+export HB_DEVICES_KEYS_DIR="${HB_DEVICES_DIR}/keys"
+export HB_DEVICES_CATALOG="${HB_DEVICES_DIR}/catalog.json"
+
+if [ ! -d "${HB_DEVICES_DIR}" ]; then
+    mkdir -p "${HB_DEVICES_DIR}"
+fi
+
+if [ ! -f "${HB_DEVICES_CATALOG}" ]; then
+    jq -Mnc "{}" > "${HB_DEVICES_CATALOG}"
+fi
+
+cmd="${1:-list}"
+devices_command="hb-devices-$cmd"
+if ! which "${devices_command}" > /dev/null; then
+    log_fatal "Unknown command $cmd"
+fi
+
+"${devices_command}" "${@:2}"

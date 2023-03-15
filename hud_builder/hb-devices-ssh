@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#-Help: SSH into device as deploy user
+#-Use: [<device-name>]

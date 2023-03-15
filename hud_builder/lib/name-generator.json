@@ -1,0 +1,45 @@
+{
+    "emotions": [
+      "Ecstatic",
+      "Melancholic",
+      "Overjoyed",
+      "Irate",
+      "Nostalgic",
+      "Anxious",
+      "Perplexed",
+      "Serene",
+      "Bewildered",
+      "Elated",
+      "Indifferent",
+      "Sullen",
+      "Enraged",
+      "Astonished",
+      "Apprehensive",
+      "Euphoric",
+      "Disgruntled",
+      "Ambivalent"
+    ],
+    "objects": [
+      "Toothbrush",
+      "Lampshade",
+      "Cushion",
+      "Vacuum",
+      "Doormat",
+      "Cutlery",
+      "Teapot",
+      "Blender",
+      "Curtains",
+      "Mirror",
+      "Plunger",
+      "Stapler",
+      "Vase",
+      "Rug",
+      "CoatHanger",
+      "IroningBoard",
+      "Toaster",
+      "Spatula",
+      "Broom",
+      "Clock"
+    ]
+  }
+  

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#-Help: List available devices
+#-Use: [<device-name>]
+set -euo pipefail
+source "${HB_LIB_DIR}/logging.sh"
+
+device_name="${1:-}"
+
+if [[ "${device_name}" != "" ]]; then
+    if ! jq -e --arg d "${device_name}" '.devices[] | select(.name == $d)' "${HB_DEVICES_CATALOG}"; then
+        log_fatal "Unknown device ${device_name}"
+    fi
+else
+    jq '.' "${HB_DEVICES_CATALOG}"
+fi
