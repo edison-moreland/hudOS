@@ -5,9 +5,6 @@ source "${HB_LIB_DIR}/json.sh"
 source "${HB_LIB_DIR}/vendor/git.sh"
 source "${HB_LIB_DIR}/vendor/tar.sh"
 
-HB_VENDOR_FILE="${HB_REPOSITORY_DIR}/vendor.json"
-HB_VENDOR_DIR="${HB_BUILD_DIR}/vendor"
-
 function should_update() {
     case "${1}" in
     "git")
@@ -52,6 +49,19 @@ function download() {
         ;;
     esac
 }
+
+HB_VENDOR_FILE="${HB_REPOSITORY_DIR}/vendor.json"
+HB_VENDOR_DIR="${HB_BUILD_DIR}/vendor"
+HB_VENDOR_STAMP="${HB_VENDOR_DIR}/.stamp"
+
+if [ -f "${HB_VENDOR_STAMP}" ]; then
+    if [ "${HB_VENDOR_STAMP}" -nt "${HB_VENDOR_FILE}" ]; then
+        log_warning "Skipping vendor update, stamp is newer"
+        exit 0
+    fi
+fi
+mkdir -p "${HB_VENDOR_DIR}"
+touch "${HB_VENDOR_STAMP}"
 
 json_query_file_array "${HB_VENDOR_FILE}" VENDOR '.[]'
 for dep in "${VENDOR[@]}"; do

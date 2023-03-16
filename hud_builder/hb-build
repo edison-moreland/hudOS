@@ -45,7 +45,6 @@ if [ "${clear_cache}" == "true" ]; then
   rm -rf "${HB_BUILD_CACHE_DIR}"
 fi
 
-# TODO: This should be a no-op if the vendor file hasn't been updated
 hb-vendor
 
 app_bundles=()
