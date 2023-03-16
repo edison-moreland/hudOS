@@ -7,13 +7,14 @@ define HUDOS_DEPLOY_USER_USERS
 	deploy -1 deploy -1 - /home/deploy /bin/bash wheel,sudo hudOS Deploy
 endef
 
+# brhook will copy the default devices keys into the given directory
 define HUDOS_DEPLOY_USER_BUILD_CMDS
-	rm -f $(@D)/deploy_ed25519 $(@D)/deploy_ed25519.pub; \
-	ssh-keygen -t ed25519 -N "" -C "hudOS Development Key" -f $(@D)/deploy_ed25519
+	HB_NO_LOCK="buildroot" \
+	$(BR2_EXTERNAL_HUDOS_PATH)/../../hb devices brhook $(@D)
 endef
 
 define HUDOS_DEPLOY_USER_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m 644 $(@D)/deploy_ed25519.pub \
+	$(INSTALL) -D -m 644 $(@D)/ed25519.pub \
 		$(TARGET_DIR)/home/deploy/.ssh/authorized_keys; \
 
 	$(INSTALL) -D -m 440 $(HUDOS_DEPLOY_USER_PKGDIR)/deploy_sudoers \

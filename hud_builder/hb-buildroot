@@ -3,6 +3,9 @@
 set -euo pipefail
 source "${HB_LIB_DIR}/logging.sh"
 
+# TODO: Can we cache downloads/git objects in the cache dir?
+#       Could speed up reset/rebuild considerably
+
 export HB_BUILDROOT_DIR="${HB_VENDOR_DIR}/buildroot"
 export HB_BUILDROOT_CONFIG="${HB_BUILDROOT_DIR}/.config"
 export HB_BUILDROOT_EXTERNAL_TREE="${HB_REPOSITORY_DIR}/buildroot/br2_hudos"

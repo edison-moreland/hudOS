@@ -11,8 +11,7 @@ define HUDOS_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 644 $(HUDOS_PKGDIR)/50-disable_getty.preset \
 		$(TARGET_DIR)/etc/systemd/system-preset/50-disable_getty.preset; \
 	$(INSTALL) -D -m 644 $(HUDOS_PKGDIR)/fw_env.config \
-		$(TARGET_DIR)/etc/fw_env.config; \
-	mkdir -p $(TARGET_DIR)/opt/hud/systemd/system/;
+		$(TARGET_DIR)/etc/fw_env.config; 
 endef
 
 # These could probably find a better place to live

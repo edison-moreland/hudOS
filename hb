@@ -27,6 +27,13 @@ if ! which "${hb_command}" > /dev/null; then
     log_fatal "Unknown command $cmd"
 fi
 
+if [[ "${HB_NO_LOCK:-}" == "buildroot" ]]; then
+    # This is only to be used with buildroot hooks
+    # Don't do something stupid
+    "${hb_command}" "${@:2}"
+    exit $?
+fi
+
 { 
     if ! flock -n 9; then
         log_fatal "Could not obtain lock"

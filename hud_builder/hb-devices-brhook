@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#-NoHelp: Internal
+#-Use: <destination_dir>
+#-Extended: This is called by buildroot to copy the default device's keys into the build dir
+set -euo pipefail
+source "${HB_LIB_DIR}/json.sh"
+
+# The directory we need to copy the keys into
+destination_dir="$1"
+
+device="$(hb-devices-default)"
+
+public_key_path="$(json_query_blob "${device}" '.keys.public')"
+private_key_path="$(json_query_blob "${device}" '.keys.private')"
+
+cp "${public_key_path}" "${destination_dir}"
+cp "${private_key_path}" "${destination_dir}"
