@@ -11,6 +11,10 @@ export PATH="${HB_COMMANDS_DIR}:${PATH}"
 
 source "${HB_LIB_DIR}/logging.sh"
 
+if ! which jq >/dev/null; then
+	log_fatal "Please install jq!"
+fi
+
 cmd="${1:-help}"
 hb_command="hb-$cmd"
 if ! which "${hb_command}" > /dev/null; then

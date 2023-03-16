@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+#-Help: Build all apps, or single app
+#-Use: [(-o/--only) <app_name>] [(-c/--clear-cache)]
+source "${HB_LIB_DIR}/logging.sh"
+
+only_app_name=""
+clear_cache="false"
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+  -c | --clear-cache)
+    clear_cache="true"
+    shift 1
+    ;;
+  -o | --only)
+    if [ "$#" -gt 1 ]; then
+      only_app_name="$2"
+      shift 2
+    else
+      log_fatal "-h or --host requires a value"
+    fi
+    ;;
+  -*)
+    log_fatal "Unknown option $1"
+    ;;
+  *)
+    break
+    ;;
+  esac
+done
+
+HB_APP_BUILDER="${HB_REPOSITORY_DIR}/app_builder/app_builder.sh"
+HB_APPS_DIR="${HB_REPOSITORY_DIR}/apps"
+HB_FINAL_BUNDLE="${HB_BUILD_DIR}/bundle.tar"
+HB_BUILD_CACHE_DIR="${HB_BUILD_DIR}/cache"
+HB_BUILD_APP_DIR="${HB_BUILD_DIR}/app"
+
+# workspaces are cleared before every build
+# anything that needs to be kept between runs should go in the cache dir
+if [ -d "${HB_BUILD_APP_DIR}" ]; then
+  rm -rf "${HB_BUILD_APP_DIR}"
+fi
+
+if [ "${clear_cache}" == "true" ]; then
+  log_warning "Clearing cache..."
+  rm -rf "${HB_BUILD_CACHE_DIR}"
+fi
+
+# TODO: This should be a no-op if the vendor file hasn't been updated
+hb-vendor
+
+app_bundles=()
+for app_manifest in "${HB_APPS_DIR}"/**/.hud_app.json; do
+  app_name="$(jq -r '.app.name' "${app_manifest}")"
+  app_bundle_out="${HB_BUILD_APP_DIR}/${app_name}.tar"
+
+  if [[ "${only_app_name}" != "" ]]; then
+    if [[ "${app_name}" != "${only_app_name}" ]]; then
+      continue
+    fi
+  fi
+
+  if "${HB_APP_BUILDER}" -i "${app_manifest}" -o "${app_bundle_out}"; then
+    if [ ! -f "${app_bundle_out}" ]; then
+      log_warning "Build did NOT produce an app bundle! (${app_name})"
+    else
+      log_success "${app_name}"
+      app_bundles+=("${app_bundle_out}")
+    fi
+  else
+    log_failure "${app_name}"
+  fi
+done
+
+log_section "Bundling app bundles"
+TEMP_BUNDLE="$(mktemp)"
+trap "rm ${TEMP_BUNDLE}" EXIT
+
+for app_bundle in "${app_bundles[@]}"; do
+  log_action "BUNDLE" "$(basename "${app_bundle}")"
+  tar -rf "${TEMP_BUNDLE}" \
+      -C "$(dirname "${app_bundle}")" \
+      "$(basename "${app_bundle}")"
+done
+
+cp "${TEMP_BUNDLE}" "${HB_FINAL_BUNDLE}"
+gzip -f "${HB_FINAL_BUNDLE}"
