@@ -50,10 +50,7 @@ function download() {
     esac
 }
 
-HB_VENDOR_FILE="${HB_REPOSITORY_DIR}/vendor.json"
-HB_VENDOR_DIR="${HB_BUILD_DIR}/vendor"
 HB_VENDOR_STAMP="${HB_VENDOR_DIR}/.stamp"
-
 if [ -f "${HB_VENDOR_STAMP}" ]; then
     if [ "${HB_VENDOR_STAMP}" -nt "${HB_VENDOR_FILE}" ]; then
         log_warning "Skipping vendor update, stamp is newer"

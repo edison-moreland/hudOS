@@ -10,6 +10,8 @@ export HB_BUILD_DIR="${HB_REPOSITORY_DIR}/.build"
 export HB_FINAL_BUNDLE="${HB_BUILD_DIR}/bundle.tar"
 export HB_BUILD_CACHE_DIR="${HB_BUILD_DIR}/cache"
 export HB_BUILD_APP_DIR="${HB_BUILD_DIR}/app"
+export HB_VENDOR_FILE="${HB_REPOSITORY_DIR}/vendor.json"
+export HB_VENDOR_DIR="${HB_BUILD_DIR}/vendor"
 
 export PATH="${HB_COMMANDS_DIR}:${PATH}"
 

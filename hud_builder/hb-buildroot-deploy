@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#-Help: Upload latest rootfs to device
+#-Use: [<device_name>]
+#-Extended: If non-default device is used, it's deploy key will be built into the image first

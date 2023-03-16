@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#-Help: Call buildroot's makefile
+#-Use: [<buildroot_target>]
+#-Extended: Use the target "nconfig" to configure buildroot

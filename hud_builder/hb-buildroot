@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#-Help: Wraps buildroot to include custom packages
+set -euo pipefail
+source "${HB_LIB_DIR}/logging.sh"
+
+export HB_BUILDROOT_DIR="${HB_VENDOR_DIR}/buildroot"
+export HB_BUILDROOT_CONFIG="${HB_BUILDROOT_DIR}/.config"
+export HB_BUILDROOT_EXTERNAL_TREE="${HB_REPOSITORY_DIR}/buildroot/br2_hudos"
+export HB_BUILDROOT_GIT_CONFIG="${HB_BUILDROOT_EXTERNAL_TREE}/configs/hudos_defconfig"
+export HB_BUILDROOT_BUILD_DIR="${HB_BUILDROOT_DIR}/output/build"
+export HB_BUILDROOT_IMAGES_DIR="${HB_BUILDROOT_DIR}/output/images"
+export HB_BUILDROOT_TARGET_DIR="${HB_BUILDROOT_DIR}/output/target"
+
+# Has buildroot been setup?
+if [ ! -f "${HB_BUILDROOT_DIR}/.hbstamp" ]; then
+    if [ ! -d "${HB_BUILDROOT_DIR}" ]; then
+        # If the directory doesn't exist, we need to download buildroot
+        hb-vendor
+    fi
+
+    # Apply our custom defconfig
+    # At somepoint we'll need to support multiple defconfigs
+    pushd "${BUILDROOT_DIR}"
+    make BR2_EXTERNAL="${HB_BUILDROOT_EXTERNAL_TREE}" "$(basename "${HB_BUILDROOT_GIT_CONFIG}")"
+    popd
+else
+    if [ "${HB_BUILDROOT_GIT_CONFIG}" -nt "${HB_BUILDROOT_CONFIG}" ]; then
+        log_warning "Defconfig has been updated by git!"
+        log_fatal "Either reset buildroot (erasing any changes), or merge your changes into the new config" 
+    fi
+fi
+touch "${HB_BUILDROOT_DIR}/.hbstamp"
+
+cmd="${1:-}"
+if [[ "${cmd}" == "" ]]; then
+    log_warning "No command given"
+    exit 0
+fi
+
+buildroot_command="hb-devices-$cmd"
+if ! which "${buildroot_command}" > /dev/null; then
+    log_fatal "Unknown command $cmd"
+fi
+
+"${buildroot_command}" "${@:2}"

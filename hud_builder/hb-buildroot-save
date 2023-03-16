@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#-Help: Export the current buildroot configuration to hudos_defconfig
+#-Extended: All sensitive keys (wifi settings, etc) will be removed

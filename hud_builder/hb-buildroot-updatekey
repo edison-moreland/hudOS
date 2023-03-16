@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#-Help: Rebuild with the given device's deploy key
+#-Use: [<device_name>]
