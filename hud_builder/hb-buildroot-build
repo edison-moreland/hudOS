@@ -2,3 +2,8 @@
 #-Help: Call buildroot's makefile
 #-Use: [<buildroot_target>]
 #-Extended: Use the target "nconfig" to configure buildroot
+set -euo pipefail
+
+pushd "${HB_BUILDROOT_DIR}"
+make BR2_EXTERNAL="${HB_BUILDROOT_EXTERNAL_TREE}" "$@"
+popd

@@ -16,7 +16,12 @@ function add_command() {
     json_frontmatter="${2}"
 
     help="$(json_query_blob "${json_frontmatter}" '.help')"
+    nohelp="$(json_query_blob "${json_frontmatter}" '.nohelp')"
     use="$(json_query_blob "${json_frontmatter}" '.use')"
+
+    if [[ "$nohelp" != "null" ]]; then
+        return
+    fi
 
     if [[ "$help" == "null" ]]; then
         log_fatal "${name} is missing help text!"

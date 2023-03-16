@@ -1,2 +1,12 @@
 #!/usr/bin/env bash
 #-Help: Wipe buildroot directory and reconfigure
+set -euo pipefail
+
+read -p "Do you really want to do this? [y/N]: " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+	exit 0
+fi
+
+rm -rf "${HB_BUILDROOT_DIR}"
+hb-buildroot-configure

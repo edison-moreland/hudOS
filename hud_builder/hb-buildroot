@@ -11,35 +11,30 @@ export HB_BUILDROOT_BUILD_DIR="${HB_BUILDROOT_DIR}/output/build"
 export HB_BUILDROOT_IMAGES_DIR="${HB_BUILDROOT_DIR}/output/images"
 export HB_BUILDROOT_TARGET_DIR="${HB_BUILDROOT_DIR}/output/target"
 
-# Has buildroot been setup?
-if [ ! -f "${HB_BUILDROOT_DIR}/.hbstamp" ]; then
-    if [ ! -d "${HB_BUILDROOT_DIR}" ]; then
-        # If the directory doesn't exist, we need to download buildroot
-        hb-vendor
-    fi
-
-    # Apply our custom defconfig
-    # At somepoint we'll need to support multiple defconfigs
-    pushd "${BUILDROOT_DIR}"
-    make BR2_EXTERNAL="${HB_BUILDROOT_EXTERNAL_TREE}" "$(basename "${HB_BUILDROOT_GIT_CONFIG}")"
-    popd
-else
-    if [ "${HB_BUILDROOT_GIT_CONFIG}" -nt "${HB_BUILDROOT_CONFIG}" ]; then
-        log_warning "Defconfig has been updated by git!"
-        log_fatal "Either reset buildroot (erasing any changes), or merge your changes into the new config" 
-    fi
-fi
-touch "${HB_BUILDROOT_DIR}/.hbstamp"
-
 cmd="${1:-}"
 if [[ "${cmd}" == "" ]]; then
     log_warning "No command given"
     exit 0
 fi
 
-buildroot_command="hb-devices-$cmd"
+hb-buildroot-configure
+
+if [ "${HB_BUILDROOT_GIT_CONFIG}" -nt "${HB_BUILDROOT_CONFIG}" ]; then
+    log_warning "Defconfig has been updated by git!"
+    log_fatal "Either reset buildroot (erasing any changes), or merge your changes into the new config" 
+fi
+
+buildroot_command="hb-buildroot-$cmd"
 if ! which "${buildroot_command}" > /dev/null; then
     log_fatal "Unknown command $cmd"
 fi
 
 "${buildroot_command}" "${@:2}"
+
+if [ "${HB_BUILDROOT_CONFIG}" -nt "${HB_BUILDROOT_GIT_CONFIG}" ]; then
+    read -p "Do you want to save buildroot config to git? [y/N]: " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        hb-buildroot-save
+    fi
+fi

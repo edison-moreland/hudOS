@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#-NoHelp: Internal
+set -euo pipefail
+
+# Has buildroot been setup?
+if [ ! -f "${HB_BUILDROOT_DIR}/.hbstamp" ]; then
+    if [ ! -d "${HB_BUILDROOT_DIR}" ]; then
+        # Force vendor to download dependencies
+        rm "${HB_VENDOR_DIR}/.stamp"
+        # If the directory doesn't exist, we need to download buildroot
+        hb-vendor
+    fi
+
+    # Apply our custom defconfig
+    # At somepoint we'll need to support multiple defconfigs
+    hb-buildroot-build "$(basename "${HB_BUILDROOT_GIT_CONFIG}")"
+else
+    if [ "${HB_BUILDROOT_GIT_CONFIG}" -nt "${HB_BUILDROOT_CONFIG}" ]; then
+        log_warning "Defconfig has been updated by git!"
+        log_fatal "Either reset buildroot (erasing any changes), or merge your changes into the new config" 
+    fi
+fi
+touch "${HB_BUILDROOT_DIR}/.hbstamp"
