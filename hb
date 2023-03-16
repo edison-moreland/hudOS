@@ -4,8 +4,12 @@ set -euo pipefail
 export HB_REPOSITORY_DIR="$(dirname "$(realpath "$0")")"
 export HB_COMMANDS_DIR="${HB_REPOSITORY_DIR}/hud_builder"
 export HB_LIB_DIR="${HB_COMMANDS_DIR}/lib"
-
+export HB_APP_BUILDER="${HB_REPOSITORY_DIR}/app_builder/app_builder.sh"
+export HB_APPS_DIR="${HB_REPOSITORY_DIR}/apps"
 export HB_BUILD_DIR="${HB_REPOSITORY_DIR}/.build"
+export HB_FINAL_BUNDLE="${HB_BUILD_DIR}/bundle.tar"
+export HB_BUILD_CACHE_DIR="${HB_BUILD_DIR}/cache"
+export HB_BUILD_APP_DIR="${HB_BUILD_DIR}/app"
 
 export PATH="${HB_COMMANDS_DIR}:${PATH}"
 

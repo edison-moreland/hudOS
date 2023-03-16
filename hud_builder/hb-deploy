@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#-Help: Build apps then deploy them to the device
+#-Use: [<device_name>] [(-o/--only) <app_name>]
+source "${HB_LIB_DIR}/logging.sh"
+source "${HB_LIB_DIR}/json.sh"
+
+device_name="${1:-}"
+if [[ "${device_name}" != "" ]]; then
+    shift 1
+fi
+
+build_args=""
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+    -o | --only)
+        if [ "$#" -gt 1 ]; then
+            build_args+=" --only $2"
+            shift 2
+        else
+            log_fatal "-o or --only requires a value"
+        fi
+        ;;
+    -*)
+        log_fatal "Unknown option $1"
+        ;;
+    *)
+        break
+        ;;
+    esac
+done
+
+if [[ "${device_name}" != "" ]]; then
+    device="$(hb-devices list "${device_name}" )"
+else
+    device="$(hb-devices default)"
+fi
+device_private_key="$(json_query_blob "${device}" '.keys.private')"
+device_host="$(json_query_blob "${device}" '.host')"
+
+log_section "Building App Bundle"
+hb-build ${build_args}
+
+log_section "Deploying App Bundle"
+gzip -c "${HB_FINAL_BUNDLE}" | pv | ssh \
+     -o StrictHostKeychecking=no \
+     -o UserKnownHostsFile=/dev/null \
+     -o PreferredAuthentications=publickey \
+     -i "${device_private_key}" \
+     "deploy@${device_host}" \
+     "sudo hudctl deploy"
