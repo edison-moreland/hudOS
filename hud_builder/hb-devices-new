@@ -61,4 +61,6 @@ jq -e \
    "${HB_DEVICES_CATALOG}" >"${catalog_tmp}"
 cat "${catalog_tmp}" >"${HB_DEVICES_CATALOG}"
 
+hb-devices-default "${device_name}"
+
 echo "${device}" | jq '.'
