@@ -35,7 +35,7 @@ export CACHE_DIR="${BUILD_DIR}/cache"
 export WORKSPACE_DIR="${BUILD_DIR}/app/${APP_NAME}/workspace"
 export VENDOR_DIR="${BUILD_DIR}/vendor"
 export SOURCE_DIR="$(dirname "$(realpath "${INPUT_MANIFEST}")")"
-export BUILDROOT_OUTPUT_DIR="${REPO_DIR}/buildroot/.buildroot/output"
+export BUILDROOT_OUTPUT_DIR="${VENDOR_DIR}/buildroot/output"
 export BUILDROOT_HOST_DIR="${BUILDROOT_OUTPUT_DIR}/host"
 export BUILDROOT_SYSROOT_DIR="${BUILDROOT_HOST_DIR}/aarch64-buildroot-linux-gnu/sysroot"
 export OUTPUT_BUNDLE

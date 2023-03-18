@@ -7,7 +7,7 @@ source "${HB_LIB_DIR}/logging.sh"
 if [ ! -f "${HB_BUILDROOT_DIR}/.hbstamp" ]; then
     if [ ! -d "${HB_BUILDROOT_DIR}" ]; then
         # Force vendor to download dependencies
-        rm "${HB_VENDOR_DIR}/.stamp"
+        rm -f "${HB_VENDOR_DIR}/.stamp"
         # If the directory doesn't exist, we need to download buildroot
         hb-vendor
     fi
