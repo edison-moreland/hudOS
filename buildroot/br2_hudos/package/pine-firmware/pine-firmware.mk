@@ -6,6 +6,13 @@ PINE_FIRMWARE_SITE_METHOD = git
 PINE_FIRMWARE_INSTALL_IMAGES = YES
 PINE_FIRMWARE_INSTALL_TARGET = YES
 
+# Pinephone pro needed firmware:
+# hx8394-mode.bin
+# rockchip/dptx.bin
+# brcm/brcmfmac43455-sdio.pine64,pinephone-pro.bin
+# brcm/brcmfmac43455-sdio.bin
+# goodix_1158_cfg.bin
+# regulatory.db
 
 ifeq ($(BR2_PACKAGE_PINE_FIRMWARE_ANX7688),y)
 PINE_FIRMWARE_FILES += anx7688-fw.bin
@@ -24,7 +31,9 @@ endif
 
 ifeq ($(BR2_PACKAGE_PINE_FIRMWARE_BCM43),y)
 PINE_FIRMWARE_FILES += \
-    brcm/brcmfmac43362-sdio.bin \
+    brcm/brcmfmac43455-sdio.bin \
+    brcm/brcmfmac43455-sdio.clm_blob \
+    brcm/brcmfmac43455-sdio.txt \
     brcm/brcmfmac43455-sdio.pine64,pinephone-pro.txt
 endif
 
