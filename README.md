@@ -52,6 +52,7 @@ Deploy a new buildroot image to the phone:
 ./hb buildroot build # Buildroot produces a new rootfs
 ./hb buildroot deploy # Rootfs is written to an unused partition on the phone
 # The phone should now reboot into the new image
+# Note: This does not update the kernel or boot script
 ```
 
 Deploy a single app the the phone:
