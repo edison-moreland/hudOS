@@ -3,11 +3,32 @@ set -euo pipefail
 
 source "${HUD_DATA_DIR}/json.sh"
 
+to_boot_partition="false"
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+    -b | --boot)
+        to_boot_partition="true"
+        shift 1
+        ;;
+    -*)
+        log_fatal "Unknown option $1"
+        ;;
+    *)
+        break
+        ;;
+    esac
+done
+
 ROOT_INFO="$(hudctl-root-info)"
-OFF_PARTITION="$(json_query_blob "${ROOT_INFO}" '.[] | select(.current == false)')"
-DEVICE="$(json_query_blob "${OFF_PARTITION}" '.device')"
-UBOOT_VAL="$(json_query_blob "${OFF_PARTITION}" '.uboot')"
+if [[ "${to_boot_partition}" == "true" ]]; then
+    DEVICE="$(json_query_blob "${ROOT_INFO}" '.boot.device')"
+else
+    OFF_PARTITION="$(json_query_blob "${ROOT_INFO}" '.root[] | select(.current == false)')"
+    DEVICE="$(json_query_blob "${OFF_PARTITION}" '.device')"
+    UBOOT_VAL="$(json_query_blob "${OFF_PARTITION}" '.uboot')"
+
+    fw_setenv "${HR_UBOOT_VAR}" "${UBOOT_VAL}"
+fi
 
 zcat <&0 > "${DEVICE}"
-fw_setenv "${HR_UBOOT_VAR}" "${UBOOT_VAL}"
 systemctl reboot

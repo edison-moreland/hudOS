@@ -3,11 +3,6 @@
 set -euo pipefail
 source "${HB_LIB_DIR}/logging.sh"
 
-# TODO: Can we cache downloads/git objects in the cache dir?
-#       Could speed up reset/rebuild considerably
-# Buildroot ccache: BR2_CCACHE_DIR=$HOME/.buildroot-ccache
-# export BR2_DL_DIR=<shared download location>
-
 export HB_BUILDROOT_DIR="${HB_VENDOR_DIR}/buildroot"
 export HB_BUILDROOT_CONFIG="${HB_BUILDROOT_DIR}/.config"
 export HB_BUILDROOT_EXTERNAL_TREE="${HB_REPOSITORY_DIR}/buildroot"
@@ -15,6 +10,12 @@ export HB_BUILDROOT_GIT_CONFIG="${HB_BUILDROOT_EXTERNAL_TREE}/configs/hudos_defc
 export HB_BUILDROOT_BUILD_DIR="${HB_BUILDROOT_DIR}/output/build"
 export HB_BUILDROOT_IMAGES_DIR="${HB_BUILDROOT_DIR}/output/images"
 export HB_BUILDROOT_TARGET_DIR="${HB_BUILDROOT_DIR}/output/target"
+
+# Setup buildroot cache
+HB_BUILDROOT_CACHE_ROOT="${HB_BUILD_CACHE_DIR}/buildroot"
+export BR2_DL_DIR="${HB_BUILDROOT_CACHE_ROOT}/dl"
+export BR2_CCACHE_DIR="${HB_BUILDROOT_CACHE_ROOT}/ccache"
+
 
 cmd="${1:-}"
 if [[ "${cmd}" == "" ]]; then

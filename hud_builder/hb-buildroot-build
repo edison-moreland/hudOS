@@ -4,6 +4,10 @@
 #-Extended: Use the target "nconfig" to configure buildroot
 set -euo pipefail
 
+# TODO: Detect when certain files change, and add rebuild target automatically
+#       Ex: Changes to boot script: host-uboot-tools-rebuild
+#           Changes to hudctl: hudctl-rebuild
+
 pushd "${HB_BUILDROOT_DIR}"
 make BR2_EXTERNAL="${HB_BUILDROOT_EXTERNAL_TREE}" "$@"
 popd

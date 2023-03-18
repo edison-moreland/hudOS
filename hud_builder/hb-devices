@@ -3,6 +3,8 @@
 set -euo pipefail
 source "${HB_LIB_DIR}/logging.sh"
 
+# TODO: Move wifi settings to devices, consolidate deploy-user+network steps into "device_settings"
+
 export HB_DEVICES_DIR="${HB_BUILD_DIR}/devices"
 export HB_DEVICES_KEYS_DIR="${HB_DEVICES_DIR}/keys"
 export HB_DEVICES_CATALOG="${HB_DEVICES_DIR}/catalog.json"

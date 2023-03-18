@@ -4,19 +4,26 @@ set -euo pipefail
 source "${HUD_DATA_DIR}/logging.sh"
 
 
-OUTPUT="{}"
+OUTPUT="$(jq -n '{"root": [], "boot": {}}')"
 
 function add_partition() {
-    NAME="$1"
-    UBOOT_VAL="$2"
+    UBOOT_VAL="$1"
 
     OUTPUT="$(
         echo "${OUTPUT}" | \
         jq -M \
-           --arg n "${NAME}" \
            --arg u "${UBOOT_VAL}" \
            --arg d "${HR_BLOCK_DEVICE}p${UBOOT_VAL}" \
-           '.[$n] = {"uboot": $u, "device": $d}'
+           '.root += [{"uboot": $u, "device": $d}]'
+    )"
+}
+
+function add_boot_partition() {
+    OUTPUT="$(
+        echo "${OUTPUT}" | \
+        jq -M \
+           --arg d "${HR_BLOCK_DEVICE}p1" \
+           '.boot = {"device": $d}'
     )"
 }
 
@@ -27,13 +34,15 @@ function set_current_partition() {
         echo "${OUTPUT}" | \
         jq -M \
            --arg c "${CURRENT_PARTITION}" \
-           'map(if (.uboot == $c) then (.current = true) else (.current = false) end)'
+           '.root |= map(if (.uboot == $c) then (.current = true) else (.current = false) end)'
     )"
 }
 
 
-add_partition "A" "${HR_ROOT_PART_A}"
-add_partition "B" "${HR_ROOT_PART_B}"
+add_partition "${HR_ROOT_PART_A}"
+add_partition "${HR_ROOT_PART_B}"
+add_boot_partition
 set_current_partition
+
 
 echo "${OUTPUT}" | jq -M '.'

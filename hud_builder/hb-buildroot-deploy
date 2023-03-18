@@ -1,13 +1,38 @@
 #!/usr/bin/env bash
 #-Help: Upload latest rootfs to device
-#-Use: [<device_name>]
+#-Use: [<device_name>] [(-b/--boot)]
 #-Extended: If non-default device is used, it's deploy key will be built into the image first
 set -euo pipefail
 source "${HB_LIB_DIR}/logging.sh"
 source "${HB_LIB_DIR}/json.sh"
 
-# TODO: Which key is built into the image?
 device_name="${1:-}"
+if [[ "${device_name}" == -* ]]; then
+    device_name=""
+fi
+
+if [[ "${device_name}" != "" ]]; then
+    shift 1
+fi
+
+deploy_boot_partition="false"
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+    -b | --boot)
+        deploy_boot_partition="true"
+        shift 1
+        ;;
+    -*)
+        log_fatal "Unknown option $1"
+        ;;
+    *)
+        break
+        ;;
+    esac
+done
+
+
+# TODO: Which key is built into the image?
 if [[ "${device_name}" != "" ]]; then
     log_fatal "building image with a different device is not supported yet"
     device="$(hb-devices list "${device_name}" )"
@@ -17,15 +42,32 @@ fi
 device_private_key="$(json_query_blob "${device}" '.keys.private')"
 device_host="$(json_query_blob "${device}" '.host')"
 
-buildroot_rootfs="${HB_BUILDROOT_IMAGES_DIR}/rootfs.ext4"
-if [ ! -f "${buildroot_rootfs}" ]; then
-    log_fatal "No rootfs found. Have you ran buildroot?"
-fi
+if [[ "${deploy_boot_partition}" == "true" ]]; then
+    log_warning "THIS IS STILL EXPERIMENTAL!"
 
-gzip -c "${buildroot_rootfs}" | pv | ssh \
-     -o StrictHostKeychecking=no \
-     -o UserKnownHostsFile=/dev/null \
-     -o PreferredAuthentications=publickey \
-     -i "${device_private_key}" \
-     "deploy@${device_host}" \
-     "sudo hudctl root upgrade"
+    buildroot_bootfs="${HB_BUILDROOT_IMAGES_DIR}/boot.vfat"
+    if [ ! -f "${buildroot_bootfs}" ]; then
+        log_fatal "No bootfs found. Have you ran buildroot?"
+    fi
+
+    gzip -c "${buildroot_bootfs}" | pv | ssh \
+         -o StrictHostKeychecking=no \
+         -o UserKnownHostsFile=/dev/null \
+         -o PreferredAuthentications=publickey \
+         -i "${device_private_key}" \
+         "deploy@${device_host}" \
+         "sudo hudctl root upgrade --boot"
+else
+    buildroot_rootfs="${HB_BUILDROOT_IMAGES_DIR}/rootfs.ext4"
+    if [ ! -f "${buildroot_rootfs}" ]; then
+        log_fatal "No rootfs found. Have you ran buildroot?"
+    fi
+
+    gzip -c "${buildroot_rootfs}" | pv | ssh \
+         -o StrictHostKeychecking=no \
+         -o UserKnownHostsFile=/dev/null \
+         -o PreferredAuthentications=publickey \
+         -i "${device_private_key}" \
+         "deploy@${device_host}" \
+         "sudo hudctl root upgrade"
+fi
