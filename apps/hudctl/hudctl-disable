@@ -55,7 +55,7 @@ fi
 
 unlink_app_files "binaries" "${HUD_BIN_DIR}"
 unlink_app_files "units" "${HUD_UNIT_DIR}"
-unlink_app_files "configs" "${HUD_CONFIG_DIR}"
+unlink_app_files "configs" "${HUD_CONFIG_DIR}/${APP_NAME}"
 unlink_app_files "data" "${HUD_DATA_DIR}"
 
 # Final step, set state to linked

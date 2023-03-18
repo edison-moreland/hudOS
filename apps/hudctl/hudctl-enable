@@ -51,8 +51,14 @@ fi
 
 if (( ${#APP_CONFIGS[@]} != 0 )); then
     log_section "Linking configs"
+    
+    app_config_dir="${HUD_CONFIG_DIR}/${APP_NAME}"
+    mkdir -p "${app_config_dir}"
+    chown -h "${HUD_USER}:${HUD_USER}" "${app_config_dir}"
+    chmod 755 "${app_config_dir}"
+    
     for config in "${APP_CONFIGS[@]}"; do
-        link_app_file "configs/${config}" "${HUD_CONFIG_DIR}"
+        link_app_file "configs/${config}" "${app_config_dir}"
     done
 fi
 
