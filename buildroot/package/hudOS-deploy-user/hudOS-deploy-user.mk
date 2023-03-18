@@ -10,7 +10,7 @@ endef
 # brhook will copy the default devices keys into the given directory
 define HUDOS_DEPLOY_USER_BUILD_CMDS
 	HB_NO_LOCK="buildroot" \
-	$(BR2_EXTERNAL_HUDOS_PATH)/../../hb devices brhook $(@D)
+	$(BR2_EXTERNAL_HUDOS_PATH)/../hb devices brhook $(@D)
 endef
 
 define HUDOS_DEPLOY_USER_INSTALL_TARGET_CMDS

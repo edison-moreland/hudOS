@@ -8,7 +8,7 @@ source "${HB_LIB_DIR}/logging.sh"
 
 export HB_BUILDROOT_DIR="${HB_VENDOR_DIR}/buildroot"
 export HB_BUILDROOT_CONFIG="${HB_BUILDROOT_DIR}/.config"
-export HB_BUILDROOT_EXTERNAL_TREE="${HB_REPOSITORY_DIR}/buildroot/br2_hudos"
+export HB_BUILDROOT_EXTERNAL_TREE="${HB_REPOSITORY_DIR}/buildroot"
 export HB_BUILDROOT_GIT_CONFIG="${HB_BUILDROOT_EXTERNAL_TREE}/configs/hudos_defconfig"
 export HB_BUILDROOT_BUILD_DIR="${HB_BUILDROOT_DIR}/output/build"
 export HB_BUILDROOT_IMAGES_DIR="${HB_BUILDROOT_DIR}/output/images"
