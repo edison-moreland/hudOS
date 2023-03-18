@@ -4,7 +4,7 @@ HUDOS_SITE_METHOD = local
 HUDOS_INSTALL_TARGET = YES
 
 define HUDOS_USERS
-	hud -1 hud -1 * /opt/hud /bin/false seat hudOS
+	hud -1 hud -1 * /opt/hud /bin/false seat,video hudOS
 endef
 
 define HUDOS_INSTALL_TARGET_CMDS
