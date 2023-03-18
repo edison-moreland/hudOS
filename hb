@@ -35,6 +35,7 @@ if [[ "${HB_NO_LOCK:-}" == "buildroot" ]]; then
     exit $?
 fi
 
+mkdir -p "${HB_BUILD_DIR}"
 { 
     if ! flock -n 9; then
         log_fatal "Could not obtain lock"
