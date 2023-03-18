@@ -1,0 +1,31 @@
+[Unit]
+Description=Japokwm Compositor
+PartOf=hud.target
+Before=hud-apps.target
+
+[Service]
+User=hud
+Group=hud
+WorkingDirectory=/opt/hud
+#PAMName=login
+
+UtmpIdentifier=tty7
+UtmpMode=user
+TTYPath=/dev/tty7
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+StandardOutput=journal
+StandardInput=tty-fail
+StandardError=journal
+
+Slice=hud.slice
+Restart=always
+Environment=XDG_RUNTIME_DIR=/opt/hud/run
+ExecStartPre=/bin/chvt 7
+ExecStart=/usr/bin/japokwm
+IgnoreSIGPIPE=no
+
+[Install]
+WantedBy=hud.target

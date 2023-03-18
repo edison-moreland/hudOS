@@ -22,14 +22,15 @@ function install() {
     fi
 }
 
-if [ -f "${BUNDLE}/weston.tar" ]; then
-	# Special case, weston always gets installed first
+compositor="japokwm"
+if [ -f "${BUNDLE}/${compositor}.tar" ]; then
+	# Special case, compositor always gets installed first
 	# It would be nice if apps could have dependecies on each other
-	install "${BUNDLE}/weston.tar"
+	install "${BUNDLE}/${compositor}.tar"
 fi
 
 for app_bundle in "${BUNDLE}"/*.tar; do
-	if [[ "${app_bundle}" == *"weston.tar"* ]]; then
+	if [[ "${app_bundle}" == *"${compositor}.tar"* ]]; then
 		continue
 	fi
 

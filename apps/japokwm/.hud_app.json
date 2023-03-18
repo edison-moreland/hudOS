@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "japokwm"
+  },
+  "build": [
+    {
+      "step": "bundle_app",
+      "units": [
+        "${SOURCE_DIR}/hud.slice",
+        "${SOURCE_DIR}/hud.target",
+        "${SOURCE_DIR}/hud-apps.target",
+        "${SOURCE_DIR}/japokwm.service"
+      ],
+      "scripts": [
+        "${SOURCE_DIR}/001-japokwm.sh"
+      ],
+      "configs": [
+        "${SOURCE_DIR}/init.lua"
+      ]
+    }
+  ]
+}

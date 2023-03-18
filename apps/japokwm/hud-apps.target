@@ -1,0 +1,7 @@
+[Unit]
+Description=hudOS Apps
+After=hud.target
+After=japokwm.target
+
+[Install]
+WantedBy=hud.target

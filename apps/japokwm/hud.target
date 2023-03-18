@@ -1,0 +1,6 @@
+[Unit]
+Description=hudOS
+After=multi-user.target
+
+[Install]
+WantedBy=multi-user.target
