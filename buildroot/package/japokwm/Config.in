@@ -1,6 +1,8 @@
 config BR2_PACKAGE_JAPOKWM
 	bool "japokwm"
     depends on BR2_PACKAGE_WLROOTS
+    depends on BR2_PACKAGE_WLROOTS_XWAYLAND
+    depends on BR2_PACKAGE_WLROOTS_X11
     depends on BR2_PACKAGE_LUA
     depends on BR2_PACKAGE_LIBUV
     depends on BR2_PACKAGE_WAYLAND
