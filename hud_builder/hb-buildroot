@@ -5,6 +5,8 @@ source "${HB_LIB_DIR}/logging.sh"
 
 # TODO: Can we cache downloads/git objects in the cache dir?
 #       Could speed up reset/rebuild considerably
+# Buildroot ccache: BR2_CCACHE_DIR=$HOME/.buildroot-ccache
+# export BR2_DL_DIR=<shared download location>
 
 export HB_BUILDROOT_DIR="${HB_VENDOR_DIR}/buildroot"
 export HB_BUILDROOT_CONFIG="${HB_BUILDROOT_DIR}/.config"
