@@ -4,6 +4,7 @@
 #-Extended: If non-default device is used, it's deploy key will be built into the image first
 set -euo pipefail
 source "${HB_LIB_DIR}/logging.sh"
+source "${HB_LIB_DIR}/json.sh"
 
 # TODO: Which key is built into the image?
 device_name="${1:-}"

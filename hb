@@ -12,6 +12,7 @@ export HB_BUILD_CACHE_DIR="${HB_BUILD_DIR}/cache"
 export HB_BUILD_APP_DIR="${HB_BUILD_DIR}/app"
 export HB_VENDOR_FILE="${HB_REPOSITORY_DIR}/vendor.json"
 export HB_VENDOR_DIR="${HB_BUILD_DIR}/vendor"
+export HB_OUTPUT_DIR="${HB_REPOSITORY_DIR}/output"
 
 export PATH="${HB_COMMANDS_DIR}:${PATH}"
 

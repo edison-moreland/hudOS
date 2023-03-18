@@ -5,6 +5,10 @@ source "${HB_LIB_DIR}/logging.sh"
 source "${HB_LIB_DIR}/json.sh"
 
 device_name="${1:-}"
+if [[ "${device_name}" == -* ]]; then
+    device_name=""
+fi
+
 if [[ "${device_name}" != "" ]]; then
     shift 1
 fi

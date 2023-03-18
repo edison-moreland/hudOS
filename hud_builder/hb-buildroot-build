@@ -7,3 +7,8 @@ set -euo pipefail
 pushd "${HB_BUILDROOT_DIR}"
 make BR2_EXTERNAL="${HB_BUILDROOT_EXTERNAL_TREE}" "$@"
 popd
+
+if [ "${HB_BUILDROOT_IMAGES_DIR}/hudOS.img" -nt "${HB_OUTPUT_DIR}/hudOS.img" ]; then
+    mkdir -p "${HB_OUTPUT_DIR}"
+    cp "${HB_BUILDROOT_IMAGES_DIR}/hudOS.img" "${HB_OUTPUT_DIR}/hudOS.img" 
+fi
