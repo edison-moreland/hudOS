@@ -7,7 +7,7 @@ OUT="$(echo "${STEP_CONFIG}" | jq -r '.out')"
 cat <<EOF | envsubst >"${OUT}"
 [Unit]
 Description=${APP_NAME}, a HUD Application
-ConditionPathExists=/opt/hud/run/wayland-0
+AssertPathExists=/opt/hud/run/wayland-0
 PartOf=hud-apps.target
 
 [Service]
