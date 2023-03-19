@@ -25,6 +25,7 @@ Restart=always
 Environment=XDG_RUNTIME_DIR=/opt/hud/run
 ExecStartPre=/bin/chvt 7
 ExecStart=/usr/bin/japokwm
+ExecStartPost=/bin/sleep 1
 IgnoreSIGPIPE=no
 
 [Install]

@@ -4,5 +4,7 @@ JAPOKWM_INSTALL_TARGET = YES
 JAPOKWM_DEPENDENCIES = libnotify libxcb json-c wlroots lua libuv wayland wayland-protocols mpfr
 JAPOKWM_CONF_OPTS += -Dzsh-completions=false
 JAPOKWM_CONF_OPTS += -Dfish-completions=false
+JAPOKWM_CONF_OPTS += -Dxwayland=false
+JAPOKWM_CONF_OPTS += -Ddebug=true
 
 $(eval $(meson-package))
