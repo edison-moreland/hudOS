@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #-Help: Build apps then deploy them to the device
-#-Use: [<device_name>] [(-o/--only) <app_name>]
+#-Use: [<device_name>] [(-o/--only) <app_name>[,<app_name>]]
 source "${HB_LIB_DIR}/logging.sh"
 source "${HB_LIB_DIR}/json.sh"
 

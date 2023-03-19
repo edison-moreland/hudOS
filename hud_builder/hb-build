@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #-Help: Build all apps, or single app
-#-Use: [(-o/--only) <app_name>] [(-c/--clear-cache)]
+#-Use: [(-o/--only) <app_name>[,<app_name>]] [(-c/--clear-cache)]
 source "${HB_LIB_DIR}/logging.sh"
 
-only_app_name=""
+only_apps=()
 clear_cache="false"
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -13,7 +13,7 @@ while [ "$#" -gt 0 ]; do
         ;;
     -o | --only)
         if [ "$#" -gt 1 ]; then
-            only_app_name="$2"
+            mapfile -d ',' -t only_apps < <(printf "%s" "$2")
             shift 2
         else
             log_fatal "-o or --only requires a value"
@@ -46,8 +46,17 @@ for app_manifest in "${HB_APPS_DIR}"/**/.hud_app.json; do
     app_name="$(jq -r '.app.name' "${app_manifest}")"
     app_bundle_out="${HB_BUILD_APP_DIR}/${app_name}.tar"
 
-    if [[ "${only_app_name}" != "" ]]; then
-        if [[ "${app_name}" != "${only_app_name}" ]]; then
+    if (( ${#only_apps[@]} != 0 )); then
+        # TODO: Make this not suck?
+        found="false"
+        for only_app in "${only_apps[@]}"; do
+            if [[ "${app_name}" == "${only_app}" ]]; then
+                found="true"
+                break
+            fi
+        done
+
+        if [[ "${found}" == "false" ]]; then
             continue
         fi
     fi
