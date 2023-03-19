@@ -24,10 +24,6 @@
         "name": "buildroot",
         "type": "tar",
         "url": "https://buildroot.org/downloads/buildroot-2023.02.tar.gz",
-        "version": "1db0ea8b5148d8f80321ff6d81c3962defee069138ebd97cc09729662fd83916",
-        "patches": [
-            "patch/vendor/buildroot/00-upgrade-wlroots.patch",
-            "patch/vendor/buildroot/01-upgrade-wlroots-hash.patch"
-        ]
+        "version": "1db0ea8b5148d8f80321ff6d81c3962defee069138ebd97cc09729662fd83916"
     }
 ]
