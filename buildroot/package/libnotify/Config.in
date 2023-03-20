@@ -1,6 +1,0 @@
-config BR2_PACKAGE_LIBNOTIFY
-	bool "libnotify"
-    depends on BR2_PACKAGE_GDK_PIXBUF
-    depends on BR2_PACKAGE_LIBGTK3
-	help
-	    libnotify

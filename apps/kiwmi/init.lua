@@ -25,6 +25,11 @@ kiwmi:on("view", function(view)
     view:resize(window.width, window.height)
 end)
 
+available_outputs={}
 kiwmi:on("output", function(output)
-    print("New output!", output:name())
+    available_outputs[output:name()] = available_outputs
+
+    output:on("destroy", function(output)
+        available_outputs[output:name()] = nil
+    end)
 end)

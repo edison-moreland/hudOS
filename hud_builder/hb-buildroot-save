@@ -12,6 +12,5 @@ popd
 
 # These settings should not be saved to git
 sed -i '/^BR2_PACKAGE_HUDOS_NETWORK_WIFI_/d' "${HB_BUILDROOT_GIT_CONFIG}"
-sed -i '/^BR2_PACKAGE_HUDOS_DEPLOY_USER/d' "${HB_BUILDROOT_GIT_CONFIG}"
 
 touch "${HB_BUILDROOT_GIT_CONFIG}" "${HB_BUILDROOT_CONFIG}"

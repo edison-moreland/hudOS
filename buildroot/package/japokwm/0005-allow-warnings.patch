@@ -1,8 +1,0 @@
---- a/src/meson.build
-+++ b/src/meson.build
-@@ -1,4 +1,4 @@
--add_project_arguments('-rdynamic', '-DWLR_USE_UNSTABLE', '-Werror',
-+add_project_arguments('-rdynamic', '-DWLR_USE_UNSTABLE',
- '-Wno-unused-function', '-Wno-uninitialized', '-Wno-sizeof-pointer-div', language: 'c')
- 
- foreach name : ['lua', 'lua5.3', 'lua-5.3', 'lua53']
