@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+
+APP_NAME="${1}"
+APP_MANIFEST="$(hudctl-manifest "${APP_NAME}")"
+
+name="$(echo "${APP_MANIFEST}" | jq -re '.app.name')"
+catalog_tmp="$(mktemp)"
+jq -M \
+   --arg name "${name}" \
+   '[.[] | select(.name != $name) ]' \
+   "${HB_WINDOW_CATALOG}" > "${catalog_tmp}"
+cat "${catalog_tmp}" > "${HB_WINDOW_CATALOG}"
+
+hudctl-window-render

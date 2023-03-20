@@ -1,0 +1,10 @@
+--- a/kiwmi/desktop/popup.c
++++ b/kiwmi/desktop/popup.c
+@@ -32,6 +32,7 @@
+                 parent = xdg_surface->popup->parent;
+                 break;
+             case WLR_XDG_SURFACE_ROLE_TOPLEVEL:
++                if (false) {}
+                 struct kiwmi_view *view = xdg_surface->data;
+                 return &view->desktop_surface;
+             default:

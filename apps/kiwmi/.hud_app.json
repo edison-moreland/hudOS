@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "japokwm"
+    "name": "kiwmi",
+    "type": "compositor"
   },
   "build": [
     {
@@ -9,13 +10,14 @@
         "${SOURCE_DIR}/hud.slice",
         "${SOURCE_DIR}/hud.target",
         "${SOURCE_DIR}/hud-apps.target",
-        "${SOURCE_DIR}/japokwm.service"
-      ],
-      "scripts": [
-        "${SOURCE_DIR}/001-japokwm.sh"
+        "${SOURCE_DIR}/kiwmi.service"
       ],
       "configs": [
-        "${SOURCE_DIR}/init.lua"
+        "${SOURCE_DIR}/init.lua",
+        "${SOURCE_DIR}/windows.lua"
+      ],
+      "scripts": [
+        "${SOURCE_DIR}/001-kiwmi.sh"
       ]
     }
   ]

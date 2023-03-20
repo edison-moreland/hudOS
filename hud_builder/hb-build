@@ -36,7 +36,7 @@ fi
 
 if [ "${clear_cache}" == "true" ]; then
     log_warning "Clearing cache..."
-    rm -rf "${HB_BUILD_CACHE_DIR}"
+    rm -rf "${HB_BUILD_CACHE_DIR}/apps"
 fi
 
 hb-vendor

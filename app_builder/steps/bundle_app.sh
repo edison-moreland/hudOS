@@ -14,7 +14,12 @@ function remove_staging_bundle {
 }
 trap remove_staging_bundle EXIT
 
-MANIFEST="$(jq -ncM --arg app_name "${APP_NAME}" '{"name":$app_name}')"
+MANIFEST="$( \
+	jq -ncM \
+	   --arg app_name "${APP_NAME}" \
+	   --argjson metadata "${APP_METADATA}" \
+	   '{"name":$app_name, "app":$metadata}' \
+)"
 function add_to_bundle {
 	DIR_IN_BUNDLE="${1}"
 	MODE="${2}"

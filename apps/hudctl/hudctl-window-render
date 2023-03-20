@@ -1,0 +1,67 @@
+#!/bin/bash
+set -euo pipefail
+source "${HUD_DATA_DIR}/json.sh"
+
+# Outputs {"glasses": "DP-1", "phone": "DSI-1"}
+
+# {
+#     "output": "glasses",
+#     "position": {
+#         "x": 0,
+#         "y": 0
+#     },
+#     "dimensions": {
+#         "width": 461,
+#         "height": 112
+#     },
+#     "name": "clock"
+# }
+
+# windows = {}
+# windows.clock = {}
+# windows.clock.output = "DSI-1"
+# windows.clock.width = 461
+# windows.clock.height = 112
+# windows.clock.x = 0
+# windows.clock.y = 0
+
+staging_tmp="$(mktemp)"
+trap "rm -f ${staging_tmp}" EXIT
+
+cat <<EOF >"${staging_tmp}"
+windows = {}
+EOF
+
+function add_window() {
+    output_raw="$(json_query_blob "$1" '.output')"
+    case "${output_raw}" in
+        "phone") window_output="DSI-1" ;;
+        "glasses") window_output="DP-1" ;;
+        *) log_fatal "Output ${output_raw} doesn't exist" ;;
+    esac
+
+    window_name="$(json_query_blob "$1" '.name')"
+    window_width="$(json_query_blob "$1" '.dimensions.width')"
+    window_height="$(json_query_blob "$1" '.dimensions.height')"
+    window_x="$(json_query_blob "$1" '.position.x')"
+    window_y="$(json_query_blob "$1" '.position.y')"
+
+    cat <<EOF | envsubst >>"${staging_tmp}"
+windows.${window_name} = {}
+windows.${window_name}.output = "${window_output}"
+windows.${window_name}.width = ${window_width}
+windows.${window_name}.height = ${window_height}
+windows.${window_name}.x = ${window_x}
+windows.${window_name}.y = ${window_y}
+EOF
+}
+
+mapfile -t windows < <(jq -Mc '.[]' "${HB_WINDOW_CATALOG}")
+if (( ${#windows[@]} != 0 )); then
+    for window in "${windows[@]}"; do
+        add_window "${window}"
+    done
+fi
+
+# TODO: Either restart the compositor, or setup systemd to watch this path
+cat "${staging_tmp}" > "${HB_WINDOW_COMPOSITOR_CONFIG}"

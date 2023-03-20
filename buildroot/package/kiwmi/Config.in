@@ -3,6 +3,5 @@ config BR2_PACKAGE_KIWMI
 	depends on BR2_PACKAGE_WLROOTS
 	depends on BR2_PACKAGE_LUA
 	depends on BR2_PACKAGE_PIXMAN
-	depends on BR2_PACKAGE_CLANG
 	help
 		A fully programmable Wayland Compositor

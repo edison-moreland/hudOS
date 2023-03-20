@@ -1,6 +1,17 @@
 {
   "app": {
-    "name": "clock"
+    "name": "clock",
+    "window": {
+      "output": "glasses",
+      "position": {
+        "x": 100,
+        "y": 100
+      },
+      "dimensions": {
+        "width": 461,
+        "height": 112
+      }
+    }
   },
   "build": [
     {

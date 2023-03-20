@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+
+source "${HUD_DATA_DIR}/logging.sh"
+
+# hudctl-window is used to keep the compositor configuration in sync with enabled apps
+export HB_WINDOW_CATALOG="${HUD_PREFIX}/apps/windows.json"
+export HB_WINDOW_COMPOSITOR_CONFIG="/etc/kiwmi/windows.lua"
+
+if [ ! -f "${HB_WINDOW_CATALOG}" ]; then
+    echo "[]" > "${HB_WINDOW_CATALOG}"
+    chown "${HUD_USER}:${HUD_USER}" "${HB_WINDOW_CATALOG}"
+fi
+
+cmd="${1:-list}"
+window_command="hudctl-window-${cmd}"
+
+if ! which "${window_command}" > /dev/null; then
+    log_fatal "Unknown command ${cmd}"
+fi
+
+"${window_command}" "${@:2}"

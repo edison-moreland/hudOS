@@ -30,8 +30,9 @@ fi
 STEP_DIR="${APPBUILDER_DIR}/steps"
 
 export APP_NAME="$(jq -r '.app.name' "${INPUT_MANIFEST}")"
+export APP_METADATA="$(jq -Mcr '.app' "${INPUT_MANIFEST}")"
 export BUILD_DIR="${REPO_DIR}/.build"
-export CACHE_DIR="${BUILD_DIR}/cache"
+export CACHE_DIR="${BUILD_DIR}/cache/apps"
 export WORKSPACE_DIR="${BUILD_DIR}/app/${APP_NAME}/workspace"
 export VENDOR_DIR="${BUILD_DIR}/vendor"
 export SOURCE_DIR="$(dirname "$(realpath "${INPUT_MANIFEST}")")"

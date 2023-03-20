@@ -13,6 +13,11 @@ if [ "$(hudctl-catalog "${APP_NAME}" get enabled)" == "false" ]; then
 fi
 log_section "Disabling ${APP_NAME}"
 
+if jq -e '.app.window' "${APP_MANIFEST_PATH}" > /dev/null; then
+    log_warning "APP HAS WINDOW"
+    hudctl-window remove "${APP_NAME}"
+fi
+
 function unlink_app_files() {
     BUNDLE_SECTION="${1}" 
     LINKED_FOLDER="${2}" # System folder that these files are linked to

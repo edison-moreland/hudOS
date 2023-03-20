@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+
+jq '.' "${HB_WINDOW_CATALOG}"

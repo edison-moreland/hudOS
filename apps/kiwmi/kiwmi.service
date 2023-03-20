@@ -1,12 +1,12 @@
 [Unit]
-Description=Japokwm Compositor
+Description=Kiwmi, hudOS Compositor
 PartOf=hud.target
 Before=hud-apps.target
 
 [Service]
 User=hud
 Group=hud
-WorkingDirectory=/opt/hud
+WorkingDirectory=/etc/kiwmi
 #PAMName=login
 
 UtmpIdentifier=tty7
@@ -24,8 +24,8 @@ Slice=hud.slice
 Restart=always
 Environment=XDG_RUNTIME_DIR=/opt/hud/run
 ExecStartPre=/bin/chvt 7
-ExecStart=/usr/bin/japokwm
-ExecStartPost=/bin/sleep 1
+ExecStart=/usr/bin/kiwmi -c /etc/kiwmi/init.lua
+ExecStartPost=/usr/bin/sleep 1
 IgnoreSIGPIPE=no
 
 [Install]

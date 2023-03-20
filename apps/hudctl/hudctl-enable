@@ -17,6 +17,11 @@ else
     log_section "Enabling ${APP_NAME}"
 fi
 
+if jq -e '.app.window' "${APP_MANIFEST_PATH}" > /dev/null; then
+    log_warning "APP HAS WINDOW"
+    hudctl-window add "${APP_NAME}"
+fi
+
 function link_app_file() {
     FILENAME=$1
     DESTINATION_DIR=$2

@@ -22,7 +22,7 @@ function install() {
     fi
 }
 
-compositor="japokwm"
+compositor="kiwmi"
 if [ -f "${BUNDLE}/${compositor}.tar" ]; then
 	# Special case, compositor always gets installed first
 	# It would be nice if apps could have dependecies on each other

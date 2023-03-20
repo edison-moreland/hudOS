@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+
+source "${HUD_DATA_DIR}/logging.sh"
+
+APP_NAME="${1}"
+APP_MANIFEST="$(hudctl-manifest "${APP_NAME}")"
+APP_WINDOW="$(echo "${APP_MANIFEST}" | jq -eMc '.app.window')"
+
+catalog_tmp="$(mktemp)"
+trap "rm -f ${catalog_tmp}" EXIT
+if jq -e --arg n "${APP_NAME}" '.[] | select(.name == $n)' "${HB_WINDOW_CATALOG}" > /dev/null; then
+    # Update the existing window
+    jq -M \
+       --arg name "${APP_NAME}" \
+       --argjson window "${APP_WINDOW}" \
+       'map(if (.name == $name) then ($window + {"name": $name}) else (.) end)' \
+       "${HB_WINDOW_CATALOG}" > "${catalog_tmp}"
+else
+    # Add a new window
+    jq -M \
+       --arg name "${APP_NAME}" \
+       --argjson window "${APP_WINDOW}" \
+       '. += [$window + {"name": $name}]' \
+       "${HB_WINDOW_CATALOG}" > "${catalog_tmp}"
+fi
+cat "${catalog_tmp}" > "${HB_WINDOW_CATALOG}"
+
+hudctl-window-render

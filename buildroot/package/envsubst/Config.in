@@ -1,0 +1,5 @@
+config BR2_PACKAGE_ENVSUBST
+	depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+	bool "envsubst"
+	help
+		go implementation of envsubst
