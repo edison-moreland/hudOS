@@ -1,4 +1,14 @@
 # TODO
+- [ ] Investigate levinboot for faster boot
+    - might require moving root partition swap to initramfs init
+    - write tiny initramfs init in go?
+- [ ] nReal glasses
+    - [ ] reverse engineer macos app to figure out 3D support
+        - maybe force glasses into a widescreen mode?
+- [ ] hudctl
+    - [ ] app_id field (uuid) to support rename/ act as wayland id
+- [ ] hud_builder
+    - [ ] allow building apps outside of the project
 - [ ] Buildroot 
     - [ ] Allow remote upgrade of kernel/boot script
     - [ ] Resize root partitions on first boot
@@ -17,5 +27,8 @@
     - [ ] Restart compositor when windows.lua is updated
     - [ ] Could init.lua read the window catalog directly?
     - [ ] Get rid of cursor
+    - [ ] restart when glasses plugged in or fix hotplug
 - [ ] Apps
+    - [ ] auto start some apps when glasses are plugged in
     - [ ] device-info: display ip adress/battery/time on phone screen
+        - to read battery: https://github.com/svenwltr/i3-statusbar/blob/master/upower/upower.go
