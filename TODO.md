@@ -1,0 +1,21 @@
+# TODO
+- [ ] Buildroot 
+    - [ ] Allow remote upgrade of kernel/boot script
+    - [ ] Resize root partitions on first boot
+        - How will this affect OS upgrade?
+        - Will probably require adding init to initramfs
+    - [ ] Add tailscale
+    - [ ] Bundle kiwmi,device-info into image
+    - [ ] Handle branch switches better
+    - [ ] Detect when certain packages need to be updated, automatically add targets to build
+        - Boot script/ hudctl
+    - [ ] Move wifi configuration out of buildroot and into hud_builder devices
+    - [ ] Automatically build the correct key into the image when deploying to a device
+    - [ ] Experiment with top level parrallel build
+- [ ] Compositor
+    - [ ] Support positioning apps on both screens
+    - [ ] Restart compositor when windows.lua is updated
+    - [ ] Could init.lua read the window catalog directly?
+    - [ ] Get rid of cursor
+- [ ] Apps
+    - [ ] device-info: display ip adress/battery/time on phone screen

@@ -42,7 +42,6 @@ Dependencies
       - `./hb devices host <device-name> <ip-address>`
    2. Deploy apps to the phone
       - `./hb deploy --only kiwmi,device-info`
-      - Note: `kiwmi` is the wayland compositor
 
 # Notes
 ## Development
