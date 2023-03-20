@@ -47,12 +47,12 @@ function add_window() {
     window_y="$(json_query_blob "$1" '.position.y')"
 
     cat <<EOF | envsubst >>"${staging_tmp}"
-windows.${window_name} = {}
-windows.${window_name}.output = "${window_output}"
-windows.${window_name}.width = ${window_width}
-windows.${window_name}.height = ${window_height}
-windows.${window_name}.x = ${window_x}
-windows.${window_name}.y = ${window_y}
+windows["${window_name}"] = {}
+windows["${window_name}"].output = "${window_output}"
+windows["${window_name}"].width = ${window_width}
+windows["${window_name}"].height = ${window_height}
+windows["${window_name}"].x = ${window_x}
+windows["${window_name}"].y = ${window_y}
 EOF
 }
 

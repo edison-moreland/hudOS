@@ -25,9 +25,7 @@ Dependencies
 3. Building hudOS
    1. Configure OS 
       - `./hb buildroot build nconfig`
-      - Under `External options`
-         - Select `hudOS deploy user`
-         - Fill in WiFi settings
+      - Configure WiFi under `External options`
    2. Build OS 
       - `./hb buildroot build`
       - This step will take 30 minutes to an hour and consume significant amounts of system resources.
@@ -43,7 +41,8 @@ Dependencies
    1. Add ip to device configuration
       - `./hb devices host <device-name> <ip-address>`
    2. Deploy apps to the phone
-      - `./hb deploy`
+      - `./hb deploy --only kiwmi,device-info`
+      - Note: `kiwmi` is the wayland compositor
 
 # Notes
 ## Development
