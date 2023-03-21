@@ -17,7 +17,7 @@
     - [ ] Add tailscale
     - [ ] Bundle kiwmi,device-info into image
     - [ ] Dim/turn off screen based on proximity sensor
-    - [ ] start systemd target when glasses are plugged in
+    - [x] start systemd target when glasses are plugged in
         - Allows apps to run only when glasses are plugged in
 - [ ] Buildroot
     - [ ] Handle branch switches better
@@ -27,11 +27,12 @@
     - [ ] Automatically build the correct key into the image when deploying to a device
     - [ ] Experiment with top level parrallel build
 - [ ] Compositor
-    - [ ] Support positioning apps on both screens
+    - [x] Support positioning apps on both screens
     - [ ] Restart compositor when windows.lua is updated
     - [ ] Could init.lua read the window catalog directly?
     - [ ] Get rid of cursor
-    - [ ] restart when glasses plugged in or fix hotplug
+    - [x] restart when glasses plugged in
+        - [ ] fix hotplug to remove this hack
 - [ ] Apps
-    - [ ] device-info: display ip adress/battery/time on phone screen
+    - [x] device-info: display ip adress/battery/time on phone screen
         - to read battery: https://github.com/svenwltr/i3-statusbar/blob/master/upower/upower.go
