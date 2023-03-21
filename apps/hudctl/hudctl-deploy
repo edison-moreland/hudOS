@@ -37,5 +37,6 @@ for app_bundle in "${BUNDLE}"/*.tar; do
 	install "${app_bundle}"
 done
 
+hudctl-window render 
 systemctl restart hud.target 
 systemctl restart hud-apps.target

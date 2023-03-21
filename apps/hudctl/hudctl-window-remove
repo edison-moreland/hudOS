@@ -11,5 +11,3 @@ jq -M \
    '[.[] | select(.name != $name) ]' \
    "${HB_WINDOW_CATALOG}" > "${catalog_tmp}"
 cat "${catalog_tmp}" > "${HB_WINDOW_CATALOG}"
-
-hudctl-window-render

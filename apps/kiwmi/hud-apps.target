@@ -1,7 +1,6 @@
 [Unit]
 Description=hudOS Phone screen apps
 After=hud.target
-After=kiwmi.target
 
 [Install]
 WantedBy=hud.target
