@@ -1,5 +1,5 @@
 [Unit]
-Description=hudOS Apps
+Description=hudOS Phone screen apps
 After=hud.target
 After=kiwmi.target
 

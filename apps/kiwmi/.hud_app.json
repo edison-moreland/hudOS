@@ -10,7 +10,9 @@
         "${SOURCE_DIR}/hud.slice",
         "${SOURCE_DIR}/hud.target",
         "${SOURCE_DIR}/hud-apps.target",
-        "${SOURCE_DIR}/kiwmi.service"
+        "${SOURCE_DIR}/hud-glasses.target",
+        "${SOURCE_DIR}/kiwmi.service",
+        "${SOURCE_DIR}/restart-kiwmi.service"
       ],
       "configs": [
         "${SOURCE_DIR}/init.lua",

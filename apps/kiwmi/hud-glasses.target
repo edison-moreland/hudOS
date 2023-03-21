@@ -1,0 +1,8 @@
+[Unit]
+Description=hudOS Glasses apps
+After=hud.target
+After=kiwmi.target
+StopWhenUnneeded=true
+
+[Install]
+WantedBy=nreal-glasses.target

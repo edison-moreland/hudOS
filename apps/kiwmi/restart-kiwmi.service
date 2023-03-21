@@ -1,0 +1,12 @@
+[Unit]
+Description=Restart kiwmi when glasses are plugged in. This is a bandaid
+PartOf=hud-glasses.target
+
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/systemctl restart kiwmi.service
+
+[Install]
+WantedBy=hud-glasses.target
