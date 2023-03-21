@@ -9,13 +9,17 @@
     - [ ] app_id field (uuid) to support rename/ act as wayland id
 - [ ] hud_builder
     - [ ] allow building apps outside of the project
-- [ ] Buildroot 
+- [ ] hudOS
     - [ ] Allow remote upgrade of kernel/boot script
     - [ ] Resize root partitions on first boot
         - How will this affect OS upgrade?
         - Will probably require adding init to initramfs
     - [ ] Add tailscale
     - [ ] Bundle kiwmi,device-info into image
+    - [ ] Dim/turn off screen based on proximity sensor
+    - [ ] start systemd target when glasses are plugged in
+        - Allows apps to run only when glasses are plugged in
+- [ ] Buildroot
     - [ ] Handle branch switches better
     - [ ] Detect when certain packages need to be updated, automatically add targets to build
         - Boot script/ hudctl
@@ -29,6 +33,5 @@
     - [ ] Get rid of cursor
     - [ ] restart when glasses plugged in or fix hotplug
 - [ ] Apps
-    - [ ] auto start some apps when glasses are plugged in
     - [ ] device-info: display ip adress/battery/time on phone screen
         - to read battery: https://github.com/svenwltr/i3-statusbar/blob/master/upower/upower.go

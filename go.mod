@@ -5,6 +5,7 @@ go 1.20
 require (
 	gioui.org v0.0.0-20230224004350-5f818bc5e7f9
 	github.com/go-ble/ble v0.0.0-20230130210458-dd4b07d15402
+	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 )
 
@@ -27,6 +28,5 @@ require (
 	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
 	golang.org/x/text v0.7.0 // indirect
 )
-
 
 replace gioui.org => ./.build/vendor/go/gio
