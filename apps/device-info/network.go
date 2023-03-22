@@ -1,4 +1,4 @@
-package components
+package main
 
 import (
 	"net"
@@ -6,6 +6,7 @@ import (
 
 	"gioui.org/layout"
 	"gioui.org/widget/material"
+	"github.com/edison-moreland/nreal-hud/go-sdk/components"
 )
 
 // Information to display
@@ -56,6 +57,6 @@ func (n *networkInfo) Layout(gtx layout.Context) layout.Dimensions {
 			sb.WriteString(ip.To4().String())
 		}
 
-		return MonoLabel(n.theme, 40, sb.String()).Layout(gtx)
+		return components.MonoLabel(n.theme, 40, sb.String()).Layout(gtx)
 	})
 }

@@ -4,11 +4,11 @@
     "window": {
       "output": "glasses",
       "position": {
-        "x": 100,
-        "y": 100
+        "x": 1400,
+        "y": 0
       },
       "dimensions": {
-        "width": 461,
+        "width": 520,
         "height": 112
       }
     }

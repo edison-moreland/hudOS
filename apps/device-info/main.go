@@ -11,7 +11,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/widget/material"
-	"github.com/edison-moreland/nreal-hud/apps/device-info/components"
+	"github.com/edison-moreland/nreal-hud/go-sdk/components"
 	"github.com/edison-moreland/nreal-hud/go-sdk/system/dbus"
 )
 
@@ -44,7 +44,7 @@ func run(w *app.Window) error {
 	}
 	defer systemDBus.Close()
 
-	networkInfo := components.NetworkInfo(theme)
+	networkInfo := NetworkInfo(theme)
 	batteryDevice := systemDBus.UPowerDaemon().DisplayDevice()
 
 	var ops op.Ops
@@ -68,7 +68,7 @@ func run(w *app.Window) error {
 					return layout.Flex{}.Layout(gtx,
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 							return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-								layout.Rigid(components.Clock(theme).Layout),
+								layout.Rigid(components.Clock(theme, 110).Layout),
 								layout.Flexed(1, networkInfo.Layout),
 							)
 						}),

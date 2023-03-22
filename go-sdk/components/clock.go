@@ -5,6 +5,7 @@ import (
 
 	"gioui.org/layout"
 	"gioui.org/op"
+	"gioui.org/unit"
 	"gioui.org/widget/material"
 )
 
@@ -12,9 +13,9 @@ type clock struct {
 	material.LabelStyle
 }
 
-func Clock(th *material.Theme) *clock {
+func Clock(th *material.Theme, size unit.Sp) *clock {
 	return &clock{
-		LabelStyle: MonoLabel(th, 110, time.Now().Format("15:04 PM")),
+		LabelStyle: MonoLabel(th, size, time.Now().Format("15:04 PM")),
 	}
 }
 
