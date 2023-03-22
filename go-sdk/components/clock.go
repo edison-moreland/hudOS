@@ -15,7 +15,7 @@ type clock struct {
 
 func Clock(th *material.Theme, size unit.Sp) *clock {
 	return &clock{
-		LabelStyle: MonoLabel(th, size, time.Now().Format("15:04 PM")),
+		LabelStyle: MonoLabel(th, size, time.Now().Format("03:04 PM")),
 	}
 }
 
