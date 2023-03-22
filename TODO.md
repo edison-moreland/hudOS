@@ -5,6 +5,7 @@
 - [ ] nReal glasses
     - [ ] reverse engineer macos app to figure out 3D support
         - maybe force glasses into a widescreen mode?
+    - [ ] connection is loose when back cover is on
 - [ ] hudctl
     - [ ] app_id field (uuid) to support rename/ act as wayland id
 - [ ] hud_builder
@@ -25,8 +26,11 @@
         - Boot script/ hudctl
     - [ ] Move wifi configuration out of buildroot and into hud_builder devices
     - [ ] Automatically build the correct key into the image when deploying to a device
+        - move key into pre image buildroot hook? key would update every build
     - [ ] Experiment with top level parrallel build
 - [ ] Compositor
+    - [ ] Make phone screen the primary monitor
+    - [ ] Is touch input working?
     - [x] Support positioning apps on both screens
     - [ ] Restart compositor when windows.lua is updated
     - [ ] Could init.lua read the window catalog directly?
