@@ -39,4 +39,7 @@
         - [ ] fix hotplug to remove this hack
 - [ ] Apps
     - [x] device-info: display ip adress/battery/time on phone screen
+        - [ ] add charging indicator
         - to read battery: https://github.com/svenwltr/i3-statusbar/blob/master/upower/upower.go
+    - [x] auto-dim: Use sensor data to automatically dim the phone screen when not in use
+        - proximity sensor
