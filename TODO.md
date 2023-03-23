@@ -7,7 +7,8 @@
         - maybe force glasses into a widescreen mode?
     - [ ] connection is loose when back cover is on
 - [ ] hudctl
-    - [ ] app_id field (uuid) to support rename/ act as wayland id
+    - [ ] Multiple windows support
+        - add id field to app, and another one to windows
 - [ ] hud_builder
     - [ ] allow building apps outside of the project
 - [ ] hudOS
@@ -41,5 +42,3 @@
     - [x] device-info: display ip adress/battery/time on phone screen
         - [ ] add charging indicator
         - to read battery: https://github.com/svenwltr/i3-statusbar/blob/master/upower/upower.go
-    - [x] auto-dim: Use sensor data to automatically dim the phone screen when not in use
-        - proximity sensor
