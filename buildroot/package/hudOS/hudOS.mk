@@ -12,8 +12,6 @@ define HUDOS_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/etc/systemd/system-preset/50-disable_getty.preset; \
 	$(INSTALL) -D -m 644 $(HUDOS_PKGDIR)/fw_env.config \
 		$(TARGET_DIR)/etc/fw_env.config; \
-	$(INSTALL) -D -m 644 $(HUDOS_PKGDIR)/95-proximity-sensor.rules \
-		$(TARGET_DIR)/etc/udev/rules.d/95-proximity-sensor.rules; \
 	$(INSTALL) -D -m 644 $(HUDOS_PKGDIR)/95-nreal-glasses.rules \
 		$(TARGET_DIR)/etc/udev/rules.d/95-nreal-glasses.rules; \
 	$(INSTALL) -D -m 644 $(HUDOS_PKGDIR)/nreal-glasses.target \

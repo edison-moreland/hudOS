@@ -1,1 +1,0 @@
-SUBSYSTEM=="iio", ATTR{name}=="stk3310", GROUP="proximity", MODE="0664"
