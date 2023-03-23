@@ -1,1 +1,1 @@
-SUBSYSTEM=="usb", ATTRS{manufacturer}=="Nreal", TAG+="systemd", ENV{SYSTEMD_WANTS}="nreal-glasses.target", RUN{program}="/usr/bin/touch /opt/hud/glasses_touch"
+SUBSYSTEM=="usb", ATTRS{manufacturer}=="Nreal", TAG+="systemd", ENV{SYSTEMD_WANTS}="nreal-glasses.target"
