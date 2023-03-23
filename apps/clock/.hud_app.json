@@ -24,7 +24,7 @@
     },
     {
       "step": "generate_service",
-      "onGlasses": true,
+      "on_glasses": true,
       "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
     },
     {

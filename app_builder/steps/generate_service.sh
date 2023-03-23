@@ -3,7 +3,8 @@ set -euo pipefail
 
 STEP_CONFIG="$1"
 OUT="$(echo "${STEP_CONFIG}" | jq -r '.out')"
-ON_GLASSES="$(echo "${STEP_CONFIG}" | jq -r '.onGlasses // false')"
+ON_GLASSES="$(echo "${STEP_CONFIG}" | jq -r '.on_glasses // false')"
+SVC_USER="$(echo "${STEP_CONFIG}" | jq -r '.user // "hud"')"
 
 
 cat <<EOF | envsubst >"${OUT}"
@@ -26,8 +27,8 @@ fi
 cat <<EOF | envsubst >>"${OUT}"
 
 [Service]
-User=hud
-Group=hud
+User=${SVC_USER}
+Group=${SVC_USER}
 WorkingDirectory=/opt/hud
 
 Slice=hud.slice
