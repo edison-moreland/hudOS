@@ -1,8 +1,6 @@
 package hud
 
 import (
-	"image/color"
-
 	"gioui.org/app"
 	"gioui.org/font/gofont"
 	"gioui.org/widget/material"
@@ -19,8 +17,8 @@ func App(appName string, appMain HudMain) {
 		)
 
 		theme := material.NewTheme(gofont.Collection()).WithPalette(material.Palette{
-			Fg: color.NRGBA{R: 255, G: 255, B: 255, A: 255},
-			Bg: color.NRGBA{R: 0, G: 0, B: 0, A: 255},
+			Fg: White,
+			Bg: Black,
 		})
 
 		logger := zerolog.New(zerolog.NewConsoleWriter())
