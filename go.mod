@@ -4,6 +4,8 @@ go 1.20
 
 require (
 	gioui.org v0.0.0-20230224004350-5f818bc5e7f9
+	github.com/Picovoice/porcupine/binding/go v1.9.2
+	github.com/gen2brain/malgo v0.11.10
 	github.com/go-ble/ble v0.0.0-20230130210458-dd4b07d15402
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/pkg/errors v0.9.1

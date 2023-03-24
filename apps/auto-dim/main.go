@@ -14,7 +14,7 @@ const (
 
 	accelerometerXPath     = "/sys/bus/iio/devices/iio:device1/in_accel_x_raw"
 	accelerometerYPath     = "/sys/bus/iio/devices/iio:device1/in_accel_y_raw"
-	accelerometerThreshold = 500
+	accelerometerThreshold = 1000
 )
 
 func main() {

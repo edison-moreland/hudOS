@@ -1,0 +1,26 @@
+{
+    "app": {
+        "name": "voice-activation"
+    },
+    "build": [
+        {
+            "step": "build_go",
+            "target": "${SOURCE_DIR}/",
+            "out": "${WORKSPACE_DIR}/${APP_NAME}"
+        },
+        {
+            "step": "generate_service",
+            "user": "root",
+            "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+        },
+        {
+            "step": "bundle_app",
+            "binaries": [
+                "${WORKSPACE_DIR}/${APP_NAME}"
+            ],
+            "units": [
+                "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+            ]
+        }
+    ]
+}
