@@ -1,39 +1,39 @@
 {
-  "app": {
-    "name": "device-info",
-    "window": {
-      "output": "phone",
-      "position": {
-        "x": 0,
-        "y": 0
-      },
-      "dimensions": {
-        "width": 720,
-        "height": 300
-      }
-    }
-  },
-  "build": [
-    {
-      "step": "build_go",
-      "target": "${SOURCE_DIR}/",
-      "out": "${WORKSPACE_DIR}/${APP_NAME}",
-      "tags": [
-        "nox11"
-      ]
+    "app": {
+        "name": "device-info",
+        "window": {
+            "output": "phone",
+            "position": {
+                "x": 0,
+                "y": 0
+            },
+            "dimensions": {
+                "width": 720,
+                "height": 300
+            }
+        }
     },
-    {
-      "step": "generate_service",
-      "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
-    },
-    {
-      "step": "bundle_app",
-      "binaries": [
-          "${WORKSPACE_DIR}/${APP_NAME}"
-      ],
-      "units": [
-          "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
-      ]
-    }
-  ]
+    "build": [
+        {
+            "step": "build_go",
+            "target": "${SOURCE_DIR}/",
+            "out": "${WORKSPACE_DIR}/${APP_NAME}",
+            "tags": [
+                "nox11"
+            ]
+        },
+        {
+            "step": "generate_service",
+            "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+        },
+        {
+            "step": "bundle_app",
+            "binaries": [
+                "${WORKSPACE_DIR}/${APP_NAME}"
+            ],
+            "units": [
+                "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+            ]
+        }
+    ]
 }

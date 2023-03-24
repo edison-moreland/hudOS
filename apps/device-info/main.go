@@ -1,43 +1,23 @@
 package main
 
 import (
-	"image/color"
-	"log"
-	"os"
-
 	"gioui.org/app"
-	"gioui.org/font/gofont"
-	giosystem "gioui.org/io/system"
+	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/widget/material"
-	"github.com/edison-moreland/nreal-hud/go-sdk/components"
+	"github.com/rs/zerolog"
+
+	"github.com/edison-moreland/nreal-hud/go-sdk/hud"
+	"github.com/edison-moreland/nreal-hud/go-sdk/hud/components"
 	"github.com/edison-moreland/nreal-hud/go-sdk/system/dbus"
 )
 
 func main() {
-	go func() {
-		w := app.NewWindow(
-			app.Decorated(false),
-		)
-		err := run(w)
-		if err != nil {
-			log.Fatal(err)
-		}
-		os.Exit(0)
-	}()
-	app.Main()
+	hud.App("device-info", hudMain)
 }
 
-func run(w *app.Window) error {
-	theme := material.NewTheme(gofont.Collection())
-	{
-		fg := theme.Fg
-		bg := theme.Bg
-		theme.Fg = fg
-		theme.Bg = bg
-	}
-
+func hudMain(window *app.Window, theme *material.Theme, logger zerolog.Logger) error {
 	systemDBus, err := dbus.NewSystemDbus()
 	if err != nil {
 		return err
@@ -49,19 +29,16 @@ func run(w *app.Window) error {
 
 	var ops op.Ops
 	for {
-		e := <-w.Events()
-		switch e := e.(type) {
-		case giosystem.DestroyEvent:
-			return e.Err
-		case giosystem.FrameEvent:
-			gtx := layout.NewContext(&ops, e)
+		event := <-window.Events()
+		switch event := event.(type) {
+		case system.DestroyEvent:
+			return event.Err
+
+		case system.FrameEvent:
+			gtx := layout.NewContext(&ops, event)
 			// Color background
-			components.Fill(color.NRGBA{
-				R: 0,
-				G: 0,
-				B: 0,
-				A: 255,
-			}).Layout(gtx, gtx.Constraints.Max)
+			components.Fill(theme.Bg).
+				Layout(gtx, gtx.Constraints.Max)
 
 			layout.UniformInset(10).Layout(gtx,
 				func(gtx layout.Context) layout.Dimensions {
@@ -77,7 +54,7 @@ func run(w *app.Window) error {
 				},
 			)
 
-			e.Frame(gtx.Ops)
+			event.Frame(gtx.Ops)
 		}
 	}
 }

@@ -7,6 +7,7 @@ require (
 	github.com/go-ble/ble v0.0.0-20230130210458-dd4b07d15402
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/pkg/errors v0.9.1
+	github.com/rs/zerolog v1.29.0
 )
 
 require (
@@ -16,8 +17,8 @@ require (
 	github.com/benoitkugler/textlayout v0.3.0 // indirect
 	github.com/go-text/typesetting v0.0.0-20221214153724-0399769901d5 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/mattn/go-colorable v0.1.6 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mgutz/logxi v0.0.0-20161027140823-aebf8a7d67ab // indirect
 	github.com/raff/goble v0.0.0-20190909174656-72afc67d6a99 // indirect
