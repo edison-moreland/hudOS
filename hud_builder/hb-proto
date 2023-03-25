@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#-Help: Build protobuf files
+
+HB_PROTOC="${HB_VENDOR_DIR}/proto/protoc/bin/protoc"
+HB_PROTOC_INCLUDE="${HB_VENDOR_DIR}/proto/protoc/include"
+HB_PROTOC_GEN_GO="${HB_VENDOR_DIR}/proto/protoc-gen-go/protoc-gen-go"
+HB_PROTO_INPUT_DIR="${HB_REPOSITORY_DIR}/proto"
+HB_PROTO_OUTPUT_DIR="${HB_BUILD_DIR}/proto"
+HB_PROTO_GO_OUTPUT_DIR="${HB_PROTO_OUTPUT_DIR}/go"
+
+mkdir -p "${HB_PROTO_GO_OUTPUT_DIR}"
+
+"${HB_PROTOC}" \
+    --plugin "${HB_PROTOC_GEN_GO}" \
+    -I "${HB_PROTOC_INCLUDE}" \
+    -I "${HB_PROTO_INPUT_DIR}" \
+    --go_out="${HB_PROTO_GO_OUTPUT_DIR}" \
+    --go_opt=paths=source_relative \
+    "${HB_PROTO_INPUT_DIR}"/**/*.proto

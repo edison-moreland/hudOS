@@ -31,3 +31,4 @@ require (
 )
 
 replace gioui.org => ./.build/vendor/go/gio
+replace github.com/edison-moreland/nreal-hud/proto => ./.build/proto/go

@@ -14,6 +14,9 @@ export HB_VENDOR_FILE="${HB_REPOSITORY_DIR}/vendor.json"
 export HB_VENDOR_DIR="${HB_BUILD_DIR}/vendor"
 export HB_OUTPUT_DIR="${HB_REPOSITORY_DIR}/output"
 
+
+HB_PROTO_GO_OUTPUT_DIR=""
+
 export PATH="${HB_COMMANDS_DIR}:${PATH}"
 
 source "${HB_LIB_DIR}/logging.sh"

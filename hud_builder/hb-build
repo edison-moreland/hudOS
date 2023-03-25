@@ -40,6 +40,7 @@ if [ "${clear_cache}" == "true" ]; then
 fi
 
 hb-vendor
+hb-proto # This is not a no-op if files haven't changed
 
 app_bundles=()
 for app_manifest in "${HB_APPS_DIR}"/**/.hud_app.json; do
