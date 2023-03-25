@@ -1,19 +1,44 @@
 #!/usr/bin/env bash
 #-Help: Build protobuf files
 
+# TODO: Trigger full rebuild
 HB_PROTOC="${HB_VENDOR_DIR}/proto/protoc/bin/protoc"
-HB_PROTOC_INCLUDE="${HB_VENDOR_DIR}/proto/protoc/include"
 HB_PROTOC_GEN_GO="${HB_VENDOR_DIR}/proto/protoc-gen-go/protoc-gen-go"
+HB_PROTOC_GEN_GO_GRPC="${HB_VENDOR_DIR}/proto/protoc-gen-go/protoc-gen-go-grpc"
+
+HB_PROTOC_INCLUDE="${HB_VENDOR_DIR}/proto/protoc/include"
 HB_PROTO_INPUT_DIR="${HB_REPOSITORY_DIR}/proto"
 HB_PROTO_OUTPUT_DIR="${HB_BUILD_DIR}/proto"
+
 HB_PROTO_GO_OUTPUT_DIR="${HB_PROTO_OUTPUT_DIR}/go"
+HB_PROTO_GO_OUTPUT_MOD="${HB_PROTO_GO_OUTPUT_DIR}/go.mod"
+
+GO="${HB_VENDOR_DIR}/go/go/bin/go"
+# There are no pre built binaries that we could vendor
+# I want a better solution for this
+if [[ ! -f "${HB_PROTOC_GEN_GO_GRPC}" ]]; then
+    GOBIN="$(realpath "${HB_VENDOR_DIR}/proto/protoc-gen-go")"
+    GOBIN="${GOBIN}" "${GO}" get -u "google.golang.org/grpc@v1.2"
+fi
 
 mkdir -p "${HB_PROTO_GO_OUTPUT_DIR}"
 
 "${HB_PROTOC}" \
     --plugin "${HB_PROTOC_GEN_GO}" \
+    --plugin "${HB_PROTOC_GEN_GO_GRPC}" \
     -I "${HB_PROTOC_INCLUDE}" \
     -I "${HB_PROTO_INPUT_DIR}" \
     --go_out="${HB_PROTO_GO_OUTPUT_DIR}" \
     --go_opt=paths=source_relative \
+    --go-grpc_out="${HB_PROTO_GO_OUTPUT_DIR}" \
+    --go-grpc_opt=paths=source_relative \
     "${HB_PROTO_INPUT_DIR}"/**/*.proto
+
+# This is so we can redirect the proto package into the build dir
+if [[ ! -f "${HB_PROTO_GO_OUTPUT_MOD}" ]]; then
+    # Inherit the mod path from repo root
+    mod_path="$("${GO}" mod edit -C "${HB_REPOSITORY_DIR}" -json | jq -r '.Module.Path')"
+
+    (cd "${HB_PROTO_GO_OUTPUT_DIR}"; "${GO}" mod init "${mod_path}/proto")
+fi
+(cd "${HB_PROTO_GO_OUTPUT_DIR}"; "${GO}" mod tidy)
