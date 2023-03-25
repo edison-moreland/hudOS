@@ -1,0 +1,36 @@
+syntax = "proto3";
+package timers;
+
+option go_package = "github.com/edison-moreland/nreal-hud/proto/timers";
+
+message Timer {
+    string name = 1;
+    uint64 lengthSeconds = 2;
+}
+
+service TimerService {
+    rpc NewTimer(NewTimerRequest) returns (NewTimerResponse);
+    rpc StopTimer(StopTimerRequest) returns (StopTimerResponse);
+    rpc ListTimers(ListTimersRequest) returns (ListTimersResponse);
+}
+
+message NewTimerRequest {
+    Timer timer = 1;
+}
+
+message NewTimerResponse {
+}
+
+message StopTimerRequest {
+    string name = 1;
+}
+
+message StopTimerResponse {
+}
+
+message ListTimersRequest {
+}
+
+message ListTimersResponse {
+    repeated Timer timers = 1;
+}

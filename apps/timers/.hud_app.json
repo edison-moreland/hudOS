@@ -1,0 +1,31 @@
+{
+    "app": {
+        "name": "timers"
+    },
+    "build": [
+        {
+            "step": "build_go",
+            "target": "${SOURCE_DIR}/daemon",
+            "out": "${WORKSPACE_DIR}/${APP_NAME}"
+        },
+        {
+            "step": "build_go",
+            "target": "${SOURCE_DIR}/ui",
+            "out": "${WORKSPACE_DIR}/${APP_NAME}-ui"
+        },
+        {
+            "step": "generate_service",
+            "out": "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+        },
+        {
+            "step": "bundle_app",
+            "binaries": [
+                "${WORKSPACE_DIR}/${APP_NAME}",
+                "${WORKSPACE_DIR}/${APP_NAME}-ui"
+            ],
+            "units": [
+                "${WORKSPACE_DIR}/hud-${APP_NAME}.service"
+            ]
+        }
+    ]
+}
