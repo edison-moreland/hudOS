@@ -15,6 +15,18 @@
         ]
     },
     {
+        "name": "proto/protoc",
+        "type": "zip",
+        "url": "https://github.com/protocolbuffers/protobuf/releases/download/v22.2/protoc-22.2-linux-x86_64.zip",
+        "version": "15f281b36897e0ffbbe3a02f687ff9108c7a0f98bb653fb433e4bd62e698abe7"
+    },
+    {
+        "name": "proto/protoc-gen-go",
+        "type": "tar",
+        "url": "https://github.com/protocolbuffers/protobuf-go/releases/download/v1.30.0/protoc-gen-go.v1.30.0.linux.amd64.tar.gz",
+        "version": "6a716905cdb0c10e9ed616ee57860e38b4738f25dc3264b61736735b69fd286c"
+    },
+    {
         "name": "towboot",
         "type": "tar",
         "url": "https://github.com/Tow-Boot/Tow-Boot/releases/download/release-2021.10-005/pine64-pinephonePro-2021.10-005.tar.xz",

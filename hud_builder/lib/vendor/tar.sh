@@ -57,5 +57,11 @@ function tar_download() {
 	fi
 
     mkdir -p "${dep_dir}"
-    tar --strip-components=1 -xf "${tar_path}" -C "${dep_dir}"
+
+    first_file="$(tar -tf "${tar_path}" | head -n1 || true)"
+    if [[ "${first_file}" =~ /$  ]]; then
+        tar --strip-components=1 -xf "${tar_path}" -C "${dep_dir}"
+    else
+        tar -xf "${tar_path}" -C "${dep_dir}"
+    fi
 }

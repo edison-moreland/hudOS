@@ -4,6 +4,7 @@ source "${HB_LIB_DIR}/logging.sh"
 source "${HB_LIB_DIR}/json.sh"
 source "${HB_LIB_DIR}/vendor/git.sh"
 source "${HB_LIB_DIR}/vendor/tar.sh"
+source "${HB_LIB_DIR}/vendor/zip.sh"
 
 function should_update() {
     case "${1}" in
@@ -12,6 +13,9 @@ function should_update() {
         ;;
     "tar")
         tar_should_update "${@:2}"
+        ;;
+    "zip")
+        zip_should_update "${@:2}"
         ;;
     *)
         log_red "Vendor type ${1} is not supported"
@@ -28,6 +32,9 @@ function update() {
     "tar")
         tar_update "${@:2}"
         ;;
+    "zip")
+        zip_update "${@:2}"
+        ;;
     *)
         log_red "Vendor type ${1} is not supported"
         exit 1
@@ -42,6 +49,9 @@ function download() {
         ;;
     "tar")
         tar_download "${@:2}"
+        ;;
+    "zip")
+        zip_download "${@:2}"
         ;;
     *)
         log_red "Vendor type ${1} is not supported"
