@@ -23,16 +23,29 @@ fi
 
 mkdir -p "${HB_PROTO_GO_OUTPUT_DIR}"
 
-"${HB_PROTOC}" \
-    --plugin "${HB_PROTOC_GEN_GO}" \
-    --plugin "${HB_PROTOC_GEN_GO_GRPC}" \
-    -I "${HB_PROTOC_INCLUDE}" \
-    -I "${HB_PROTO_INPUT_DIR}" \
-    --go_out="${HB_PROTO_GO_OUTPUT_DIR}" \
-    --go_opt=paths=source_relative \
-    --go-grpc_out="${HB_PROTO_GO_OUTPUT_DIR}" \
-    --go-grpc_opt=paths=source_relative \
-    "${HB_PROTO_INPUT_DIR}"/**/*.proto
+for proto_file in "${HB_PROTO_INPUT_DIR}"/**/*.proto; do
+    proto_name="$(realpath --relative-to="${HB_PROTO_INPUT_DIR}" "${proto_file}" | sed 's/\.proto$//')"
+    proto_stamp="${HB_PROTO_OUTPUT_DIR}/stamps/${proto_name}.stamp"
+
+    mkdir -p "$(dirname "${proto_stamp}")"
+    if [[ "${proto_file}" -ot "${proto_stamp}" ]]; then
+        continue
+    fi
+    touch "${proto_stamp}"
+
+    rm -rf "${HB_PROTO_GO_OUTPUT_DIR:?}/${proto_name:?}*"
+
+    "${HB_PROTOC}" \
+        --plugin "${HB_PROTOC_GEN_GO}" \
+        --plugin "${HB_PROTOC_GEN_GO_GRPC}" \
+        -I "${HB_PROTOC_INCLUDE}" \
+        -I "${HB_PROTO_INPUT_DIR}" \
+        --go_out="${HB_PROTO_GO_OUTPUT_DIR}" \
+        --go_opt=paths=source_relative \
+        --go-grpc_out="${HB_PROTO_GO_OUTPUT_DIR}" \
+        --go-grpc_opt=paths=source_relative \
+        "${proto_file}"
+done
 
 # This is so we can redirect the proto package into the build dir
 if [[ ! -f "${HB_PROTO_GO_OUTPUT_MOD}" ]]; then
