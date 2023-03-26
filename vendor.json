@@ -27,6 +27,12 @@
         "version": "6a716905cdb0c10e9ed616ee57860e38b4738f25dc3264b61736735b69fd286c"
     },
     {
+        "name": "proto/grpcurl",
+        "type": "tar",
+        "url": "https://github.com/fullstorydev/grpcurl/releases/download/v1.8.7/grpcurl_1.8.7_linux_arm64.tar.gz",
+        "version": "9859ba9e1855748ef76c47673e033a374fe3a8d5f0d516baa6befd00b4de0b43"
+    },
+    {
         "name": "towboot",
         "type": "tar",
         "url": "https://github.com/Tow-Boot/Tow-Boot/releases/download/release-2021.10-005/pine64-pinephonePro-2021.10-005.tar.xz",

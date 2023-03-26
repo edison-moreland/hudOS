@@ -25,17 +25,17 @@ mkdir -p "${HB_PROTO_GO_OUTPUT_DIR}"
 
 for proto_file in "${HB_PROTO_INPUT_DIR}"/**/*.proto; do
     proto_name="$(realpath --relative-to="${HB_PROTO_INPUT_DIR}" "${proto_file}" | sed 's/\.proto$//')"
-    proto_stamp="${HB_PROTO_OUTPUT_DIR}/stamps/${proto_name}.stamp"
+    proto_descriptor="${HB_PROTO_OUTPUT_DIR}/descriptors/${proto_name}"
 
-    mkdir -p "$(dirname "${proto_stamp}")"
-    if [[ "${proto_file}" -ot "${proto_stamp}" ]]; then
+    mkdir -p "$(dirname "${proto_descriptor}")"
+    if [[ "${proto_file}" -ot "${proto_descriptor}" ]]; then
         continue
     fi
-    touch "${proto_stamp}"
 
     rm -rf "${HB_PROTO_GO_OUTPUT_DIR:?}/${proto_name:?}*"
-
+    
     "${HB_PROTOC}" \
+        --descriptor_set_out="${proto_descriptor}" \
         --plugin "${HB_PROTOC_GEN_GO}" \
         --plugin "${HB_PROTOC_GEN_GO_GRPC}" \
         -I "${HB_PROTOC_INCLUDE}" \
