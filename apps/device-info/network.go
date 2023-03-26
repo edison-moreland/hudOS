@@ -7,7 +7,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/widget/material"
 
-	"github.com/edison-moreland/nreal-hud/go-sdk/hud/components"
+	"github.com/edison-moreland/nreal-hud/go-sdk/app/hud/components"
 )
 
 // Information to display

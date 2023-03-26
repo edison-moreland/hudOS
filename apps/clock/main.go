@@ -8,8 +8,8 @@ import (
 	"gioui.org/widget/material"
 	"github.com/rs/zerolog"
 
-	"github.com/edison-moreland/nreal-hud/go-sdk/hud"
-	"github.com/edison-moreland/nreal-hud/go-sdk/hud/components"
+	"github.com/edison-moreland/nreal-hud/go-sdk/app/hud"
+	"github.com/edison-moreland/nreal-hud/go-sdk/app/hud/components"
 	"github.com/edison-moreland/nreal-hud/go-sdk/system/dbus"
 )
 
