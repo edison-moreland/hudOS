@@ -8,7 +8,7 @@ message Timer {
     uint64 lengthSeconds = 2;
 }
 
-service TimerService {
+service Timers {
     rpc NewTimer(NewTimerRequest) returns (NewTimerResponse);
     rpc StopTimer(StopTimerRequest) returns (StopTimerResponse);
     rpc ListTimers(ListTimersRequest) returns (ListTimersResponse);
