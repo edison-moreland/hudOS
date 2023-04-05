@@ -1,0 +1,10 @@
+syntax = "proto3";
+package hud;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/edison-moreland/nreal-hud/proto/hud";
+
+extend google.protobuf.ServiceOptions {
+  optional uint64 port = 50001;
+}

@@ -1,6 +1,8 @@
 syntax = "proto3";
 package timers;
 
+import "hud/hud.proto";
+
 option go_package = "github.com/edison-moreland/nreal-hud/proto/timers";
 
 message Timer {
@@ -9,6 +11,8 @@ message Timer {
 }
 
 service Timers {
+    option (hud.port) = 9090;
+
     rpc NewTimer(NewTimerRequest) returns (NewTimerResponse);
     rpc StopTimer(StopTimerRequest) returns (StopTimerResponse);
     rpc ListTimers(ListTimersRequest) returns (ListTimersResponse);

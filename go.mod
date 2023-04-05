@@ -4,11 +4,14 @@ go 1.20
 
 require (
 	gioui.org v0.0.0-20230224004350-5f818bc5e7f9
+	github.com/dave/jennifer v1.6.0
 	github.com/edison-moreland/nreal-hud/proto v0.0.0-00010101000000-000000000000
 	github.com/go-ble/ble v0.0.0-20230130210458-dd4b07d15402
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.29.0
+	google.golang.org/grpc v1.54.0
+	google.golang.org/protobuf v1.30.0
 )
 
 require (
@@ -32,8 +35,6 @@ require (
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20230323212658-478b75c54725 // indirect
-	google.golang.org/grpc v1.54.0 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
 )
 
 replace gioui.org => ./.build/vendor/go/gio

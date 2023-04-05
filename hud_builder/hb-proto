@@ -5,10 +5,13 @@
 HB_PROTOC="${HB_VENDOR_DIR}/proto/protoc/bin/protoc"
 HB_PROTOC_GEN_GO="${HB_VENDOR_DIR}/proto/protoc-gen-go/protoc-gen-go"
 HB_PROTOC_GEN_GO_GRPC="${HB_VENDOR_DIR}/proto/protoc-gen-go/protoc-gen-go-grpc"
+HB_PROTOC_GEN_GO_HUD="${HB_VENDOR_DIR}/proto/protoc-gen-go/protoc-gen-go-hud"
 
 HB_PROTOC_INCLUDE="${HB_VENDOR_DIR}/proto/protoc/include"
 HB_PROTO_INPUT_DIR="${HB_REPOSITORY_DIR}/proto"
 HB_PROTO_OUTPUT_DIR="${HB_BUILD_DIR}/proto"
+
+# TODO: Make adding plugins more generic
 
 HB_PROTO_GO_OUTPUT_DIR="${HB_PROTO_OUTPUT_DIR}/go"
 HB_PROTO_GO_OUTPUT_MOD="${HB_PROTO_GO_OUTPUT_DIR}/go.mod"
@@ -19,6 +22,11 @@ GO="${HB_VENDOR_DIR}/go/go/bin/go"
 if [[ ! -f "${HB_PROTOC_GEN_GO_GRPC}" ]]; then
     GOBIN="$(realpath "${HB_VENDOR_DIR}/proto/protoc-gen-go")"
     GOBIN="${GOBIN}" "${GO}" get -u "google.golang.org/grpc@v1.2"
+fi
+
+hud_plugin="${HB_REPOSITORY_DIR}/go-sdk/protoc-gen-go-hud/main.go"
+if [[ "${hud_plugin}" -nt "${HB_PROTOC_GEN_GO_HUD}" ]]; then
+    "${GO}" build -o "${HB_PROTOC_GEN_GO_HUD}" "${hud_plugin}" 
 fi
 
 mkdir -p "${HB_PROTO_GO_OUTPUT_DIR}"
@@ -38,12 +46,15 @@ for proto_file in "${HB_PROTO_INPUT_DIR}"/**/*.proto; do
         --descriptor_set_out="${proto_descriptor}" \
         --plugin "${HB_PROTOC_GEN_GO}" \
         --plugin "${HB_PROTOC_GEN_GO_GRPC}" \
+        --plugin "${HB_PROTOC_GEN_GO_HUD}" \
         -I "${HB_PROTOC_INCLUDE}" \
         -I "${HB_PROTO_INPUT_DIR}" \
         --go_out="${HB_PROTO_GO_OUTPUT_DIR}" \
         --go_opt=paths=source_relative \
         --go-grpc_out="${HB_PROTO_GO_OUTPUT_DIR}" \
         --go-grpc_opt=paths=source_relative \
+        --go-hud_out="${HB_PROTO_GO_OUTPUT_DIR}" \
+        --go-hud_opt=paths=source_relative \
         "${proto_file}"
 done
 

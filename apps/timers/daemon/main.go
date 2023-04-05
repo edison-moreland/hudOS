@@ -11,7 +11,7 @@ import (
 
 // Daemon listens for protobuf messages, and manages the timer windows
 func main() {
-	service.ServiceGRPC("timers", &timers.Timers_ServiceDesc, func(logger zerolog.Logger) (interface{}, error) {
+	service.ServiceGRPC("timers", timers.Timers_HudServiceDesc{}, func(logger zerolog.Logger) (interface{}, error) {
 		return &TimersService{
 			Logger: logger,
 		}, nil
