@@ -1,16 +1,16 @@
 {
-    "app": {
-        "name": "gRPCurl"
-    },
-    "build": [
-        {
-          "step": "bundle_app",
-          "binaries": [
-            "${VENDOR_DIR}/proto/grpcurl/grpcurl"
-          ],
-          "configs": [
-            "${PROTO_DIR}/descriptors/**/*"
-          ]
-        }
+  "app": {
+    "name": "gRPCurl"
+  },
+  "build": [
+    {
+      "step": "bundle_app",
+      "binaries": [
+        "${VENDOR_DIR}/proto/grpcurl/grpcurl"
+      ],
+      "configs": [
+        "${PROTO_DIR}/descriptors/**/*"
       ]
+    }
+  ]
 }
